@@ -2,6 +2,7 @@
 #
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+import logging
 
 from scrapy import signals
 
@@ -71,7 +72,9 @@ class JavcrawlDownloaderMiddleware:
     def process_request(self, request, spider):
         # Called for each request that goes through the downloader
         # middleware.
-
+        proxy = "http://localhost:7890"
+        request.meta["proxy"] = proxy
+        logging.info(f"TestProxyMiddleware --> {proxy}")
         # Must either:
         # - return None: continue processing this request
         # - or return a Response object
