@@ -859,7 +859,7 @@ def insert_tag(cursor):
         tag_list = tag_re.findall(line)
         for tag in tag_list:
             # print(tag)
-            name = convert(tag[1: -4], 'zh-cn')
+            name = tag[1: -4]
             cursor.execute(insert, (name, big_type, 'javbus'))
 
 
