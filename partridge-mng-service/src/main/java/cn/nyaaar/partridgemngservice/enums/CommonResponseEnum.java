@@ -56,7 +56,7 @@ public enum CommonResponseEnum implements CommonExceptionAssert {
      *
      * @param response 远程调用的响应
      */
-    public static void assertSuccess(BaseResponse response) {
+    public static void assertSuccess(BaseResponse response) throws BaseException {
         SERVER_ERROR.assertNotNull(response);
         int code = response.getCode();
         if (CommonResponseEnum.SUCCESS.getCode() != code) {

@@ -130,6 +130,26 @@
 			<artifactId>hutool-all</artifactId>
 			<version>5.8.5</version>
 		</dependency>
+
+
+		<!-- okhttp3 依赖-->
+		<dependency>
+			<groupId>io.freefair.okhttp-spring-boot</groupId>
+			<artifactId>okhttp3-spring-boot-starter</artifactId>
+			<version>2.6.10</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.14.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.83</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
