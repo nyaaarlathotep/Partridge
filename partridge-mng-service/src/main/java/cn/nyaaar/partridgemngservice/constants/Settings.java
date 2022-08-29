@@ -257,7 +257,7 @@ public class Settings {
     private static final String KEY_REQUEST_NEWS = "request_news";
     private static final boolean DEFAULT_REQUEST_NEWS = true;
     //    private static Context sContext;
-    private static Map sSettingsPre = new HashMap();
+    private static Map<String,Object> sSettingsPre = new HashMap<>();
     private static EhConfig sEhConfig;
 
 //    public static void initialize(Context context) {
@@ -307,6 +307,9 @@ public class Settings {
     public static boolean getBoolean(String key, boolean defValue) {
         try {
             Object bool = sSettingsPre.get(key);
+            if (null == bool) {
+                return defValue;
+            }
             return (boolean) bool;
         } catch (ClassCastException e) {
             log.error(TAG, "Get ClassCastException when get " + key + " value", e);
@@ -321,6 +324,9 @@ public class Settings {
     public static int getInt(String key, int defValue) {
         try {
             Object integer = sSettingsPre.get(key);
+            if (null == integer) {
+                return defValue;
+            }
             return (int) integer;
         } catch (ClassCastException e) {
             log.error(TAG, "Get ClassCastException when get " + key + " value", e);
@@ -335,6 +341,9 @@ public class Settings {
     public static long getLong(String key, long defValue) {
         try {
             Object integer = sSettingsPre.get(key);
+            if (null == integer) {
+                return defValue;
+            }
             return (long) integer;
         } catch (ClassCastException e) {
             log.error(TAG, "Get ClassCastException when get " + key + " value", e);
@@ -349,6 +358,9 @@ public class Settings {
     public static float getFloat(String key, float defValue) {
         try {
             Object integer = sSettingsPre.get(key);
+            if (null == integer) {
+                return defValue;
+            }
             return (float) integer;
         } catch (ClassCastException e) {
             log.error(TAG, "Get ClassCastException when get " + key + " value", e);
@@ -362,8 +374,11 @@ public class Settings {
 
     public static String getString(String key, String defValue) {
         try {
-            Object integer = sSettingsPre.get(key);
-            return (String) integer;
+            Object string = sSettingsPre.get(key);
+            if (null == string) {
+                return defValue;
+            }
+            return (String) string;
         } catch (ClassCastException e) {
             log.error(TAG, "Get ClassCastException when get " + key + " value", e);
             return defValue;

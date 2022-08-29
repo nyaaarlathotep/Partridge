@@ -1,7 +1,3 @@
-/**
- * Saicfinance.com Inc.
- * Copyright (c) 1994-2022 All Rights Reserved.
- */
 package cn.nyaaar.partridgemngservice.service.eh;
 
 import cn.nyaaar.partridgemngservice.PartridgeMngServiceApplication;

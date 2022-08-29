@@ -1,13 +1,8 @@
-/**
- * Saicfinance.com Inc.
- * Copyright (c) 1994-2022 All Rights Reserved.
- */
 package cn.nyaaar.partridgemngservice.service.eh;
 
 import cn.nyaaar.partridgemngservice.constants.EhUrl;
 import cn.nyaaar.partridgemngservice.constants.Settings;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
-import cn.nyaaar.partridgemngservice.exception.eh.EhException;
 import cn.nyaaar.partridgemngservice.exception.eh.ParseException;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryInfo;
 import cn.nyaaar.partridgemngservice.util.ExceptionUtils;
@@ -37,63 +32,67 @@ import java.util.List;
 @Slf4j
 public class EhEngine {
 
-    @Autowired
     private OkHttpClient okHttpClient;
-    public static EhFilter sEhFilter;
+
+    public static EhFilter sEhFilter = EhFilter.getInstance();
     public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");
     private static final String SAD_PANDA_TYPE = "image/gif";
     private static final String SAD_PANDA_LENGTH = "9615";
     private static final String SAD_PANDA_DISPOSITION = "inline; filename=\"sadpanda.jpg\"";
     private static final String KOKOMADE_URL = "https://exhentai.org/img/kokomade.jpg";
-    private static final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");
 
+
+    @Autowired
+    public void DI(OkHttpClient okHttpClient) {
+        this.okHttpClient = okHttpClient;
+    }
 
     private static void doThrowException(Call call, int code, @Nullable Headers headers,
-                                         @Nullable String body, Throwable e) throws Throwable {
+                                         @Nullable String body, Exception e) throws Exception {
         if (call.isCanceled()) {
-            throw new EhException("call cancelled");
+            BusinessExceptionEnum.HTTP_REQUEST_FAILED.assertFail();
         }
 
         // Check sad panda
         if (headers != null && SAD_PANDA_DISPOSITION.equals(headers.get("Content-Disposition")) &&
                 SAD_PANDA_TYPE.equals(headers.get("Content-Type")) &&
                 SAD_PANDA_LENGTH.equals(headers.get("Content-Length"))) {
-            throw new EhException("Sad Panda");
+
+            BusinessExceptionEnum.SAD_PANDA.assertFail();
         }
 
         // Check sad panda(without panda)
         if (headers != null && "text/html; charset=UTF-8".equals(headers.get("Content-Type")) &&
                 "0".equals(headers.get("Content-Length"))) {
-            throw new EhException("Sad Panda\n(without panda)");
+            BusinessExceptionEnum.SAD_PANDA_WITHOUT.assertFail();
         }
 
         // Check kokomade
         if (body != null && body.contains(KOKOMADE_URL)) {
-            throw new EhException("今回はここまで\n\n");
+            BusinessExceptionEnum.END_HERE.assertFail();
         }
 
         if (body != null && body.contains("Gallery Not Available - ")) {
             String error = GalleryNotAvailableParser.parse(body);
             if (!StringUtils.isEmpty(error)) {
-                throw new EhException(error);
+                BusinessExceptionEnum.GALLERY_NOT_AVAILABLE.assertFail(error);
             }
         }
 
         if (e instanceof ParseException) {
             if (body != null && !body.contains("<")) {
-                throw new EhException(body);
+                BusinessExceptionEnum.PARSE_ERROR.assertFail("body: " + body);
             } else if (StringUtils.isEmpty(body)) {
-                throw new EhException("body is empty");
+                BusinessExceptionEnum.PARSE_ERROR.assertFail("body is empty");
             } else {
-                if (Settings.getSaveParseErrorBody()) {
-//                    AppConfig.saveParseErrorBody((ParseException) e);
-                }
-                throw new EhException("parse error");
+                log.error("unrecognized parse error", e);
+                BusinessExceptionEnum.PARSE_ERROR.assertFail("unrecognized parse error");
             }
         }
 
         if (code >= 400) {
-            throw new EhException(code + " error");
+            BusinessExceptionEnum.HTTP_REQUEST_FAILED.assertFail(code + " error");
         }
         if (e != null) {
             throw e;
@@ -101,16 +100,20 @@ public class EhEngine {
     }
 
     private static void throwException(Call call, int code, @Nullable Headers headers,
-                                       @Nullable String body, Throwable e) throws Throwable {
-        try {
-            doThrowException(call, code, headers, body, e);
-        } catch (Throwable error) {
-            error.printStackTrace();
-            throw error;
+                                       @Nullable String body, Throwable e) {
+        if (e instanceof Error) {
+            ExceptionUtils.throwIfFatal(e);
+        } else if (e instanceof Exception) {
+            try {
+                doThrowException(call, code, headers, body, (Exception) e);
+            } catch (Exception exception) {
+                log.error("unhandled exception", exception);
+                BusinessExceptionEnum.SYSTEM_ERROR_CUSTOM.assertFail(exception.toString());
+            }
         }
     }
 
-    public String signIn(String username, String password) throws Throwable {
+    public String signIn(String username, String password) {
         String referer = "https://forums.e-hentai.org/index.php?act=Login&CODE=00";
         FormBody.Builder builder = new FormBody.Builder()
                 .add("referer", referer)
@@ -131,16 +134,17 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
+        String userName = "";
         try {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
             body = response.body().string();
-            return SignInParser.parse(body);
+            userName = SignInParser.parse(body);
         } catch (Throwable e) {
-            log.error(String.valueOf(call), code, headers, body, e);
-            throw e;
+            throwException(call, code, headers, body, e);
         }
+        return userName;
     }
 
     public GalleryListParser.Result getGalleryList(String url) throws Throwable {
@@ -150,7 +154,7 @@ public class EhEngine {
         Call call = okHttpClient.newCall(request);
         String body = null;
         Headers headers = null;
-        GalleryListParser.Result result;
+        GalleryListParser.Result result = new GalleryListParser.Result();
         int code = -1;
         try {
             Response response = call.execute();
@@ -159,9 +163,7 @@ public class EhEngine {
             body = response.body().string();
             result = GalleryListParser.parse(body);
         } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
             throwException(call, code, headers, body, e);
-            throw e;
         }
 
         fillGalleryList(result.galleryInfoList, url, true);
@@ -222,8 +224,7 @@ public class EhEngine {
         }
     }
 
-    public List<GalleryInfo> fillGalleryListByApi(
-            List<GalleryInfo> galleryInfoList, String referer) throws Throwable {
+    public List<GalleryInfo> fillGalleryListByApi(List<GalleryInfo> galleryInfoList, String referer) throws Throwable {
         // We can only request 25 items one time at most
         final int MAX_REQUEST_SIZE = 25;
         List<GalleryInfo> requestItems = new ArrayList<>(MAX_REQUEST_SIZE);
@@ -238,8 +239,7 @@ public class EhEngine {
     }
 
 
-    private void doFillGalleryListByApi(
-            List<GalleryInfo> galleryInfoList, String referer) throws Throwable {
+    private void doFillGalleryListByApi(List<GalleryInfo> galleryInfoList, String referer) throws Throwable {
         JSONObject json = new JSONObject();
         json.put("method", "gdata");
         JSONArray ja = new JSONArray();
@@ -270,9 +270,7 @@ public class EhEngine {
             body = response.body().string();
             GalleryApiParser.parse(body, galleryInfoList);
         } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            log.error(e.toString());
-            BusinessExceptionEnum.BAD_REQUEST.assertFail();
+            throwException(call, code, headers, body, e);
         }
     }
 }

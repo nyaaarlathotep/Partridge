@@ -4,11 +4,6 @@ import cn.nyaaar.partridgemngservice.exception.assertion.BusinessExceptionAssert
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * @Description: 业务异常枚举
- * @author: yangyang3
- * @date: 2021/7/23
- */
 @AllArgsConstructor
 @Getter
 public enum BusinessExceptionEnum implements BusinessExceptionAssert {
@@ -39,8 +34,12 @@ public enum BusinessExceptionEnum implements BusinessExceptionAssert {
 
     ID_VERIFY_FAIL(200007, "{0}"),
     PHONE_NO_ERROR(200008, "{0}"),
-    PARSE_ERROR(200010,"parse error");
-
+    PARSE_ERROR(200010, "parse error, {0}"),
+    SAD_PANDA(200011, "Sad Panda"),
+    SAD_PANDA_WITHOUT(200011, "Sad Panda(without panda)"),
+    END_HERE(200012, "今回はここまで"),
+    GALLERY_NOT_AVAILABLE(200013, "{0}"),
+    ;
 
     int code;
 

@@ -1,7 +1,3 @@
-/**
- * Saicfinance.com Inc.
- * Copyright (c) 1994-2022 All Rights Reserved.
- */
 package cn.nyaaar.partridgemngservice.config.mybatis.extend;
 
 import com.baomidou.mybatisplus.generator.config.GlobalConfig;
@@ -11,7 +7,7 @@ import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
 import com.baomidou.mybatisplus.generator.config.rules.IColumnType;
 
 /**
- * 扩展Mybatisgenerator生成数字类型字段时对于number(*)会映射为BigDecimal的问题
+ * 扩展Mybatis generator生成数字类型字段时对于number(*)会映射为BigDecimal的问题
  */
 public class NumberConvertor extends MySqlTypeConvert implements ITypeConvert {
 

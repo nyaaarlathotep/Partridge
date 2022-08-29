@@ -7,12 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * Class definition
- *
- * @author Tiger
- * @version 2021/6/18
- */
 public class RestCallExceptionHandler extends DefaultResponseErrorHandler {
     /**
      * @see org.springframework.web.client.ResponseErrorHandler#handleError(ClientHttpResponse)

@@ -17,8 +17,7 @@
 package cn.nyaaar.partridgemngservice.util.parser;
 
 
-import cn.nyaaar.partridgemngservice.exception.BusinessException;
-import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
+import cn.nyaaar.partridgemngservice.exception.eh.EhException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.regex.Matcher;
@@ -32,7 +31,7 @@ public class SignInParser {
             "(?:<h4>The error returned was:</h4>\\s*<p>(.+?)</p>)"
                     + "|(?:<span class=\"postcolor\">(.+?)</span>)");
 
-    public static String parse(String body) throws BusinessException {
+    public static String parse(String body) throws EhException {
         Matcher m = NAME_PATTERN.matcher(body);
         if (m.find()) {
             return m.group(1);
@@ -41,8 +40,7 @@ public class SignInParser {
             if (m.find()) {
                 log.error(m.group(1) == null ? m.group(2) : m.group(1));
             }
-            BusinessExceptionEnum.PARSE_ERROR.assertFail();
+            throw new EhException("parse error, body: " + body);
         }
-        return null;
     }
 }

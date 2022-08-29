@@ -14,11 +14,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-/**
- * @Description: 全局异常处理
- * @author: yangyang3
- * @date: 2021/7/22
- */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler implements Ordered {

@@ -17,16 +17,8 @@
 package cn.nyaaar.partridgemngservice.util;
 
 
-
 import org.springframework.lang.NonNull;
 
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-
-import javax.net.ssl.SSLException;
 
 public final class ExceptionUtils {
 

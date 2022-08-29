@@ -17,8 +17,6 @@
 package cn.nyaaar.partridgemngservice.service.eh;
 
 
-
-
 import cn.nyaaar.partridgemngservice.entity.eh.Filter;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -41,10 +39,10 @@ public final class EhFilter {
     private final List<Filter> mTagNamespaceFilterList = new ArrayList<>();
 
     private EhFilter() {
+//        List<Filter> list = EhDB.getAllFilter();
         List<Filter> list = new ArrayList<>();
         // TODO filter list
-        for (int i = 0, n = list.size(); i < n; i++) {
-            Filter filter = list.get(i);
+        for (Filter filter : list) {
             switch (filter.mode) {
                 case MODE_TITLE -> {
                     filter.text = filter.text.toLowerCase();
@@ -59,7 +57,7 @@ public final class EhFilter {
                     filter.text = filter.text.toLowerCase();
                     mTagNamespaceFilterList.add(filter);
                 }
-                default -> log.error(TAG, "Unknown mode: " + filter.mode);
+                default -> log.error("Unknown mode: " + filter.mode);
             }
         }
     }
@@ -106,7 +104,7 @@ public final class EhFilter {
                 filter.text = filter.text.toLowerCase();
                 mTagNamespaceFilterList.add(filter);
             }
-            default -> log.error(TAG, "Unknown mode: " + filter.mode);
+            default -> log.error("Unknown mode: " + filter.mode);
         }
         return true;
     }
@@ -150,8 +148,8 @@ public final class EhFilter {
         String title = info.title;
         List<Filter> filters = mTitleFilterList;
         if (null != title && filters.size() > 0) {
-            for (int i = 0, n = filters.size(); i < n; i++) {
-                if (filters.get(i).enable && title.toLowerCase().contains(filters.get(i).text)) {
+            for (Filter filter : filters) {
+                if (filter.enable && title.toLowerCase().contains(filter.text)) {
                     return false;
                 }
             }

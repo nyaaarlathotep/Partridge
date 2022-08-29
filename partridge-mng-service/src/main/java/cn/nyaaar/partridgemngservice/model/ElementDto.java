@@ -1,13 +1,5 @@
-/**
- * Saicfinance.com Inc.
- * Copyright (c) 1994-2022 All Rights Reserved.
- */
 package cn.nyaaar.partridgemngservice.model;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
