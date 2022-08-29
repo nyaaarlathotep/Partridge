@@ -2,7 +2,7 @@ package ${package.Service};
 
 import ${package.Entity}.${entity};
 import ${superServiceClassPackage};
-import cn.nyaaar.partridgemngservice.entity.QueryData;
+import cn.nyaaar.partridgemngservice.model.QueryData;
 import java.util.List;
 
 /**

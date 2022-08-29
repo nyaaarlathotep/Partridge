@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.entity;
+package cn.nyaaar.partridgemngservice.model;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
