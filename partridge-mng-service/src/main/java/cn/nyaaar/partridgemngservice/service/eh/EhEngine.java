@@ -4,13 +4,11 @@ import cn.nyaaar.partridgemngservice.constants.EhUrl;
 import cn.nyaaar.partridgemngservice.constants.Settings;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.exception.eh.ParseException;
+import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryInfo;
 import cn.nyaaar.partridgemngservice.util.ExceptionUtils;
 import cn.nyaaar.partridgemngservice.util.StringUtils;
-import cn.nyaaar.partridgemngservice.util.parser.GalleryApiParser;
-import cn.nyaaar.partridgemngservice.util.parser.GalleryListParser;
-import cn.nyaaar.partridgemngservice.util.parser.GalleryNotAvailableParser;
-import cn.nyaaar.partridgemngservice.util.parser.SignInParser;
+import cn.nyaaar.partridgemngservice.util.parser.*;
 import cn.nyaaar.partridgemngservice.util.requestBuilder.EhRequestBuilder;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -147,7 +145,7 @@ public class EhEngine {
         return userName;
     }
 
-    public GalleryListParser.Result getGalleryList(String url) throws Throwable {
+    public GalleryListParser.Result getGalleryList(String url) {
         String referer = EhUrl.getReferer();
         log.info("getGalleryList url:{}", url);
         Request request = new EhRequestBuilder(url, referer).build();
@@ -170,7 +168,7 @@ public class EhEngine {
         return result;
     }
 
-    private void fillGalleryList(List<GalleryInfo> list, String url, boolean filter) throws Throwable {
+    private void fillGalleryList(List<GalleryInfo> list, String url, boolean filter) {
         // Filter title and uploader
         if (filter) {
             for (int i = 0, n = list.size(); i < n; i++) {
@@ -224,7 +222,8 @@ public class EhEngine {
         }
     }
 
-    public List<GalleryInfo> fillGalleryListByApi(List<GalleryInfo> galleryInfoList, String referer) throws Throwable {
+    // At least, GalleryInfo contain valid gid and token
+    public List<GalleryInfo> fillGalleryListByApi(List<GalleryInfo> galleryInfoList, String referer) {
         // We can only request 25 items one time at most
         final int MAX_REQUEST_SIZE = 25;
         List<GalleryInfo> requestItems = new ArrayList<>(MAX_REQUEST_SIZE);
@@ -239,7 +238,7 @@ public class EhEngine {
     }
 
 
-    private void doFillGalleryListByApi(List<GalleryInfo> galleryInfoList, String referer) throws Throwable {
+    private void doFillGalleryListByApi(List<GalleryInfo> galleryInfoList, String referer) {
         JSONObject json = new JSONObject();
         json.put("method", "gdata");
         JSONArray ja = new JSONArray();
@@ -272,5 +271,31 @@ public class EhEngine {
         } catch (Throwable e) {
             throwException(call, code, headers, body, e);
         }
+    }
+
+    public GalleryDetail getGalleryDetail(String url) {
+        String referer = EhUrl.getReferer();
+        log.info("getGalleryDetail url:{}", url);
+        Request request = new EhRequestBuilder(url, referer).build();
+        Call call = okHttpClient.newCall(request);
+
+        String body = null;
+        Headers headers = null;
+        int code = -1;
+        GalleryDetail galleryDetail = null;
+        try {
+            Response response = call.execute();
+            code = response.code();
+            headers = response.headers();
+            body = response.body().string();
+            String html = EventPaneParser.parse(body);
+//            if (html != null) {
+//                EhApplication.getInstance().showEventPane(html);
+//            }
+            galleryDetail = GalleryDetailParser.parse(body);
+        } catch (Throwable e) {
+            throwException(call, code, headers, body, e);
+        }
+        return galleryDetail;
     }
 }

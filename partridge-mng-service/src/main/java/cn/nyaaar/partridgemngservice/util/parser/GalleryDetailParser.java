@@ -191,7 +191,7 @@ public class GalleryDetailParser {
             try {
                 Elements es = gdd.child(0).child(0).children();
                 for (Element e : es) {
-                    parseDetailInfo(gd, e, body);
+                    parseDetailInfo(gd, e);
                 }
             } catch (Throwable e) {
                 ExceptionUtils.throwIfFatal(e);
@@ -280,7 +280,7 @@ public class GalleryDetailParser {
         }
     }
 
-    private static void parseDetailInfo(GalleryDetail gd, Element e, String body) {
+    private static void parseDetailInfo(GalleryDetail gd, Element e) {
         Elements es = e.children();
         if (es.size() < 2) {
             return;
