@@ -1,6 +1,7 @@
 package cn.nyaaar.partridgemngservice.service.eh;
 
 import cn.nyaaar.partridgemngservice.PartridgeMngServiceApplication;
+import cn.nyaaar.partridgemngservice.constants.EhUrl;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
 import cn.nyaaar.partridgemngservice.util.parser.GalleryListParser;
 import com.alibaba.fastjson.JSON;
@@ -10,6 +11,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Objects;
 
 /**
  * @author yuegenhua
@@ -65,10 +68,42 @@ public class EhEngineTest {
     @Test
     public void getGalleryDetailTest() {
         try {
-            GalleryDetail galleryDetail= ehEngine.getGalleryDetail("https://e-hentai.org/g/2312700/9813f4654d/");
+            GalleryDetail galleryDetail = ehEngine.getGalleryDetail("https://e-hentai.org/g/2312700/9813f4654d/");
             log.info(JSON.toJSONString(galleryDetail));
         } catch (Throwable e) {
             log.error(e.toString());
         }
+    }
+
+    // always Invalid page...
+    @Test
+    public void getGalleryTokenTest() {
+        log.info(
+                ehEngine.getGalleryToken(2313044, "60b8e59f7c", 3)
+        );
+    }
+
+    @Test
+    public void getGalleryPageApiTest() {
+        String pageUrl = getPageUrl(2313044, 1, "8b41332140", null, null);
+        log.info("pageUrl:{}", pageUrl);
+        log.info(
+                ehEngine.getGalleryPage(pageUrl, 2313044, "849f2a02ea").toString()
+        );
+    }
+
+    private String getPageUrl(long gid, int index, String pToken,
+                              String oldPageUrl, String skipHathKey) {
+        String pageUrl;
+        pageUrl = Objects.requireNonNullElseGet(oldPageUrl, () -> EhUrl.getPageUrl(gid, index, pToken));
+        // Add skipHathKey
+        if (skipHathKey != null) {
+            if (pageUrl.contains("?")) {
+                pageUrl += "&nl=" + skipHathKey;
+            } else {
+                pageUrl += "?nl=" + skipHathKey;
+            }
+        }
+        return pageUrl;
     }
 }

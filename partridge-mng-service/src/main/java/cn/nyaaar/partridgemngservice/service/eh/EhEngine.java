@@ -298,4 +298,100 @@ public class EhEngine {
         }
         return galleryDetail;
     }
+
+    public String getGalleryToken(long gid, String gtoken, int page) {
+        JSONObject json = new JSONObject();
+        json.put("method", "gtoken");
+        JSONArray gidAndToken = new JSONArray();
+        gidAndToken.add(gid);
+        gidAndToken.add(gtoken);
+        gidAndToken.add(page + 1);
+        JSONArray outerArray = new JSONArray();
+        outerArray.add(gidAndToken);
+        json.put("pagelist", outerArray);
+        log.info("request body:{}", json);
+        final RequestBody requestBody = RequestBody.create(json.toString(), MEDIA_TYPE_JSON);
+        String url = EhUrl.getApiUrl();
+        String referer = EhUrl.getReferer();
+        String origin = EhUrl.getOrigin();
+        log.info("getGalleryToken url:{}", url);
+        Request request = new EhRequestBuilder(url, referer, origin)
+                .post(requestBody)
+                .build();
+        Call call = okHttpClient.newCall(request);
+
+        String body = null;
+        Headers headers = null;
+        int code = -1;
+        String res = "";
+        try {
+            Response response = call.execute();
+            code = response.code();
+            headers = response.headers();
+            body = response.body().string();
+            res = GalleryTokenApiParser.parse(body);
+        } catch (Throwable e) {
+            throwException(call, code, headers, body, e);
+        }
+        return res;
+    }
+
+    public GalleryPageParser.Result getGalleryPage(String url, long gid, String token) {
+        String referer = EhUrl.getGalleryDetailUrl(gid, token);
+        log.info("getGalleryPage url:{}", url);
+        Request request = new EhRequestBuilder(url, referer).build();
+        Call call = okHttpClient.newCall(request);
+
+
+        String body = null;
+        Headers headers = null;
+        int code = -1;
+        GalleryPageParser.Result result = new GalleryPageParser.Result();
+        try {
+            Response response = call.execute();
+            code = response.code();
+            headers = response.headers();
+            body = response.body().string();
+            result = GalleryPageParser.parse(body);
+        } catch (Throwable e) {
+            throwException(call, code, headers, body, e);
+        }
+        return result;
+    }
+
+    public GalleryPageApiParser.Result getGalleryPageApi(long gid, int index, String pToken, String showKey, String previousPToken) {
+        final JSONObject json = new JSONObject();
+        json.put("method", "showpage");
+        json.put("gid", gid);
+        json.put("page", index + 1);
+        json.put("imgkey", pToken);
+        json.put("showkey", showKey);
+        final RequestBody requestBody = RequestBody.create(json.toString(), MEDIA_TYPE_JSON);
+        String url = EhUrl.getApiUrl();
+        String referer = null;
+        if (index > 0 && previousPToken != null) {
+            referer = EhUrl.getPageUrl(gid, index - 1, previousPToken);
+        }
+        String origin = EhUrl.getOrigin();
+        log.info("getGalleryPageApi url:{}", url);
+        Request request = new EhRequestBuilder(url, referer, origin)
+                .post(requestBody)
+                .build();
+        Call call = okHttpClient.newCall(request);
+
+        String body = null;
+        Headers headers = null;
+        int code = -1;
+        GalleryPageApiParser.Result result = new GalleryPageApiParser.Result();
+        try {
+            Response response = call.execute();
+            code = response.code();
+            headers = response.headers();
+            body = response.body().string();
+            result = GalleryPageApiParser.parse(body);
+        } catch (Throwable e) {
+            throwException(call, code, headers, body, e);
+        }
+        return result;
+    }
 }
