@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.service.eh;
+package cn.nyaaar.partridgemngservice.service.ehService.ehBasic;
 
 import cn.nyaaar.partridgemngservice.constants.EhUrl;
 import cn.nyaaar.partridgemngservice.constants.Settings;
@@ -6,6 +6,7 @@ import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.exception.eh.ParseException;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryInfo;
+import cn.nyaaar.partridgemngservice.model.eh.PreviewSet;
 import cn.nyaaar.partridgemngservice.util.ExceptionUtils;
 import cn.nyaaar.partridgemngservice.util.StringUtils;
 import cn.nyaaar.partridgemngservice.util.parser.*;
@@ -19,7 +20,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -97,7 +100,7 @@ public class EhEngine {
         }
     }
 
-    private static void throwException(Call call, int code, @Nullable Headers headers,
+    private static void throwException(@Nullable Call call, int code, @Nullable Headers headers,
                                        @Nullable String body, Throwable e) {
         if (e instanceof Error) {
             ExceptionUtils.throwIfFatal(e);
@@ -299,12 +302,12 @@ public class EhEngine {
         return galleryDetail;
     }
 
-    public String getGalleryToken(long gid, String gtoken, int page) {
+    public String getGalleryToken(long gid, String ptoken, int page) {
         JSONObject json = new JSONObject();
         json.put("method", "gtoken");
         JSONArray gidAndToken = new JSONArray();
         gidAndToken.add(gid);
-        gidAndToken.add(gtoken);
+        gidAndToken.add(ptoken);
         gidAndToken.add(page + 1);
         JSONArray outerArray = new JSONArray();
         outerArray.add(gidAndToken);
@@ -336,8 +339,8 @@ public class EhEngine {
         return res;
     }
 
-    public GalleryPageParser.Result getGalleryPage(String url, long gid, String token) {
-        String referer = EhUrl.getGalleryDetailUrl(gid, token);
+    public GalleryPageParser.Result getGalleryPage(String url, long gid, String gtoken) {
+        String referer = EhUrl.getGalleryDetailUrl(gid, gtoken);
         log.info("getGalleryPage url:{}", url);
         Request request = new EhRequestBuilder(url, referer).build();
         Call call = okHttpClient.newCall(request);
@@ -351,7 +354,7 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
+            body = Objects.requireNonNull(response.body()).string();
             result = GalleryPageParser.parse(body);
         } catch (Throwable e) {
             throwException(call, code, headers, body, e);
@@ -387,11 +390,47 @@ public class EhEngine {
             Response response = call.execute();
             code = response.code();
             headers = response.headers();
-            body = response.body().string();
+            body = Objects.requireNonNull(response.body()).string();
             result = GalleryPageApiParser.parse(body);
         } catch (Throwable e) {
             throwException(call, code, headers, body, e);
         }
         return result;
     }
+
+    public List<String> getPTokens(long gid, String gtoken) {
+
+        String url = EhUrl.getGalleryDetailUrl(
+                gid, gtoken, 0, false);
+        String referer = EhUrl.getReferer();
+
+        Request request = new EhRequestBuilder(url, referer).build();
+        Call call = okHttpClient.newCall(request);
+
+        String body = null;
+        Headers headers = null;
+        int code = -1;
+        List<String> pTokenList =new LinkedList<>();
+        try {
+            Response response = call.execute();
+            body = Objects.requireNonNull(response.body()).string();
+            code = response.code();
+            headers = response.headers();
+
+            int pages = GalleryDetailParser.parsePages(body);
+            int previewPages = GalleryDetailParser.parsePreviewPages(body);
+            PreviewSet previewSet = GalleryDetailParser.parsePreviewSet(body);
+;
+
+            for (int i = 0, n = previewSet.size(); i < n; i++) {
+                GalleryPageUrlParser.Result result = GalleryPageUrlParser.parse(previewSet.getPageUrlAt(i));
+                pTokenList.add(result.pToken);
+            }
+
+        } catch (Throwable e) {
+            throwException(call, code, headers, body, e);
+        }
+        return pTokenList;
+    }
+
 }

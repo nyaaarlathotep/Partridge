@@ -1,8 +1,9 @@
-package cn.nyaaar.partridgemngservice.service.eh;
+package cn.nyaaar.partridgemngservice.service.ehBasic;
 
 import cn.nyaaar.partridgemngservice.PartridgeMngServiceApplication;
 import cn.nyaaar.partridgemngservice.constants.EhUrl;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
+import cn.nyaaar.partridgemngservice.service.ehService.ehBasic.EhEngine;
 import cn.nyaaar.partridgemngservice.util.parser.GalleryListParser;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -75,21 +76,32 @@ public class EhEngineTest {
         }
     }
 
-    // always Invalid page...
     @Test
     public void getGalleryTokenTest() {
         log.info(
-                ehEngine.getGalleryToken(2313044, "60b8e59f7c", 3)
+                ehEngine.getGalleryToken(2313044, "8b41332140", 1)
         );
     }
 
     @Test
-    public void getGalleryPageApiTest() {
+    public void getGalleryPageTest() {
         String pageUrl = getPageUrl(2313044, 1, "8b41332140", null, null);
         log.info("pageUrl:{}", pageUrl);
         log.info(
                 ehEngine.getGalleryPage(pageUrl, 2313044, "849f2a02ea").toString()
         );
+    }
+
+    @Test
+    public void getGalleryPageApiTest() {
+        log.info(
+                ehEngine.getGalleryPageApi(2313044, 1, "8b41332140", "1xw4m8s9w7d", null).toString()
+        );
+    }
+
+    @Test
+    public void getPTokensTest() {
+        log.info(JSON.toJSONString(ehEngine.getPTokens(2313044, "849f2a02ea")));
     }
 
     private String getPageUrl(long gid, int index, String pToken,

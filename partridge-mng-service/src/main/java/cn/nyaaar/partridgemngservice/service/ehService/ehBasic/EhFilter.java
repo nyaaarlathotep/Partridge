@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.nyaaar.partridgemngservice.service.eh;
+package cn.nyaaar.partridgemngservice.service.ehService.ehBasic;
 
 
 import cn.nyaaar.partridgemngservice.entity.eh.Filter;

@@ -256,6 +256,8 @@ public class Settings {
     private static final int DEFAULT_DOWNLOAD_DELAY = 0;
     private static final String KEY_REQUEST_NEWS = "request_news";
     private static final boolean DEFAULT_REQUEST_NEWS = true;
+    private static final String DEFAULT_DOWNLOAD_ROOT_PATH = "E:\\eh\\";
+    private static final String DOWNLOAD_ROOT_PATH = "E:\\eh\\";
     //    private static Context sContext;
     private static Map<String,Object> sSettingsPre = new HashMap<>();
     private static EhConfig sEhConfig;
@@ -1164,4 +1166,8 @@ public class Settings {
     public static void putClipboardTextHashCode(int value) {
         putInt(KEY_CLIPBOARD_TEXT_HASH_CODE, value);
     }
+
+    public static String getDownloadRootPath() {
+        return getString(DOWNLOAD_ROOT_PATH, DEFAULT_DOWNLOAD_ROOT_PATH);
+    } 
 }

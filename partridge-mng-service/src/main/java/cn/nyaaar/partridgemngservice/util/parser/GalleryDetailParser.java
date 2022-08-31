@@ -17,6 +17,8 @@
 package cn.nyaaar.partridgemngservice.util.parser;
 
 
+import cn.nyaaar.partridgemngservice.constants.EhUrl;
+import cn.nyaaar.partridgemngservice.constants.Settings;
 import cn.nyaaar.partridgemngservice.exception.eh.EhException;
 import cn.nyaaar.partridgemngservice.exception.eh.OffensiveException;
 import cn.nyaaar.partridgemngservice.exception.eh.ParseException;
@@ -599,7 +601,8 @@ public class GalleryDetailParser {
 
         return pages;
     }
-//
+
+    //
 //    public static PreviewSet parsePreviewSet(Document d, String body) throws ParseException {
 //        try {
 //            return parseLargePreviewSet(d, body);
@@ -608,14 +611,14 @@ public class GalleryDetailParser {
 //        }
 //    }
 //
-//    public static PreviewSet parsePreviewSet(String body) throws ParseException {
-//        try {
-//            return parseLargePreviewSet(body);
-//        } catch (ParseException e) {
-//            return parseNormalPreviewSet(body);
-//        }
-//    }
-//
+    public static PreviewSet parsePreviewSet(String body) throws ParseException {
+        try {
+            return parseLargePreviewSet(body);
+        } catch (ParseException e) {
+            return parseNormalPreviewSet(body);
+        }
+    }
+   
 //    /**
 //     * Parse large previews with regular expressions
 //     */
@@ -628,8 +631,8 @@ public class GalleryDetailParser {
 //            if (n <= 0) {
 //                throw new ParseException("Can't parse large preview", body);
 //            }
-//            for (int i = 0; i < n; i++) {
-//                Element element = gdtls.get(i).child(0);
+//            for (Element gdtl : gdtls) {
+//                Element element = gdtl.child(0);
 //                String pageUrl = element.attr("href");
 //                element = element.child(0);
 //                String imageUrl = element.attr("src");
@@ -642,68 +645,67 @@ public class GalleryDetailParser {
 //            return largePreviewSet;
 //        } catch (Throwable e) {
 //            ExceptionUtils.throwIfFatal(e);
-//            e.printStackTrace();
 //            throw new ParseException("Can't parse large preview", body);
 //        }
 //    }
-//
-//    /**
-//     * Parse large previews with regular expressions
-//     */
-//    private static LargePreviewSet parseLargePreviewSet(String body) throws ParseException {
-//        Matcher m = PATTERN_LARGE_PREVIEW.matcher(body);
-//        LargePreviewSet largePreviewSet = new LargePreviewSet();
-//
-//        while (m.find()) {
-//            int index = ParserUtils.parseInt(m.group(2), 0) - 1;
-//            if (index < 0) {
-//                continue;
-//            }
-//            String imageUrl = ParserUtils.trim(m.group(3));
-//            String pageUrl = ParserUtils.trim(m.group(1));
-//            if (Settings.getFixThumbUrl()) {
-//                imageUrl = EhUrl.getFixedPreviewThumbUrl(imageUrl);
-//            }
-//            largePreviewSet.addItem(index, imageUrl, pageUrl);
-//        }
-//
-//        if (largePreviewSet.size() == 0) {
-//            throw new ParseException("Can't parse large preview", body);
-//        }
-//
-//        return largePreviewSet;
-//    }
-//
-//    /**
-//     * Parse normal previews with regular expressions
-//     */
-//    private static NormalPreviewSet parseNormalPreviewSet(String body) throws ParseException {
-//        Matcher m = PATTERN_NORMAL_PREVIEW.matcher(body);
-//        NormalPreviewSet normalPreviewSet = new NormalPreviewSet();
-//        while (m.find()) {
-//            int position = ParserUtils.parseInt(m.group(6), 0) - 1;
-//            if (position < 0) {
-//                continue;
-//            }
-//            String imageUrl = ParserUtils.trim(m.group(3));
-//            int xOffset = ParserUtils.parseInt(m.group(4), 0);
-//            int yOffset = 0;
-//            int width = ParserUtils.parseInt(m.group(1), 0);
-//            if (width <= 0) {
-//                continue;
-//            }
-//            int height = ParserUtils.parseInt(m.group(2), 0);
-//            if (height <= 0) {
-//                continue;
-//            }
-//            String pageUrl = ParserUtils.trim(m.group(5));
-//            normalPreviewSet.addItem(position, imageUrl, xOffset, yOffset, width, height, pageUrl);
-//        }
-//
-//        if (normalPreviewSet.size() == 0) {
-//            throw new ParseException("Can't parse normal preview", body);
-//        }
-//
-//        return normalPreviewSet;
-//    }
+
+    /**
+     * Parse large previews with regular expressions
+     */
+    private static LargePreviewSet parseLargePreviewSet(String body) throws ParseException {
+        Matcher m = PATTERN_LARGE_PREVIEW.matcher(body);
+        LargePreviewSet largePreviewSet = new LargePreviewSet();
+
+        while (m.find()) {
+            int index = ParserUtils.parseInt(m.group(2), 0) - 1;
+            if (index < 0) {
+                continue;
+            }
+            String imageUrl = ParserUtils.trim(m.group(3));
+            String pageUrl = ParserUtils.trim(m.group(1));
+            if (Settings.getFixThumbUrl()) {
+                imageUrl = EhUrl.getFixedPreviewThumbUrl(imageUrl);
+            }
+            largePreviewSet.addItem(index, imageUrl, pageUrl);
+        }
+
+        if (largePreviewSet.size() == 0) {
+            throw new ParseException("Can't parse large preview", body);
+        }
+
+        return largePreviewSet;
+    }
+
+    /**
+     * Parse normal previews with regular expressions
+     */
+    private static NormalPreviewSet parseNormalPreviewSet(String body) throws ParseException {
+        Matcher m = PATTERN_NORMAL_PREVIEW.matcher(body);
+        NormalPreviewSet normalPreviewSet = new NormalPreviewSet();
+        while (m.find()) {
+            int position = ParserUtils.parseInt(m.group(6), 0) - 1;
+            if (position < 0) {
+                continue;
+            }
+            String imageUrl = ParserUtils.trim(m.group(3));
+            int xOffset = ParserUtils.parseInt(m.group(4), 0);
+            int yOffset = 0;
+            int width = ParserUtils.parseInt(m.group(1), 0);
+            if (width <= 0) {
+                continue;
+            }
+            int height = ParserUtils.parseInt(m.group(2), 0);
+            if (height <= 0) {
+                continue;
+            }
+            String pageUrl = ParserUtils.trim(m.group(5));
+            normalPreviewSet.addItem(position, imageUrl, xOffset, yOffset, width, height, pageUrl);
+        }
+
+        if (normalPreviewSet.size() == 0) {
+            throw new ParseException("Can't parse normal preview", body);
+        }
+
+        return normalPreviewSet;
+    }
 }
