@@ -6,6 +6,7 @@ import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -62,7 +63,6 @@ public class BeanConfig {
             public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
             }
 
-            @Override
             public X509Certificate[] getAcceptedIssuers() {
                 return new X509Certificate[0];
             }
@@ -81,5 +81,23 @@ public class BeanConfig {
             log.error(e.toString());
         }
         return null;
+    }
+
+
+    @Bean(name = "downloadExecutor")
+    public ThreadPoolTaskExecutor downloadExecutor() {
+        ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
+        //核心线程池数
+        pool.setCorePoolSize(5);
+        //最大线程数
+        pool.setMaxPoolSize(10);
+        //队列容量
+        pool.setQueueCapacity(1000);
+        // 线程最大空闲时间
+        pool.setKeepAliveSeconds(300);
+        //队列满，调用线程中运行被拒绝的任务。
+        pool.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy());
+        pool.setThreadNamePrefix("download-executor---");
+        return pool;
     }
 }

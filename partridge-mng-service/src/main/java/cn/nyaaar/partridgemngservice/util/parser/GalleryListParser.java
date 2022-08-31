@@ -366,14 +366,5 @@ public class GalleryListParser {
         public boolean noWatchedTags;
         public List<GalleryInfo> galleryInfoList;
 
-        @Override
-        public String toString() {
-            return "Result{" +
-                    "pages=" + pages +
-                    ", nextPage=" + nextPage +
-                    ", noWatchedTags=" + noWatchedTags +
-                    ", galleryInfoList=" + galleryInfoList +
-                    '}';
-        }
     }
 }
