@@ -1,17 +1,16 @@
 package cn.nyaaar.partridgemngservice.service.download.impl;
 
 import cn.nyaaar.partridgemngservice.constants.Settings;
+import cn.nyaaar.partridgemngservice.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.service.download.DownloadService;
+import cn.nyaaar.partridgemngservice.service.file.FileSaveService;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Objects;
 
 /**
@@ -21,14 +20,16 @@ import java.util.Objects;
 @Service
 @Slf4j
 public class DownloadServiceImpl implements DownloadService {
-    private OkHttpClient okHttpClient;
+    private final OkHttpClient okHttpClient;
 
-    private ThreadPoolTaskExecutor downloadExecutor;
+    private final ThreadPoolTaskExecutor downloadExecutor;
 
-    @Autowired
-    public void DI(OkHttpClient okHttpClient, ThreadPoolTaskExecutor downloadExecutor) {
+    private final FileSaveService fileSaveService;
+
+    public DownloadServiceImpl(OkHttpClient okHttpClient, ThreadPoolTaskExecutor downloadExecutor, FileSaveService fileSaveService) {
         this.okHttpClient = okHttpClient;
         this.downloadExecutor = downloadExecutor;
+        this.fileSaveService = fileSaveService;
     }
 
     @Override
@@ -46,14 +47,7 @@ public class DownloadServiceImpl implements DownloadService {
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                     byte[] bytes = Objects.requireNonNull(response.body()).bytes();
-                    Path dic = Path.of(destDic);
-                    if (Files.notExists(dic)) {
-                        Files.createDirectories(dic);
-                    }
-                    Path filePath = Path.of(destDic + fileName);
-                    if (Files.notExists(filePath)) {
-                        Files.write(filePath, bytes);
-                    }
+                    fileSaveService.saveBytesToFileWithSource(bytes, destDic, fileName, SourceEnum.Ehentai, false);
                     log.info("download success!");
                 }
             });

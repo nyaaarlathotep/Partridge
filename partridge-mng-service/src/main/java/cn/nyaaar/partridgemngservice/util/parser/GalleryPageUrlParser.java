@@ -18,6 +18,7 @@ package cn.nyaaar.partridgemngservice.util.parser;
 
 
 import cn.nyaaar.partridgemngservice.constants.EhUrl;
+import cn.nyaaar.partridgemngservice.exception.eh.ParseException;
 import cn.nyaaar.partridgemngservice.util.NumberUtils;
 import org.springframework.lang.Nullable;
 
@@ -35,30 +36,30 @@ public final class GalleryPageUrlParser {
     private static final Pattern URL_PATTERN = Pattern.compile(
             "([0-9a-f]{10})/(\\d+)-(\\d+)");
 
-    @Nullable
-    public static Result parse(String url) {
+    public static Result parse(String url) throws ParseException {
         return parse(url, true);
     }
 
-    @Nullable
-    public static Result parse(String url, boolean strict) {
+    public static Result parse(String url, boolean strict) throws ParseException {
+        Result result = new Result();
         if (url == null) {
-            return null;
+            result.page = -1;
+            result.pToken = "";
+            return result;
         }
 
         Pattern pattern = strict ? URL_STRICT_PATTERN : URL_PATTERN;
         Matcher m = pattern.matcher(url);
         if (m.find()) {
-            Result result = new Result();
             result.gid = NumberUtils.parseLongSafely(m.group(2), -1L);
             result.pToken = m.group(1);
             result.page = NumberUtils.parseIntSafely(m.group(3), 0) - 1;
             if (result.gid < 0 || result.page < 0) {
-                return null;
+                throw new ParseException("GalleryPageUrlParser error", url);
             }
             return result;
         } else {
-            return null;
+            throw new ParseException("GalleryPageUrlParser error", url);
         }
     }
 

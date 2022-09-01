@@ -5,6 +5,7 @@ import cn.nyaaar.partridgemngservice.constants.Settings;
 import cn.nyaaar.partridgemngservice.service.download.DownloadService;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
 import cn.nyaaar.partridgemngservice.service.ehService.ehBasic.EhEngine;
+import cn.nyaaar.partridgemngservice.util.PathUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +19,19 @@ import java.util.Objects;
 @Service
 public class EhServiceImpl implements EhService {
 
-    private EhEngine ehEngine;
-    private DownloadService downloadService;
+    private final EhEngine ehEngine;
+    private final DownloadService downloadService;
 
 
-    @Autowired
-    public void DI(EhEngine ehEngine, DownloadService downloadService) {
+    public EhServiceImpl(EhEngine ehEngine, DownloadService downloadService) {
         this.ehEngine = ehEngine;
         this.downloadService = downloadService;
+    }
+
+    @Override
+    public String getGalleryPage(long gid, int pageIndex) {
+
+        return null;
     }
 
     @Override
@@ -36,10 +42,10 @@ public class EhServiceImpl implements EhService {
 
             String pageUrl = EhUrl.getPageUrl(gid, i, galleryTokens.get(i));
             String pagePicUrl = ehEngine.getGalleryPage(pageUrl, gid, gtoken).imageUrl;
-            downloadService.downloadUrlToDest(pagePicUrl, Settings.getDownloadRootPath() + gid
-                    + "\\", i + ".jpg");
+            downloadService.downloadUrlToDest(pagePicUrl,
+                    PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(), String.valueOf(gid)),
+                    (i + 1) + ".jpg");
         }
-
     }
 
 }
