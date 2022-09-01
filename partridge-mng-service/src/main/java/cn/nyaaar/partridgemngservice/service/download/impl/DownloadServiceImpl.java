@@ -1,9 +1,8 @@
 package cn.nyaaar.partridgemngservice.service.download.impl;
 
-import cn.nyaaar.partridgemngservice.constants.Settings;
 import cn.nyaaar.partridgemngservice.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.service.download.DownloadService;
-import cn.nyaaar.partridgemngservice.service.file.FileSaveService;
+import cn.nyaaar.partridgemngservice.service.file.FileHandleService;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
@@ -24,12 +23,12 @@ public class DownloadServiceImpl implements DownloadService {
 
     private final ThreadPoolTaskExecutor downloadExecutor;
 
-    private final FileSaveService fileSaveService;
+    private final FileHandleService fileHandleService;
 
-    public DownloadServiceImpl(OkHttpClient okHttpClient, ThreadPoolTaskExecutor downloadExecutor, FileSaveService fileSaveService) {
+    public DownloadServiceImpl(OkHttpClient okHttpClient, ThreadPoolTaskExecutor downloadExecutor, FileHandleService fileHandleService) {
         this.okHttpClient = okHttpClient;
         this.downloadExecutor = downloadExecutor;
-        this.fileSaveService = fileSaveService;
+        this.fileHandleService = fileHandleService;
     }
 
     @Override
@@ -47,7 +46,7 @@ public class DownloadServiceImpl implements DownloadService {
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                     byte[] bytes = Objects.requireNonNull(response.body()).bytes();
-                    fileSaveService.saveBytesToFileWithSource(bytes, destDic, fileName, SourceEnum.Ehentai, false);
+                    fileHandleService.saveBytesToFileWithSource(bytes, destDic, fileName, SourceEnum.Ehentai, false);
                     log.info("download success!");
                 }
             });

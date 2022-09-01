@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.nyaaar.partridgemngservice.mapper.EhentaiGalleryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.nyaaar.partridgemngservice.entity.EhentaiGallery">
+        <id column="GID" property="gid" />
+        <result column="ELE_ID" property="eleId" />
+        <result column="TITLE" property="title" />
+        <result column="TITLE_JPN" property="titleJpn" />
+        <result column="CATEGORY" property="category" />
+        <result column="UPLOADER" property="uploader" />
+        <result column="RATING" property="rating" />
+        <result column="RATING_COUNT" property="ratingCount" />
+        <result column="PAGES" property="pages" />
+        <result column="TOKEN" property="token" />
+        <result column="POSTED" property="posted" />
+        <result column="FAVORITE_COUNT" property="favoriteCount" />
+        <result column="CASHED_FLAG" property="cashedFlag" />
+        <result column="DOWNLOAD_FLAG" property="downloadFlag" />
+        <result column="CREATED_TIME" property="createdTime" />
+        <result column="UPDATED_TIME" property="updatedTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        GID, ELE_ID, TITLE, TITLE_JPN, CATEGORY, UPLOADER, RATING, RATING_COUNT, PAGES, TOKEN, POSTED, FAVORITE_COUNT, CASHED_FLAG, DOWNLOAD_FLAG, CREATED_TIME, UPDATED_TIME
+    </sql>
+
+</mapper>

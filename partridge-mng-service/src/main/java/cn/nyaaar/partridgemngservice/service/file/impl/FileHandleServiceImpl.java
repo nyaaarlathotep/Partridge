@@ -1,7 +1,7 @@
 package cn.nyaaar.partridgemngservice.service.file.impl;
 
 import cn.nyaaar.partridgemngservice.enums.SourceEnum;
-import cn.nyaaar.partridgemngservice.service.file.FileSaveService;
+import cn.nyaaar.partridgemngservice.service.file.FileHandleService;
 import cn.nyaaar.partridgemngservice.util.PathUtil;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import java.nio.file.StandardOpenOption;
  * @Version $Id: FileSaveServiceImpl.java, v 0.1 2022-01 10:38 yuegenhua Exp $$
  */
 @Service
-public class FileSaveServiceImpl implements FileSaveService {
+public class FileHandleServiceImpl implements FileHandleService {
     @Override
     public void saveBytesToFileWithSource(byte[] bytes, String destDic, String fileName, SourceEnum sourceEnum, boolean reDownload) throws IOException {
 

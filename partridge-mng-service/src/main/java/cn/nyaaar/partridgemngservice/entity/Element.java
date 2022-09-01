@@ -33,7 +33,7 @@ public class Element extends Model<Element> {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "ID", type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     @TableField("TYPE")
     private String type;

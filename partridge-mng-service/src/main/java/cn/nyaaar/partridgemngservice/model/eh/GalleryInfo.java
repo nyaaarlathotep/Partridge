@@ -27,7 +27,6 @@ public class GalleryInfo {
     /**
      * ISO 639-1
      */
-    @SuppressWarnings("unused")
     public static final String S_LANG_JA = "JA";
     public static final String S_LANG_EN = "EN";
     public static final String S_LANG_ZH = "ZH";

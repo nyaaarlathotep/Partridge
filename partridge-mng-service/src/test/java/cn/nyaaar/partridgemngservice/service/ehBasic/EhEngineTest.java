@@ -69,7 +69,7 @@ public class EhEngineTest {
     @Test
     public void getGalleryDetailTest() {
         try {
-            GalleryDetail galleryDetail = ehEngine.getGalleryDetail("https://e-hentai.org/g/2312700/9813f4654d/");
+            GalleryDetail galleryDetail = ehEngine.getGalleryDetail(2312700,"9813f4654d");
             log.info(JSON.toJSONString(galleryDetail));
         } catch (Throwable e) {
             log.error(e.toString());

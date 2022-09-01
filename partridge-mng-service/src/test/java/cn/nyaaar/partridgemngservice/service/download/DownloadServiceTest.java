@@ -5,7 +5,7 @@ import cn.nyaaar.partridgemngservice.PartridgeMngServiceApplication;
 import cn.nyaaar.partridgemngservice.constants.Settings;
 import cn.nyaaar.partridgemngservice.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
-import cn.nyaaar.partridgemngservice.service.file.FileSaveService;
+import cn.nyaaar.partridgemngservice.service.file.FileHandleService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +33,7 @@ public class DownloadServiceTest {
     private EhService ehService;
 
     @Autowired
-    private FileSaveService fileSaveService;
+    private FileHandleService fileHandleService;
 
     @Test
     public void downloadTest() {
@@ -54,6 +54,6 @@ public class DownloadServiceTest {
     public void fileSaveTest() throws IOException {
         String sss = "testAppend";
 
-        fileSaveService.saveBytesToFileWithSource(sss.getBytes(StandardCharsets.UTF_8), "C:\\Users\\yuegenhua\\Desktop\\testFile", "test.txt", SourceEnum.Ehentai, true);
+        fileHandleService.saveBytesToFileWithSource(sss.getBytes(StandardCharsets.UTF_8), "C:\\Users\\yuegenhua\\Desktop\\testFile", "test.txt", SourceEnum.Ehentai, true);
     }
 }

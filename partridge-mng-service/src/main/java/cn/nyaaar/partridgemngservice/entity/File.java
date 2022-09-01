@@ -32,7 +32,7 @@ public class File extends Model<File> {
     private Integer id;
 
     @TableField("ELE_ID")
-    private Integer eleId;
+    private Long eleId;
 
     @TableField("NAME")
     private String name;
@@ -46,8 +46,8 @@ public class File extends Model<File> {
     /**
      * 启用标志(0-禁用;1-启用)
      */
-    @TableField("IS_AVAILABLE")
-    private String isAvailable;
+    @TableField("IS_AVAILABLE_FLAG")
+    private Integer isAvailableFlag;
 
     @TableField(value = "CREATED_TIME", fill = FieldFill.INSERT)
     private Date createdTime;

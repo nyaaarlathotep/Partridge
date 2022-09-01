@@ -276,7 +276,8 @@ public class EhEngine {
         }
     }
 
-    public GalleryDetail getGalleryDetail(String url) {
+    public GalleryDetail getGalleryDetail(long gid, String gtoken) {
+        String url = EhUrl.getGalleryDetailUrl(gid, gtoken);
         String referer = EhUrl.getReferer();
         log.info("getGalleryDetail url:{}", url);
         Request request = new EhRequestBuilder(url, referer).build();
@@ -424,6 +425,7 @@ public class EhEngine {
                 try {
                     result = GalleryPageUrlParser.parse(previewSet.getPageUrlAt(i));
                 } catch (ParseException e) {
+                    // TODO 缺页处理
                     continue;
                 }
                 pTokenList.add(result.pToken);
