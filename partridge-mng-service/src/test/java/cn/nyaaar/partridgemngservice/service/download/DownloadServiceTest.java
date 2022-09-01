@@ -3,7 +3,9 @@ package cn.nyaaar.partridgemngservice.service.download;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.nyaaar.partridgemngservice.PartridgeMngServiceApplication;
 import cn.nyaaar.partridgemngservice.constants.Settings;
+import cn.nyaaar.partridgemngservice.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
+import cn.nyaaar.partridgemngservice.service.file.FileHandleService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,6 +32,9 @@ public class DownloadServiceTest {
     @Autowired
     private EhService ehService;
 
+    @Autowired
+    private FileHandleService fileHandleService;
+
     @Test
     public void downloadTest() {
         downloadService.downloadUrlToDest("https://iymlvib.fawvwgxlrdfx.hath.network/" +
@@ -41,5 +48,12 @@ public class DownloadServiceTest {
     public void downloadGalleryTest() {
         ehService.downloadGallery(2313044, "849f2a02ea");
         ThreadUtil.sleep(20, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void fileSaveTest() throws IOException {
+        String sss = "testAppend";
+
+        fileHandleService.saveBytesToFileWithSource(sss.getBytes(StandardCharsets.UTF_8), "C:\\Users\\yuegenhua\\Desktop\\testFile", "test.txt", SourceEnum.Ehentai, true);
     }
 }

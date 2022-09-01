@@ -33,7 +33,7 @@ import java.util.Objects;
 @Slf4j
 public class EhEngine {
 
-    private OkHttpClient okHttpClient;
+    private final OkHttpClient okHttpClient;
 
     public static EhFilter sEhFilter = EhFilter.getInstance();
     public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
@@ -45,7 +45,7 @@ public class EhEngine {
 
 
     @Autowired
-    public void DI(OkHttpClient okHttpClient) {
+    public EhEngine(OkHttpClient okHttpClient) {
         this.okHttpClient = okHttpClient;
     }
 
@@ -276,7 +276,8 @@ public class EhEngine {
         }
     }
 
-    public GalleryDetail getGalleryDetail(String url) {
+    public GalleryDetail getGalleryDetail(long gid, String gtoken) {
+        String url = EhUrl.getGalleryDetailUrl(gid, gtoken);
         String referer = EhUrl.getReferer();
         log.info("getGalleryDetail url:{}", url);
         Request request = new EhRequestBuilder(url, referer).build();
@@ -410,23 +411,25 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        List<String> pTokenList =new LinkedList<>();
+        List<String> pTokenList = new LinkedList<>();
         try {
             Response response = call.execute();
             body = Objects.requireNonNull(response.body()).string();
             code = response.code();
             headers = response.headers();
 
-            int pages = GalleryDetailParser.parsePages(body);
-            int previewPages = GalleryDetailParser.parsePreviewPages(body);
             PreviewSet previewSet = GalleryDetailParser.parsePreviewSet(body);
-;
 
             for (int i = 0, n = previewSet.size(); i < n; i++) {
-                GalleryPageUrlParser.Result result = GalleryPageUrlParser.parse(previewSet.getPageUrlAt(i));
+                GalleryPageUrlParser.Result result;
+                try {
+                    result = GalleryPageUrlParser.parse(previewSet.getPageUrlAt(i));
+                } catch (ParseException e) {
+                    // TODO 缺页处理
+                    continue;
+                }
                 pTokenList.add(result.pToken);
             }
-
         } catch (Throwable e) {
             throwException(call, code, headers, body, e);
         }

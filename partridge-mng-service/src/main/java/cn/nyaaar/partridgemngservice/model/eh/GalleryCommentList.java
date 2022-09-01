@@ -18,7 +18,6 @@ package cn.nyaaar.partridgemngservice.model.eh;
 
 public class GalleryCommentList {
 
-
     public GalleryComment[] comments;
     public boolean hasMore;
 
@@ -26,6 +25,4 @@ public class GalleryCommentList {
         this.comments = comments;
         this.hasMore = hasMore;
     }
-
-
 }

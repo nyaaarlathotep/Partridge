@@ -22,7 +22,7 @@ import java.util.ArrayList;
 // TODO Add url field?
 public class GalleryTagGroup {
 
-    private final ArrayList<String> mTagList;
+    public final ArrayList<String> mTagList;
     public String groupName;
 
     public GalleryTagGroup() {
