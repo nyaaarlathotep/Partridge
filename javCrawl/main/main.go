@@ -6,7 +6,9 @@ import (
 	"github.com/antchfx/htmlquery"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	"io/ioutil"
 	"log"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -20,18 +22,74 @@ var (
 const urlPrefix = "https://www.javbus.com/"
 const YYYYMMDD = "2006-01-02"
 
+var spaceReg = regexp.MustCompile("\\s+")
+var movieReg = regexp.MustCompile(".*[a-zA-Z]{3,5}[-_]?[0-9]{3}.*(avi|mp4)$")
+var codeReg = regexp.MustCompile("[a-zA-Z]{3,5}[-_]?[0-9]{3}")
+var bigLetter = regexp.MustCompile("[A-Z]+")
+
 func main() {
+	bT := time.Now()
 	defer func(db *sqlx.DB) {
 		err := db.Close()
 		if err != nil {
 			log.Println(err)
 		}
 	}(db)
+	codeFPathMap := make(map[string]string)
+	scanDic("/media/nyaaar/bigbro/stream/movies", &codeFPathMap)
+	i:=0
+	for code := range codeFPathMap {
+		log.Printf("%s has matched string: %v", code, codeFPathMap[code])
+		jav := getJavCodeInfo(code)
+		log.Printf("%+v", *jav)
+		i++
+		if i == 5 {
+			break
+		}
+	}
+	//updateOrInsertJav(jav)
+	eT := time.Since(bT)
+	log.Printf("run time: %v", eT)
+}
 
-	jav := getJavCodeInfo("MVG-032")
-	log.Printf("%+v", *jav)
-	updateOrInsertJav(jav)
+func scanDic(dir string, codeFPathMap *map[string]string) {
+	log.Printf("start to scan %v...", dir)
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		log.Printf("read dir error, dir: %v", dir)
+		log.Fatal(err)
+	}
+	smallCodeFPathMap := make(map[string]string)
+	for _, file := range files {
+		if file.IsDir() {
+			fileDir := dir + string(os.PathSeparator) + file.Name()
+			scanDic(fileDir, codeFPathMap)
+		}
+		matches := movieReg.FindAllString(file.Name(), -1)
+		if len(matches) == 0 {
+			log.Printf("no match for name: %v", file.Name())
+			continue
+		}
+		code := getAndFormatCode(matches, file.Name())
+		smallCodeFPathMap[code] = dir + string(os.PathSeparator) + file.Name()
+	}
+	if len(smallCodeFPathMap) < 1 {
+		log.Printf("match error! file path:%s", dir)
+	}
+	for code := range smallCodeFPathMap {
+		(*codeFPathMap)[code] = smallCodeFPathMap[code]
+	}
+}
 
+func getAndFormatCode(matches []string, fileName string) string {
+	matches = codeReg.FindAllString(fileName, -1)
+	code := matches[len(matches)-1]
+	code = strings.ToUpper(code)
+	if !strings.ContainsRune(code, '-') {
+		index := bigLetter.FindAllStringIndex(code, 1)
+		code = code[0:index[0][1]] + "-" + code[index[0][1]:]
+	}
+	return code
 }
 
 func updateOrInsertJav(jav *jav) {
@@ -209,8 +267,7 @@ func getJavCodeInfo(code string) *jav {
 }
 
 func removeSpace(c string) string {
-	reg := regexp.MustCompile("\\s+")
-	content := reg.ReplaceAllString(c, "")
+	content := spaceReg.ReplaceAllString(c, "")
 	return content
 }
 func init() {
