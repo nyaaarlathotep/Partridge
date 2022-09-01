@@ -11,7 +11,7 @@
  Target Server Version : 80027
  File Encoding         : 65001
 
- Date: 30/08/2022 10:34:31
+ Date: 01/09/2022 10:25:37
 */
 
 SET NAMES utf8mb4;
@@ -27,7 +27,7 @@ CREATE TABLE `actor`  (
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for author
@@ -39,7 +39,7 @@ CREATE TABLE `author`  (
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for ele_actor_re
@@ -50,7 +50,7 @@ CREATE TABLE `ele_actor_re`  (
   `ELE_ID` int NOT NULL,
   `ACTOR_ID` int NOT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for ele_author_re
@@ -61,7 +61,7 @@ CREATE TABLE `ele_author_re`  (
   `ELE_ID` int NOT NULL,
   `AUTHOR_ID` int NOT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for ele_org_re
@@ -73,7 +73,7 @@ CREATE TABLE `ele_org_re`  (
   `ORG_ID` int NOT NULL,
   `RE_TYPE` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for ele_tag_re
@@ -84,7 +84,7 @@ CREATE TABLE `ele_tag_re`  (
   `ELE_ID` int NOT NULL,
   `TAG_ID` int NOT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for element
@@ -93,6 +93,22 @@ DROP TABLE IF EXISTS `element`;
 CREATE TABLE `element`  (
   `ID` int NOT NULL AUTO_INCREMENT,
   `TYPE` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `CREATED_TIME` datetime NULL DEFAULT NULL,
+  `UPDATED_TIME` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`ID`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for file
+-- ----------------------------
+DROP TABLE IF EXISTS `file`;
+CREATE TABLE `file`  (
+  `ID` int NOT NULL,
+  `ELE_ID` int NULL DEFAULT NULL,
+  `NAME` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `TYPE` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `PATH` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `IS_AVAILABLE` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '启用标志(0-禁用;1-启用)',
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
@@ -125,7 +141,7 @@ CREATE TABLE `organization`  (
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for tag
@@ -139,6 +155,6 @@ CREATE TABLE `tag`  (
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 418 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
