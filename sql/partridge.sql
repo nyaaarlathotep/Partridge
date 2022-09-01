@@ -11,7 +11,7 @@
  Target Server Version : 80027
  File Encoding         : 65001
 
- Date: 01/09/2022 10:25:37
+ Date: 01/09/2022 18:11:21
 */
 
 SET NAMES utf8mb4;
@@ -40,6 +40,30 @@ CREATE TABLE `author`  (
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for ehentai_gallery
+-- ----------------------------
+DROP TABLE IF EXISTS `ehentai_gallery`;
+CREATE TABLE `ehentai_gallery`  (
+  `GID` bigint NOT NULL COMMENT 'ehentai gallery id',
+  `ELE_ID` bigint NULL DEFAULT NULL,
+  `TITLE` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `TITLE_JPN` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `CATEGORY` int NULL DEFAULT NULL COMMENT 'gallery分类',
+  `UPLOADER` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '上传者',
+  `RATING` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '评分',
+  `RATING_COUNT` int NULL DEFAULT NULL COMMENT '评分人数',
+  `PAGES` int NULL DEFAULT NULL COMMENT '页数',
+  `TOKEN` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'gtoken',
+  `POSTED` datetime NULL DEFAULT NULL COMMENT '上传时间',
+  `FAVORITE_COUNT` int NULL DEFAULT NULL COMMENT '喜爱数',
+  `CASHED_FLAG` tinyint NULL DEFAULT NULL COMMENT '(0-否;1-是)',
+  `DOWNLOAD_FLAG` tinyint NULL DEFAULT NULL COMMENT '(0-否;1-是)',
+  `CREATED_TIME` datetime NULL DEFAULT NULL,
+  `UPDATED_TIME` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`GID`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for ele_actor_re
@@ -91,7 +115,7 @@ CREATE TABLE `ele_tag_re`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `element`;
 CREATE TABLE `element`  (
-  `ID` int NOT NULL AUTO_INCREMENT,
+  `ID` bigint NOT NULL AUTO_INCREMENT,
   `TYPE` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
@@ -103,12 +127,12 @@ CREATE TABLE `element`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `file`;
 CREATE TABLE `file`  (
-  `ID` int NOT NULL,
-  `ELE_ID` int NULL DEFAULT NULL,
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `ELE_ID` bigint NULL DEFAULT NULL,
   `NAME` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `TYPE` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `PATH` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `IS_AVAILABLE` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '启用标志(0-禁用;1-启用)',
+  `IS_AVAILABLE_FLAG` tinyint NULL DEFAULT NULL COMMENT '启用标志(0-禁用;1-启用)',
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
@@ -150,7 +174,7 @@ DROP TABLE IF EXISTS `tag`;
 CREATE TABLE `tag`  (
   `ID` int NOT NULL AUTO_INCREMENT,
   `NAME` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `BIG_TYPE` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `GROUP_NAME` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `SOURCE` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
