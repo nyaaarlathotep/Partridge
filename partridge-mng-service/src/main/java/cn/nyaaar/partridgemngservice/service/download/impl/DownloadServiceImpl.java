@@ -1,6 +1,5 @@
 package cn.nyaaar.partridgemngservice.service.download.impl;
 
-import cn.nyaaar.partridgemngservice.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.service.download.DownloadService;
 import cn.nyaaar.partridgemngservice.service.file.FileHandleService;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +44,7 @@ public class DownloadServiceImpl implements DownloadService {
 
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    // TODO callback to change file download status
                     byte[] bytes = Objects.requireNonNull(response.body()).bytes();
                     fileHandleService.saveBytesToFileWithSource(bytes, destDic, fileName, false);
                     log.info("download success!");

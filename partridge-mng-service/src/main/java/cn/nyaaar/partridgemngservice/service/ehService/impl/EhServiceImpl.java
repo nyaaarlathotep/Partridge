@@ -77,8 +77,8 @@ public class EhServiceImpl implements EhService {
     public void downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes) {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken);
         List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken);
-        for (int i = 0; i < galleryTokens.size(); i++) {
-            downloadUrlAndInsertFile(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(i), i);
+        for (Integer index : pageIndexes) {
+            downloadUrlAndInsertFile(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(index), index);
         }
     }
 
