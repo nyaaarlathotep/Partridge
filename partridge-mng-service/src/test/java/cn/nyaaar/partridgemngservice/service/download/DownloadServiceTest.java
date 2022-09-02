@@ -29,8 +29,6 @@ public class DownloadServiceTest {
     @Autowired
     private DownloadService downloadService;
 
-    @Autowired
-    private EhService ehService;
 
     @Autowired
     private FileHandleService fileHandleService;
@@ -45,15 +43,9 @@ public class DownloadServiceTest {
     }
 
     @Test
-    public void downloadGalleryTest() {
-        ehService.downloadGallery(2313044, "849f2a02ea");
-        ThreadUtil.sleep(20, TimeUnit.SECONDS);
-    }
-
-    @Test
     public void fileSaveTest() throws IOException {
         String sss = "testAppend";
 
-        fileHandleService.saveBytesToFileWithSource(sss.getBytes(StandardCharsets.UTF_8), "C:\\Users\\yuegenhua\\Desktop\\testFile", "test.txt", SourceEnum.Ehentai, true);
+        fileHandleService.saveBytesToFileWithSource(sss.getBytes(StandardCharsets.UTF_8), "C:\\Users\\yuegenhua\\Desktop\\testFile", "test.txt",  true);
     }
 }

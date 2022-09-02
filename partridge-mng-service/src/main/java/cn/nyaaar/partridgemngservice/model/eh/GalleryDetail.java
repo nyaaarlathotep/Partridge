@@ -17,6 +17,9 @@
 package cn.nyaaar.partridgemngservice.model.eh;
 
 
+import cn.hutool.core.date.DateUtil;
+import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
+
 import java.util.ArrayList;
 
 public class GalleryDetail extends GalleryInfo {
@@ -43,5 +46,19 @@ public class GalleryDetail extends GalleryInfo {
     public GalleryDetail() {
     }
 
-
+    public EhentaiGallery transToEntity() {
+        EhentaiGallery ehentaiGallery = new EhentaiGallery();
+        ehentaiGallery.setGid(this.gid);
+        ehentaiGallery.setTitle(this.title);
+        ehentaiGallery.setTitleJpn(this.titleJpn);
+        ehentaiGallery.setCategory(this.category);
+        ehentaiGallery.setUploader(this.uploader);
+        ehentaiGallery.setRating(String.valueOf(this.rating));
+        ehentaiGallery.setRatingCount(this.ratingCount);
+        ehentaiGallery.setPages(this.pages);
+        ehentaiGallery.setToken(this.token);
+        ehentaiGallery.setPosted(DateUtil.parse(this.posted));
+        ehentaiGallery.setFavoriteCount(this.favoriteCount);
+        return ehentaiGallery;
+    }
 }

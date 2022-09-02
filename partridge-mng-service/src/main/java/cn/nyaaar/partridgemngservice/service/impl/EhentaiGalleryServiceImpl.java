@@ -58,7 +58,7 @@ public class EhentaiGalleryServiceImpl extends ServiceImpl<EhentaiGalleryMapper,
     }
 
     @Override
-    public EhentaiGallery findById(Integer id){
+    public EhentaiGallery findById(Long id){
     
         return baseMapper.selectById(id);
     }

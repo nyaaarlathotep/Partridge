@@ -1,6 +1,5 @@
 package cn.nyaaar.partridgemngservice.service.file;
 
-import cn.nyaaar.partridgemngservice.enums.SourceEnum;
 
 import java.io.IOException;
 
@@ -10,5 +9,5 @@ import java.io.IOException;
  */
 public interface FileHandleService {
 
-    void saveBytesToFileWithSource(byte[] bytes, String destDic, String fileName, SourceEnum sourceEnum, boolean reDownload) throws IOException;
+    void saveBytesToFileWithSource(byte[] bytes, String destDic, String fileName, boolean reDownload) throws IOException;
 }

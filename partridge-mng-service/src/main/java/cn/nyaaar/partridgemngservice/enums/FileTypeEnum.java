@@ -14,12 +14,12 @@ public enum FileTypeEnum {
     ;
 
     private final String code;
-    private final String fileEnd;
+    private final String suffix;
     private static final Map<String, FileTypeEnum> MAP = new HashMap<>(10);
 
-    FileTypeEnum(String code, String fileEnd) {
+    FileTypeEnum(String code, String suffix) {
         this.code = code;
-        this.fileEnd = fileEnd;
+        this.suffix = suffix;
     }
 
     public static FileTypeEnum fromCode(String code) {
@@ -40,8 +40,8 @@ public enum FileTypeEnum {
      *
      * @return property value of msg
      */
-    public String getEnd() {
-        return fileEnd;
+    public String getSuffix() {
+        return suffix;
     }
 
     static {

@@ -1,7 +1,5 @@
 package cn.nyaaar.partridgemngservice.entity;
 
-import cn.hutool.core.date.DateUtil;
-import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 
@@ -31,27 +29,13 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class EhentaiGallery extends Model<EhentaiGallery> {
 
-    public EhentaiGallery(GalleryDetail galleryDetail) {
-        this.gid = galleryDetail.gid;
-        this.title = galleryDetail.title;
-        this.titleJpn = galleryDetail.titleJpn;
-        this.category = galleryDetail.category;
-        this.uploader = galleryDetail.uploader;
-        this.rating = String.valueOf(galleryDetail.rating);
-        this.ratingCount = galleryDetail.ratingCount;
-        this.pages = galleryDetail.pages;
-        this.token = galleryDetail.token;
-        this.posted = DateUtil.parse(galleryDetail.posted);
-        this.favoriteCount = galleryDetail.favoriteCount;
-    }
-
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
      * ehentai gallery id
      */
-    @TableId(value = "GID", type = IdType.AUTO)
+    @TableId(value = "GID", type = IdType.ASSIGN_ID)
     private Long gid;
 
     @TableField("ELE_ID")

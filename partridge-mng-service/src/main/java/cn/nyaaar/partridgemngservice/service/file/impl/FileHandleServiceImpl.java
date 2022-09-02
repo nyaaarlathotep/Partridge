@@ -17,7 +17,7 @@ import java.nio.file.StandardOpenOption;
 @Service
 public class FileHandleServiceImpl implements FileHandleService {
     @Override
-    public void saveBytesToFileWithSource(byte[] bytes, String destDic, String fileName, SourceEnum sourceEnum, boolean reDownload) throws IOException {
+    public void saveBytesToFileWithSource(byte[] bytes, String destDic, String fileName, boolean reDownload) throws IOException {
 
         Path dic = Path.of(destDic);
         if (Files.notExists(dic)) {

@@ -64,5 +64,5 @@ public interface EhentaiGalleryService extends IService<EhentaiGallery> {
      * @param id id
      * @return EhentaiGallery
      */
-    EhentaiGallery findById(Integer id);
+    EhentaiGallery findById(Long id);
 }

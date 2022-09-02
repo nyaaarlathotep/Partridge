@@ -1,5 +1,6 @@
 package cn.nyaaar.partridgemngservice.service.ehservice;
 
+import cn.hutool.core.thread.ThreadUtil;
 import cn.nyaaar.partridgemngservice.PartridgeMngServiceApplication;
 import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
 import cn.nyaaar.partridgemngservice.entity.Element;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author yuegenhua
@@ -35,11 +37,26 @@ public class EhServiceTest {
     @Autowired
     ElementService elementService;
 
+
+    @Autowired
+    private EhService ehService;
+
     @Test
     public void mybatisPlusTest() {
         Element element = new Element();
         element.setType(SourceEnum.Ehentai.getCode());
         elementService.add(element);
         log.info(Objects.toString(element));
+    }
+
+    @Test
+    public void downloadGalleryTest() {
+        ehService.downloadGallery(2312700, "9813f4654d");
+        ThreadUtil.sleep(30, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void getGalleryPageTest() {
+        log.info(ehService.getGalleryPage(2313044, 37));
     }
 }
