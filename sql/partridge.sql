@@ -11,7 +11,7 @@
  Target Server Version : 80027
  File Encoding         : 65001
 
- Date: 01/09/2022 18:11:21
+ Date: 02/09/2022 17:46:46
 */
 
 SET NAMES utf8mb4;
@@ -54,7 +54,8 @@ CREATE TABLE `ehentai_gallery`  (
   `UPLOADER` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '上传者',
   `RATING` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '评分',
   `RATING_COUNT` int NULL DEFAULT NULL COMMENT '评分人数',
-  `PAGES` int NULL DEFAULT NULL COMMENT '页数',
+  `PAGES` int NOT NULL COMMENT '总页数',
+  `PREVIEW_PAGE` int NULL DEFAULT NULL COMMENT '预览画廊对应页',
   `TOKEN` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'gtoken',
   `POSTED` datetime NULL DEFAULT NULL COMMENT '上传时间',
   `FAVORITE_COUNT` int NULL DEFAULT NULL COMMENT '喜爱数',
@@ -84,6 +85,23 @@ CREATE TABLE `ele_author_re`  (
   `ID` int NOT NULL AUTO_INCREMENT,
   `ELE_ID` int NOT NULL,
   `AUTHOR_ID` int NOT NULL,
+  PRIMARY KEY (`ID`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for ele_file
+-- ----------------------------
+DROP TABLE IF EXISTS `ele_file`;
+CREATE TABLE `ele_file`  (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `ELE_ID` bigint NULL DEFAULT NULL,
+  `NAME` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `TYPE` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `PATH` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `PAGE_NUM` tinyint NULL DEFAULT NULL COMMENT 'ehentai_gallery 对应画廊文件页码',
+  `IS_AVAILABLE_FLAG` tinyint NULL DEFAULT NULL COMMENT '启用标志(0-禁用;1-启用)',
+  `CREATED_TIME` datetime NULL DEFAULT NULL,
+  `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
@@ -120,23 +138,7 @@ CREATE TABLE `element`  (
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Table structure for file
--- ----------------------------
-DROP TABLE IF EXISTS `file`;
-CREATE TABLE `file`  (
-  `ID` int NOT NULL AUTO_INCREMENT,
-  `ELE_ID` bigint NULL DEFAULT NULL,
-  `NAME` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `TYPE` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `PATH` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `IS_AVAILABLE_FLAG` tinyint NULL DEFAULT NULL COMMENT '启用标志(0-禁用;1-启用)',
-  `CREATED_TIME` datetime NULL DEFAULT NULL,
-  `UPDATED_TIME` datetime NULL DEFAULT NULL,
-  PRIMARY KEY (`ID`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for jav
