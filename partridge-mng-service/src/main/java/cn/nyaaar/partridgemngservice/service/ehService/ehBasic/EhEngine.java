@@ -1,5 +1,6 @@
 package cn.nyaaar.partridgemngservice.service.ehService.ehBasic;
 
+import cn.nyaaar.partridgemngservice.common.config.CacheConfig;
 import cn.nyaaar.partridgemngservice.constants.EhUrl;
 import cn.nyaaar.partridgemngservice.constants.Settings;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
@@ -16,6 +17,7 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -399,6 +401,7 @@ public class EhEngine {
         return result;
     }
 
+    @Cacheable(cacheNames = CacheConfig.pToken)
     public List<String> getPTokens(long gid, String gtoken) {
 
         String url = EhUrl.getGalleryDetailUrl(

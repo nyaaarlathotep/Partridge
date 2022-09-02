@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-01
+ * @since 2022-09-02
  */
 public interface EhentaiGalleryMapper extends BaseMapper<EhentaiGallery> {
 

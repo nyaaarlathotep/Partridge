@@ -39,9 +39,6 @@ import java.util.regex.Pattern;
 
 @Slf4j
 public class GalleryListParser {
-
-    private static final String TAG = GalleryListParser.class.getSimpleName();
-
     private static final String NO_UNFILTERED_TEXT = "No unfiltered results in this page range. You either requested an invalid page or used too aggressive filters.";
 
     private static final Pattern PATTERN_RATING = Pattern.compile("\\d+px");
@@ -181,7 +178,7 @@ public class GalleryListParser {
                     gi.thumbWidth = NumberUtils.parseIntSafely(m.group(2), 0);
                     gi.thumbHeight = NumberUtils.parseIntSafely(m.group(1), 0);
                 } else {
-                    log.warn(TAG, "Can't parse gallery info thumb size");
+                    log.warn("Can't parse gallery info thumb size");
                     gi.thumbWidth = 0;
                     gi.thumbHeight = 0;
                 }
@@ -220,7 +217,7 @@ public class GalleryListParser {
                         gi.thumbWidth = NumberUtils.parseIntSafely(m.group(2), 0);
                         gi.thumbHeight = NumberUtils.parseIntSafely(m.group(1), 0);
                     } else {
-                        log.warn(TAG, "Can't parse gallery info thumb size");
+                        log.warn("Can't parse gallery info thumb size");
                         gi.thumbWidth = 0;
                         gi.thumbHeight = 0;
                     }
@@ -236,9 +233,9 @@ public class GalleryListParser {
             gi.posted = posted.text().trim();
             gi.favoriteSlot = parseFavoriteSlot(posted.attr("style"));
         }
-        if (gi.favoriteSlot == -2) {
+//        if (gi.favoriteSlot == -2) {
 //            gi.favoriteSlot = EhDB.containLocalFavorites(gi.gid) ? -1 : -2;
-        }
+//        }
 
         // Rating
         Element ir = JsoupUtils.getElementByClass(e, "ir");

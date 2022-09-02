@@ -13,6 +13,7 @@
         <result column="RATING" property="rating" />
         <result column="RATING_COUNT" property="ratingCount" />
         <result column="PAGES" property="pages" />
+        <result column="PREVIEW_PAGE" property="previewPage" />
         <result column="TOKEN" property="token" />
         <result column="POSTED" property="posted" />
         <result column="FAVORITE_COUNT" property="favoriteCount" />
@@ -24,7 +25,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        GID, ELE_ID, TITLE, TITLE_JPN, CATEGORY, UPLOADER, RATING, RATING_COUNT, PAGES, TOKEN, POSTED, FAVORITE_COUNT, CASHED_FLAG, DOWNLOAD_FLAG, CREATED_TIME, UPDATED_TIME
+        GID, ELE_ID, TITLE, TITLE_JPN, CATEGORY, UPLOADER, RATING, RATING_COUNT, PAGES, PREVIEW_PAGE, TOKEN, POSTED, FAVORITE_COUNT, CASHED_FLAG, DOWNLOAD_FLAG, CREATED_TIME, UPDATED_TIME
     </sql>
 
 </mapper>

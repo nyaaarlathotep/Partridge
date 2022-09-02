@@ -11,7 +11,7 @@ import java.util.List;
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-01
+ * @since 2022-09-02
  */
 public interface EhentaiGalleryService extends IService<EhentaiGallery> {
 

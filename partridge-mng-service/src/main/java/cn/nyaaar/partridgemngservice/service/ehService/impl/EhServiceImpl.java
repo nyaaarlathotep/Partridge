@@ -58,10 +58,8 @@ public class EhServiceImpl implements EhService {
                 new LambdaQueryWrapper<EleFile>()
                         .eq(EleFile::getEleId, ehentaiGallery.getEleId())
                         .eq(EleFile::getPageNum, pageIndex));
-
         BusinessExceptionEnum.PAGE_NOT_FOUND.assertNotNull(eleFile);
         return FileUtil.file2Base64(new File(eleFile.getPath()));
-
     }
 
     @Override
@@ -70,7 +68,17 @@ public class EhServiceImpl implements EhService {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken);
         List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken);
         for (int i = 0; i < galleryTokens.size(); i++) {
-            downloadUrlAndInsertFile(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens, i);
+            downloadUrlAndInsertFile(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(i), i);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes) {
+        EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken);
+        List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken);
+        for (int i = 0; i < galleryTokens.size(); i++) {
+            downloadUrlAndInsertFile(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(i), i);
         }
     }
 
@@ -78,6 +86,7 @@ public class EhServiceImpl implements EhService {
     private EhentaiGallery getEhGAndSavOrUpdEhg(long gid, String gtoken) {
         GalleryDetail galleryDetail = ehEngine.getGalleryDetail(gid, gtoken);
         EhentaiGallery ehentaiGallery = galleryDetail.transToEntity();
+        // TODO save tags
 
         EhentaiGallery ehentaiGalleryOld = ehentaiGalleryService.getOne(
                 new LambdaQueryWrapper<EhentaiGallery>().eq(EhentaiGallery::getGid, gid));
@@ -93,7 +102,7 @@ public class EhServiceImpl implements EhService {
         return ehentaiGallery;
     }
 
-    private void downloadUrlAndInsertFile(long gid, String gtoken, Long eleId, List<String> galleryTokens, int index) {
+    private void downloadUrlAndInsertFile(long gid, String gtoken, Long eleId, String pToken, int index) {
         String folder = PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(), String.valueOf(gid));
         EleFile eleFile = new EleFile();
         eleFile.setEleId(eleId);
@@ -103,7 +112,7 @@ public class EhServiceImpl implements EhService {
         eleFile.setPageNum(index + 1);
         eleFile.setIsAvailableFlag(1);
 
-        String pageUrl = EhUrl.getPageUrl(gid, index, galleryTokens.get(index));
+        String pageUrl = EhUrl.getPageUrl(gid, index, pToken);
         String pagePicUrl = ehEngine.getGalleryPage(pageUrl, gid, gtoken).imageUrl;
         downloadService.downloadUrlToDest(pagePicUrl,
                 folder,

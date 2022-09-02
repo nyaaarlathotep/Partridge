@@ -2,27 +2,23 @@ package cn.nyaaar.partridgemngservice.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-
 import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-
 import java.io.Serializable;
 import java.io.Serial;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
  * <p>
- *
+ * 
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-01
+ * @since 2022-09-02
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -35,7 +31,7 @@ public class EhentaiGallery extends Model<EhentaiGallery> {
     /**
      * ehentai gallery id
      */
-    @TableId(value = "GID", type = IdType.ASSIGN_ID)
+    @TableId(value = "GID", type = IdType.AUTO)
     private Long gid;
 
     @TableField("ELE_ID")
@@ -72,10 +68,16 @@ public class EhentaiGallery extends Model<EhentaiGallery> {
     private Integer ratingCount;
 
     /**
-     * 页数
+     * 总页数
      */
     @TableField("PAGES")
     private Integer pages;
+
+    /**
+     * 预览画廊对应页
+     */
+    @TableField("PREVIEW_PAGE")
+    private Integer previewPage;
 
     /**
      * gtoken
