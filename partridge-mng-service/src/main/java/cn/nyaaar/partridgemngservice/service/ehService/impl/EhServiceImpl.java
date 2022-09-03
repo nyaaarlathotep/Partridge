@@ -2,16 +2,12 @@ package cn.nyaaar.partridgemngservice.service.ehService.impl;
 
 import cn.nyaaar.partridgemngservice.constants.EhUrl;
 import cn.nyaaar.partridgemngservice.constants.Settings;
-import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
-import cn.nyaaar.partridgemngservice.entity.Element;
-import cn.nyaaar.partridgemngservice.entity.EleFile;
+import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
-import cn.nyaaar.partridgemngservice.service.EhentaiGalleryService;
-import cn.nyaaar.partridgemngservice.service.EleFileService;
-import cn.nyaaar.partridgemngservice.service.ElementService;
+import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.download.DownloadService;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
 import cn.nyaaar.partridgemngservice.service.ehService.ehBasic.EhEngine;
@@ -37,17 +33,22 @@ public class EhServiceImpl implements EhService {
     private final EhentaiGalleryService ehentaiGalleryService;
     private final EleFileService eleFileService;
     private final ElementService elementService;
+    private final TagService tagService;
+    private final EleTagReService eleTagReService;
 
     public EhServiceImpl(EhEngine ehEngine,
                          DownloadService downloadService,
                          EhentaiGalleryService ehentaiGalleryService,
                          EleFileService eleFileService,
-                         ElementService elementService) {
+                         ElementService elementService,
+                         TagService tagService, EleTagReService eleTagReService) {
         this.ehEngine = ehEngine;
         this.downloadService = downloadService;
         this.ehentaiGalleryService = ehentaiGalleryService;
         this.eleFileService = eleFileService;
         this.elementService = elementService;
+        this.tagService = tagService;
+        this.eleTagReService = eleTagReService;
     }
 
     @Override
@@ -88,13 +89,35 @@ public class EhServiceImpl implements EhService {
     private EhentaiGallery getEhGAndSavOrUpdEhg(long gid, String gtoken) {
         GalleryDetail galleryDetail = ehEngine.getGalleryDetail(gid, gtoken);
         EhentaiGallery ehentaiGallery = galleryDetail.transToEntity();
-        // TODO save tags
 
         Long eleId = getOrInsertEleIdFromGid(gid);
+        downloadGalleryTags(galleryDetail.getTags(), eleId);
         downloadGalleryThumb(gid, galleryDetail.thumb, eleId);
         ehentaiGallery.setEleId(eleId);
         ehentaiGalleryService.saveOrUpdate(ehentaiGallery);
         return ehentaiGallery;
+    }
+
+    private void downloadGalleryTags(List<Tag> galleryTags, Long eleId) {
+        for (Tag tag : galleryTags) {
+            Tag oldTag = tagService.getOne(
+                    new LambdaQueryWrapper<Tag>()
+                            .eq(Tag::getName, tag.getName())
+                            .eq(Tag::getGroupName, tag.getGroupName())
+                            .eq(Tag::getSource, tag.getSource()));
+            if (oldTag == null) {
+                tagService.add(tag);
+                EleTagRe eleTagRe = new EleTagRe()
+                        .setEleId(eleId)
+                        .setTagId(tag.getId());
+                eleTagReService.add(eleTagRe);
+            } else {
+                EleTagRe eleTagRe = new EleTagRe()
+                        .setEleId(eleId)
+                        .setTagId(oldTag.getId());
+                eleTagReService.add(eleTagRe);
+            }
+        }
     }
 
     private void downloadGalleryThumb(long gid, String thumbUrl, Long eleId) {

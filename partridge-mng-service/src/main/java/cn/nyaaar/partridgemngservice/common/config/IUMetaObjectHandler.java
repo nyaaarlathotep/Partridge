@@ -18,13 +18,12 @@ public class IUMetaObjectHandler implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
-        this.setFieldValByName("createdTime", DateUtil.now(), metaObject);
-        this.setFieldValByName("updatedTime", DateUtil.now(), metaObject);
-
+        this.setFieldValByName("createdTime", DateUtil.date(), metaObject);
+        this.setFieldValByName("updatedTime", DateUtil.date(), metaObject);
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        this.setFieldValByName("updatedTime", DateUtil.now(), metaObject);
+        this.setFieldValByName("updatedTime", DateUtil.date(), metaObject);
     }
 }

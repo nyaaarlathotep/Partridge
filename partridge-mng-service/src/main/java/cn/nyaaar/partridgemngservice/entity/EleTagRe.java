@@ -2,9 +2,7 @@ package cn.nyaaar.partridgemngservice.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.io.Serial;
@@ -23,7 +21,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class Tag extends Model<Tag> {
+public class EleTagRe extends Model<EleTagRe> {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -31,20 +29,11 @@ public class Tag extends Model<Tag> {
     @TableId(value = "ID", type = IdType.AUTO)
     private Integer id;
 
-    @TableField("NAME")
-    private String name;
+    @TableField("ELE_ID")
+    private Long eleId;
 
-    @TableField("GROUP_NAME")
-    private String groupName;
-
-    @TableField("SOURCE")
-    private String source;
-
-    @TableField(value = "CREATED_TIME", fill = FieldFill.INSERT)
-    private Date createdTime;
-
-    @TableField(value = "UPDATED_TIME", fill = FieldFill.INSERT_UPDATE)
-    private Date updatedTime;
+    @TableField("TAG_ID")
+    private Integer tagId;
 
 
     @Override

@@ -1,6 +1,6 @@
 package cn.nyaaar.partridgemngservice.service;
 
-import cn.nyaaar.partridgemngservice.entity.Tag;
+import cn.nyaaar.partridgemngservice.entity.EleTagRe;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.nyaaar.partridgemngservice.model.QueryData;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
  * @author nyaaar
  * @since 2022-09-03
  */
-public interface TagService extends IService<Tag> {
+public interface EleTagReService extends IService<EleTagRe> {
 
     /**
      * 查询分页数据
@@ -23,7 +23,7 @@ public interface TagService extends IService<Tag> {
      * @param pageCount 每页条数
      * @return QueryData
      */
-    QueryData<Tag> findListByPage(Tag where,Integer page, Integer pageCount);
+    QueryData<EleTagRe> findListByPage(EleTagRe where,Integer page, Integer pageCount);
 
     /**
     * 查询所有数据
@@ -31,16 +31,16 @@ public interface TagService extends IService<Tag> {
     * @param where     查询条件
     * @return List
     */
-    List<Tag> findList(Tag where);
+    List<EleTagRe> findList(EleTagRe where);
 
 
     /**
      * 添加
      *
-     * @param tag 
+     * @param eleTagRe 
      * @return 影响条数
      */
-    Integer add(Tag tag);
+    Integer add(EleTagRe eleTagRe);
 
     /**
      * 删除
@@ -53,16 +53,16 @@ public interface TagService extends IService<Tag> {
     /**
      * 修改
      *
-     * @param tag 
+     * @param eleTagRe 
      * @return 影响条数
      */
-    Integer updateData(Tag tag);
+    Integer updateData(EleTagRe eleTagRe);
 
     /**
      * id查询数据
      *
      * @param id id
-     * @return Tag
+     * @return EleTagRe
      */
-    Tag findById(Integer id);
+    EleTagRe findById(Integer id);
 }

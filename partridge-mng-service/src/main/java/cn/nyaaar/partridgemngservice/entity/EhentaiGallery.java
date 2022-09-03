@@ -31,7 +31,7 @@ public class EhentaiGallery extends Model<EhentaiGallery> {
     /**
      * ehentai gallery id
      */
-    @TableId(value = "GID", type = IdType.AUTO)
+    @TableId(value = "GID", type = IdType.ASSIGN_ID)
     private Long gid;
 
     @TableField("ELE_ID")

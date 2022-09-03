@@ -1,8 +1,8 @@
 package cn.nyaaar.partridgemngservice.service.impl;
 
-import cn.nyaaar.partridgemngservice.entity.Tag;
-import cn.nyaaar.partridgemngservice.mapper.TagMapper;
-import cn.nyaaar.partridgemngservice.service.TagService;
+import cn.nyaaar.partridgemngservice.entity.EleTagRe;
+import cn.nyaaar.partridgemngservice.mapper.EleTagReMapper;
+import cn.nyaaar.partridgemngservice.service.EleTagReService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -20,19 +20,19 @@ import java.util.List;
  * @since 2022-09-03
  */
 @Service
-public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
+public class EleTagReServiceImpl extends ServiceImpl<EleTagReMapper, EleTagRe> implements EleTagReService {
 
     @Override
-    public QueryData<Tag> findListByPage(Tag where, Integer page, Integer pageCount){
-        IPage<Tag> wherePage = new Page<>(page, pageCount);
+    public QueryData<EleTagRe> findListByPage(EleTagRe where, Integer page, Integer pageCount){
+        IPage<EleTagRe> wherePage = new Page<>(page, pageCount);
 
-        IPage<Tag> iPage = baseMapper.selectPage(wherePage, Wrappers.query(where));
+        IPage<EleTagRe> iPage = baseMapper.selectPage(wherePage, Wrappers.query(where));
 
         return new QueryData<>(iPage);
     }
 
     @Override
-    public List<Tag> findList(Tag where){
+    public List<EleTagRe> findList(EleTagRe where){
 
         return baseMapper.selectList( Wrappers.query(where));
     }
@@ -40,9 +40,9 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
 
 
     @Override
-    public Integer add(Tag tag){
+    public Integer add(EleTagRe eleTagRe){
  
-        return baseMapper.insert(tag);
+        return baseMapper.insert(eleTagRe);
     }
 
     @Override
@@ -52,13 +52,13 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     }
 
     @Override
-    public Integer updateData(Tag tag){
+    public Integer updateData(EleTagRe eleTagRe){
     
-        return baseMapper.updateById(tag);
+        return baseMapper.updateById(eleTagRe);
     }
 
     @Override
-    public Tag findById(Integer id){
+    public EleTagRe findById(Integer id){
     
         return baseMapper.selectById(id);
     }

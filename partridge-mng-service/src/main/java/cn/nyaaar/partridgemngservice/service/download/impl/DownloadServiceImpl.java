@@ -32,6 +32,8 @@ public class DownloadServiceImpl implements DownloadService {
 
     @Override
     public void downloadUrlToDest(@NotNull String url, @NotNull String destDic, @NotNull String fileName) {
+        // TODO download queue and callback
+        //  😇 such a stuff
         downloadExecutor.submit(() -> {
             Request request = new Request.Builder()
                     .url(url)
@@ -44,7 +46,6 @@ public class DownloadServiceImpl implements DownloadService {
 
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                    // TODO callback to change file download status
                     byte[] bytes = Objects.requireNonNull(response.body()).bytes();
                     fileHandleService.saveBytesToFileWithSource(bytes, destDic, fileName, false);
                     log.info("download success!");

@@ -21,7 +21,6 @@ import cn.hutool.core.util.NumberUtil;
 import cn.nyaaar.partridgemngservice.util.EhUtils;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -256,10 +255,10 @@ public class Settings {
     private static final int DEFAULT_DOWNLOAD_DELAY = 0;
     private static final String KEY_REQUEST_NEWS = "request_news";
     private static final boolean DEFAULT_REQUEST_NEWS = true;
-    private static final String DEFAULT_DOWNLOAD_ROOT_PATH = "E:\\eh\\";
-    private static final String DOWNLOAD_ROOT_PATH = "E:\\eh\\";
+    private static final String DEFAULT_DOWNLOAD_ROOT_PATH = "../test/mngDownload";
+    private static final String DOWNLOAD_ROOT_PATH = "../test/mngDownload";
     //    private static Context sContext;
-    private static Map<String,Object> sSettingsPre = new HashMap<>();
+    private static Map<String, Object> sSettingsPre = new HashMap<>();
     private static EhConfig sEhConfig;
 
 //    public static void initialize(Context context) {
@@ -1169,5 +1168,5 @@ public class Settings {
 
     public static String getDownloadRootPath() {
         return getString(DOWNLOAD_ROOT_PATH, DEFAULT_DOWNLOAD_ROOT_PATH);
-    } 
+    }
 }

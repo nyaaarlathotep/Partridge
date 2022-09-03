@@ -72,6 +72,8 @@ public class EhEngineTest {
         try {
             GalleryDetail galleryDetail = ehEngine.getGalleryDetail(2312700, "9813f4654d");
             log.info(JSON.toJSONString(galleryDetail));
+            log.info(JSON.toJSONString("------------tags-------------"));
+            log.info(JSON.toJSONString(galleryDetail.getTags()));
         } catch (Throwable e) {
             log.error(e.toString());
         }

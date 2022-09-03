@@ -19,8 +19,11 @@ package cn.nyaaar.partridgemngservice.model.eh;
 
 import cn.hutool.core.date.DateUtil;
 import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
+import cn.nyaaar.partridgemngservice.entity.Tag;
+import cn.nyaaar.partridgemngservice.enums.SourceEnum;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GalleryDetail extends GalleryInfo {
 
@@ -56,9 +59,24 @@ public class GalleryDetail extends GalleryInfo {
         ehentaiGallery.setRating(String.valueOf(this.rating));
         ehentaiGallery.setRatingCount(this.ratingCount);
         ehentaiGallery.setPages(this.pages);
+        ehentaiGallery.setPreviewPage(this.previewPages);
         ehentaiGallery.setToken(this.token);
         ehentaiGallery.setPosted(DateUtil.parse(this.posted));
         ehentaiGallery.setFavoriteCount(this.favoriteCount);
         return ehentaiGallery;
+    }
+
+    public List<Tag> getTags() {
+        List<Tag> partridgeTags = new ArrayList<>(tags.length);
+        for (GalleryTagGroup galleryTagGroup : tags) {
+            for (String galleryTag : galleryTagGroup.mTagList) {
+                Tag tag = new Tag()
+                        .setName(galleryTag)
+                        .setGroupName(galleryTagGroup.groupName)
+                        .setSource(SourceEnum.Ehentai.getCode());
+                partridgeTags.add(tag);
+            }
+        }
+        return partridgeTags;
     }
 }

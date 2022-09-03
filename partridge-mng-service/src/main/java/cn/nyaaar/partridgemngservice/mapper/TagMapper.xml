@@ -4,18 +4,17 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="cn.nyaaar.partridgemngservice.entity.Tag">
-        <id column="ID" property="id"/>
-        <result column="NAME" property="name"/>
-        <result column="BIG_TYPE" property="bigType"/>
-        <result column="SOURCE" property="source"/>
-        <result column="CREATED_TIME" property="createdTime"/>
-        <result column="UPDATED_TIME" property="updatedTime"/>
+        <id column="ID" property="id" />
+        <result column="NAME" property="name" />
+        <result column="GROUP_NAME" property="groupName" />
+        <result column="SOURCE" property="source" />
+        <result column="CREATED_TIME" property="createdTime" />
+        <result column="UPDATED_TIME" property="updatedTime" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        ID
-        , NAME, BIG_TYPE, SOURCE, CREATED_TIME, UPDATED_TIME
+        ID, NAME, GROUP_NAME, SOURCE, CREATED_TIME, UPDATED_TIME
     </sql>
 
 </mapper>

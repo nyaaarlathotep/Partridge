@@ -2,11 +2,11 @@ package cn.nyaaar.partridgemngservice.service.ehservice;
 
 import cn.hutool.core.thread.ThreadUtil;
 import cn.nyaaar.partridgemngservice.PartridgeMngServiceApplication;
-import cn.nyaaar.partridgemngservice.entity.Element;
-import cn.nyaaar.partridgemngservice.enums.SourceEnum;
+import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
 import cn.nyaaar.partridgemngservice.service.EhentaiGalleryService;
 import cn.nyaaar.partridgemngservice.service.ElementService;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,10 +39,11 @@ public class EhServiceTest {
 
     @Test
     public void mybatisPlusTest() {
-        Element element = new Element();
-        element.setType(SourceEnum.Ehentai.getCode());
-        elementService.add(element);
-        log.info(Objects.toString(element));
+        EhentaiGallery ehentaiGallery = new EhentaiGallery()
+                .setTitle("test")
+                .setGid(1L);
+        ehentaiGalleryService.saveOrUpdate(ehentaiGallery);
+        log.info(JSON.toJSONString(ehentaiGallery));
     }
 
     @Test
