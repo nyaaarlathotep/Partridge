@@ -1,6 +1,5 @@
 package cn.nyaaar.partridgemngservice.service.download;
 
-import org.springframework.lang.NonNull;
 
 /**
  * @author yuegenhua
@@ -8,5 +7,5 @@ import org.springframework.lang.NonNull;
  */
 public interface DownloadService {
 
-    void downloadUrlToDest(String url, String dest,String fileName);
+    void downloadUrlToDest(String url, String dest,String fileName, Runnable successHandle, Runnable failHandle);
 }

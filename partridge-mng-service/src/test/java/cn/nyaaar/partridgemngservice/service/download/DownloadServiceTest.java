@@ -3,8 +3,6 @@ package cn.nyaaar.partridgemngservice.service.download;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.nyaaar.partridgemngservice.PartridgeMngServiceApplication;
 import cn.nyaaar.partridgemngservice.constants.Settings;
-import cn.nyaaar.partridgemngservice.enums.SourceEnum;
-import cn.nyaaar.partridgemngservice.service.ehService.EhService;
 import cn.nyaaar.partridgemngservice.service.file.FileHandleService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -37,7 +35,7 @@ public class DownloadServiceTest {
     public void downloadTest() {
         downloadService.downloadUrlToDest("https://iymlvib.fawvwgxlrdfx.hath.network/" +
                 "h/8b41332140786b1c6f41d48dc2ba43cbab6c297c-49191-1100-1500-jpg/keystamp=1661940000-369c7cedf3;" +
-                "fileindex=113277182;xres=org/1211145_80751202_p1.jpg", Settings.getDownloadRootPath() + "2313044\\", "2");
+                "fileindex=113277182;xres=org/1211145_80751202_p1.jpg", Settings.getDownloadRootPath() + "2313044\\", "2", null, null);
 
         ThreadUtil.sleep(3, TimeUnit.SECONDS);
     }
@@ -46,6 +44,6 @@ public class DownloadServiceTest {
     public void fileSaveTest() throws IOException {
         String sss = "testAppend";
 
-        fileHandleService.saveBytesToFileWithSource(sss.getBytes(StandardCharsets.UTF_8), "C:\\Users\\yuegenhua\\Desktop\\testFile", "test.txt",  true);
+        fileHandleService.saveBytesToFileWithSource(sss.getBytes(StandardCharsets.UTF_8), "C:\\Users\\yuegenhua\\Desktop\\testFile", "test.txt", true);
     }
 }

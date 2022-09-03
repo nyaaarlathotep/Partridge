@@ -344,7 +344,7 @@ public class EhEngine {
 
     public GalleryPageParser.Result getGalleryPage(String url, long gid, String gtoken) {
         String referer = EhUrl.getGalleryDetailUrl(gid, gtoken);
-        log.info("getGalleryPage url:{}", url);
+        log.debug("getGalleryPage url:{}", url);
         Request request = new EhRequestBuilder(url, referer).build();
         Call call = okHttpClient.newCall(request);
 

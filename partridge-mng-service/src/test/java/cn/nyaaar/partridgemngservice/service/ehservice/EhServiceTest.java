@@ -6,6 +6,7 @@ import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
 import cn.nyaaar.partridgemngservice.service.EhentaiGalleryService;
 import cn.nyaaar.partridgemngservice.service.ElementService;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
+import cn.nyaaar.partridgemngservice.service.ehService.impl.EhServiceImpl;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -48,8 +50,28 @@ public class EhServiceTest {
 
     @Test
     public void downloadGalleryTest() {
-        ehService.downloadGallery(2312700, "9813f4654d");
+        ehService.downloadGallery(2316851, "7a18d746bd");
         ThreadUtil.sleep(30, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void downloadGalleryQueueTest() {
+        log.info("------before start-------");
+        Map<Long, EhServiceImpl.DownloadingGallery> queue = ehService.getDownloadingQueue();
+        log.info(JSON.toJSONString(queue));
+        log.info("------before start-------");
+        ehService.downloadGallery(2315232, "c4fdf93bea");
+
+        log.info("------after start-------");
+        queue = ehService.getDownloadingQueue();
+        log.info(JSON.toJSONString(queue));
+        log.info("------after start-------");
+        ThreadUtil.sleep(30, TimeUnit.SECONDS);
+
+        log.info("------finally-------");
+        queue = ehService.getDownloadingQueue();
+        log.info(JSON.toJSONString(queue));
+        log.info("------finally-------");
     }
 
     @Test

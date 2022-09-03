@@ -43,6 +43,7 @@ public class BeanConfig {
     public OkHttpClient okHttpClient() {
 
         return new OkHttpClient.Builder()
+                // TODO setting
                 .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 7890)))
                 .sslSocketFactory(sslSocketFactory(), x509TrustManager())
                 .retryOnConnectionFailure(false)//是否开启缓存
@@ -56,11 +57,11 @@ public class BeanConfig {
     public X509TrustManager x509TrustManager() {
         return new X509TrustManager() {
             @Override
-            public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+            public void checkClientTrusted(X509Certificate[] x509Certificates, String s) {
             }
 
             @Override
-            public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+            public void checkServerTrusted(X509Certificate[] x509Certificates, String s) {
             }
 
             public X509Certificate[] getAcceptedIssuers() {
@@ -74,7 +75,7 @@ public class BeanConfig {
     public SSLSocketFactory sslSocketFactory() {
         try {
             //信任任何链接
-            SSLContext sslContext = SSLContext.getInstance("TLS");
+            SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
             sslContext.init(null, new TrustManager[]{x509TrustManager()}, new SecureRandom());
             return sslContext.getSocketFactory();
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
@@ -88,11 +89,11 @@ public class BeanConfig {
     public ThreadPoolTaskExecutor downloadExecutor() {
         ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
         //核心线程池数
-        pool.setCorePoolSize(5);
+        pool.setCorePoolSize(2);
         //最大线程数
-        pool.setMaxPoolSize(10);
+        pool.setMaxPoolSize(5);
         //队列容量
-        pool.setQueueCapacity(1000);
+        pool.setQueueCapacity(300);
         // 线程最大空闲时间
         pool.setKeepAliveSeconds(300);
         //队列满，调用线程中运行被拒绝的任务。

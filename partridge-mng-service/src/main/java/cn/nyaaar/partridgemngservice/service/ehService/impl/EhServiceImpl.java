@@ -1,5 +1,8 @@
 package cn.nyaaar.partridgemngservice.service.ehService.impl;
 
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.nyaaar.partridgemngservice.constants.EhUrl;
 import cn.nyaaar.partridgemngservice.constants.Settings;
 import cn.nyaaar.partridgemngservice.entity.*;
@@ -14,18 +17,24 @@ import cn.nyaaar.partridgemngservice.service.ehService.ehBasic.EhEngine;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.PathUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author yuegenhua
  * @Version $Id: EhServiceImpl.java, v 0.1 2022-31 14:32 yuegenhua Exp $$
  */
 @Service
+@Slf4j
 public class EhServiceImpl implements EhService {
 
     private final EhEngine ehEngine;
@@ -35,6 +44,8 @@ public class EhServiceImpl implements EhService {
     private final ElementService elementService;
     private final TagService tagService;
     private final EleTagReService eleTagReService;
+
+    private final Map<Long, DownloadingGallery> downloadingGalleryQueue = new HashMap<>();
 
     public EhServiceImpl(EhEngine ehEngine,
                          DownloadService downloadService,
@@ -65,13 +76,18 @@ public class EhServiceImpl implements EhService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    // FIXME max download page 40...
     public void downloadGallery(long gid, String gtoken) {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken);
         List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken);
+
+        DownloadingGallery downloadingGallery = new DownloadingGallery()
+                .setGid(ehentaiGallery.getGid())
+                .setPages(ehentaiGallery.getPages());
+        downloadingGalleryQueue.put(ehentaiGallery.getGid(), downloadingGallery);
         for (int i = 0; i < galleryTokens.size(); i++) {
-            downloadGalleryPage(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(i), i);
+            downloadGalleryPage(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(i), i, downloadingGallery);
         }
-        ehentaiGallery.setDownloadFlag(1);
         ehentaiGalleryService.updateData(ehentaiGallery);
     }
 
@@ -81,7 +97,10 @@ public class EhServiceImpl implements EhService {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken);
         List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken);
         for (Integer index : pageIndexes) {
-            downloadGalleryPage(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(index), index);
+            // TODO download to cache dir or turn to sync
+            // now it's broken
+            downloadGalleryPage(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(index), index,
+                    null);
         }
     }
 
@@ -131,7 +150,9 @@ public class EhServiceImpl implements EhService {
         eleFile.setIsAvailableFlag(1);
         downloadService.downloadUrlToDest(thumbUrl,
                 folder,
-                eleFile.getName());
+                eleFile.getName(),
+                null,
+                null);
         eleFileService.add(eleFile);
     }
 
@@ -150,7 +171,8 @@ public class EhServiceImpl implements EhService {
         return eleId;
     }
 
-    private void downloadGalleryPage(long gid, String gtoken, Long eleId, String pToken, int index) {
+    private void downloadGalleryPage(long gid, String gtoken, Long eleId, String pToken, int index,
+                                     DownloadingGallery downloadingGallery) {
         String folder = PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(), String.valueOf(gid));
         EleFile eleFile = new EleFile();
         eleFile.setEleId(eleId);
@@ -164,8 +186,65 @@ public class EhServiceImpl implements EhService {
         String pagePicUrl = ehEngine.getGalleryPage(pageUrl, gid, gtoken).imageUrl;
         downloadService.downloadUrlToDest(pagePicUrl,
                 folder,
-                eleFile.getName());
-        eleFileService.add(eleFile);
+                eleFile.getName(),
+                () -> handlePageDownloadComplete(gid, downloadingGallery),
+                () -> handlePageDownloadFail(gid, gtoken, eleId, pToken, index, downloadingGallery));
+        eleFileService.saveOrUpdate(eleFile);
     }
 
+    private void handlePageDownloadFail(long gid, String gtoken, Long eleId, String pToken, int index, DownloadingGallery downloadingGallery) {
+        Integer failCount = downloadingGallery.downloadFailPageIndex.getOrDefault(index, 0);
+        if (failCount > 2) {
+            log.warn("[{}]gallery page download failed...index:{}, fail count:{}, try again...", gid, index, failCount);
+            downloadingGallery.downloadFailPageIndex.remove(index);
+            handlePageDownloadComplete(gid, downloadingGallery);
+        } else {
+            log.warn("[{}]gallery page download failed...index:{}, fail count:{}", gid, index, failCount + 1);
+            downloadingGallery.downloadFailPageIndex.put(index, failCount + 1);
+            downloadGalleryPage(gid, gtoken, eleId, pToken, index, downloadingGallery);
+        }
+    }
+
+    private void handlePageDownloadComplete(long gid, DownloadingGallery downloadingGallery) {
+        Integer completeNum = downloadingGallery.downloadCompleteNum.addAndGet(1);
+        if (completeNum.equals(downloadingGallery.pages)) {
+            downloadingGalleryQueue.remove(gid);
+
+            ehentaiGalleryService.update(new LambdaUpdateWrapper<EhentaiGallery>()
+                    .eq(EhentaiGallery::getGid, gid)
+                    .set(EhentaiGallery::getDownloadFlag, 1));
+            log.info("[{}]gallery download complete!", gid);
+        }
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static class DownloadingGallery {
+        long gid;
+
+        int pages;
+
+        Date deadline = DateUtil.date().offset(DateField.HOUR, 1);
+
+        AtomicInteger downloadCompleteNum = new AtomicInteger();
+
+        Map<Integer, Integer> downloadFailPageIndex = new HashMap<>();
+    }
+
+    @Override
+    public Map<Long, DownloadingGallery> getDownloadingQueue() {
+        DateTime now = DateUtil.date();
+        List<Long> deadGalleries = new ArrayList<>();
+        for (DownloadingGallery downloadingGallery : downloadingGalleryQueue.values()) {
+            if (downloadingGallery.deadline.before(now)) {
+                deadGalleries.add(downloadingGallery.gid);
+            }
+        }
+        if (!deadGalleries.isEmpty()) {
+            for (Long gid : deadGalleries) {
+                downloadingGalleryQueue.remove(gid);
+            }
+        }
+        return downloadingGalleryQueue;
+    }
 }

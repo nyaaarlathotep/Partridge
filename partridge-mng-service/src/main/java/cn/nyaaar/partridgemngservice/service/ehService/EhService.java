@@ -1,6 +1,9 @@
 package cn.nyaaar.partridgemngservice.service.ehService;
 
+import cn.nyaaar.partridgemngservice.service.ehService.impl.EhServiceImpl;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author yuegenhua
@@ -33,4 +36,13 @@ public interface EhService {
      * @param pageIndexes 画廊页数
      */
     void downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes);
+
+    /**
+     * 返回当前画廊下载队列
+     * key: gid
+     * value: gallery download status
+     *
+     * @return queue
+     */
+    Map<Long, EhServiceImpl.DownloadingGallery> getDownloadingQueue();
 }

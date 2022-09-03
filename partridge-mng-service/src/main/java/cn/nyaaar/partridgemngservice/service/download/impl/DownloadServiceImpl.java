@@ -31,9 +31,7 @@ public class DownloadServiceImpl implements DownloadService {
     }
 
     @Override
-    public void downloadUrlToDest(@NotNull String url, @NotNull String destDic, @NotNull String fileName) {
-        // TODO download queue and callback
-        //  😇 such a stuff
+    public void downloadUrlToDest(@NotNull String url, @NotNull String destDic, @NotNull String fileName, Runnable successHandle, Runnable failHandle) {
         downloadExecutor.submit(() -> {
             Request request = new Request.Builder()
                     .url(url)
@@ -42,13 +40,18 @@ public class DownloadServiceImpl implements DownloadService {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     log.error("download error, url:{}", url, e);
+                    if (failHandle != null) {
+                        failHandle.run();
+                    }
                 }
 
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                     byte[] bytes = Objects.requireNonNull(response.body()).bytes();
                     fileHandleService.saveBytesToFileWithSource(bytes, destDic, fileName, false);
-                    log.info("download success!");
+                    if (successHandle != null) {
+                        successHandle.run();
+                    }
                 }
             });
         });
