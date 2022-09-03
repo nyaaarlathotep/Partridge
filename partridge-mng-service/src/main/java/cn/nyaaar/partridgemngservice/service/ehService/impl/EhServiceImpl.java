@@ -68,8 +68,10 @@ public class EhServiceImpl implements EhService {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken);
         List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken);
         for (int i = 0; i < galleryTokens.size(); i++) {
-            downloadUrlAndInsertFile(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(i), i);
+            downloadGalleryPage(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(i), i);
         }
+        ehentaiGallery.setDownloadFlag(1);
+        ehentaiGalleryService.updateData(ehentaiGallery);
     }
 
     @Override
@@ -78,7 +80,7 @@ public class EhServiceImpl implements EhService {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken);
         List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken);
         for (Integer index : pageIndexes) {
-            downloadUrlAndInsertFile(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(index), index);
+            downloadGalleryPage(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(index), index);
         }
     }
 
@@ -88,21 +90,44 @@ public class EhServiceImpl implements EhService {
         EhentaiGallery ehentaiGallery = galleryDetail.transToEntity();
         // TODO save tags
 
+        Long eleId = getOrInsertEleIdFromGid(gid);
+        downloadGalleryThumb(gid, galleryDetail.thumb, eleId);
+        ehentaiGallery.setEleId(eleId);
+        ehentaiGalleryService.saveOrUpdate(ehentaiGallery);
+        return ehentaiGallery;
+    }
+
+    private void downloadGalleryThumb(long gid, String thumbUrl, Long eleId) {
+        String folder = PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(), String.valueOf(gid));
+        EleFile eleFile = new EleFile();
+        eleFile.setEleId(eleId);
+        eleFile.setType(FileTypeEnum.jpg.getCode());
+        eleFile.setName((0) + FileTypeEnum.jpg.getSuffix());
+        eleFile.setPath(PathUtil.simpleConcatUrl(folder, eleFile.getName()));
+        eleFile.setPageNum(0);
+        eleFile.setIsAvailableFlag(1);
+        downloadService.downloadUrlToDest(thumbUrl,
+                folder,
+                eleFile.getName());
+        eleFileService.add(eleFile);
+    }
+
+    private Long getOrInsertEleIdFromGid(long gid) {
+        Long eleId;
         EhentaiGallery ehentaiGalleryOld = ehentaiGalleryService.getOne(
                 new LambdaQueryWrapper<EhentaiGallery>().eq(EhentaiGallery::getGid, gid));
         if (ehentaiGalleryOld == null) {
             Element element = new Element();
             element.setType(SourceEnum.Ehentai.getCode());
             elementService.add(element);
-            ehentaiGallery.setEleId(element.getId());
+            eleId = element.getId();
         } else {
-            ehentaiGallery.setEleId(ehentaiGalleryOld.getEleId());
+            eleId = ehentaiGalleryOld.getEleId();
         }
-        ehentaiGalleryService.saveOrUpdate(ehentaiGallery);
-        return ehentaiGallery;
+        return eleId;
     }
 
-    private void downloadUrlAndInsertFile(long gid, String gtoken, Long eleId, String pToken, int index) {
+    private void downloadGalleryPage(long gid, String gtoken, Long eleId, String pToken, int index) {
         String folder = PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(), String.valueOf(gid));
         EleFile eleFile = new EleFile();
         eleFile.setEleId(eleId);
