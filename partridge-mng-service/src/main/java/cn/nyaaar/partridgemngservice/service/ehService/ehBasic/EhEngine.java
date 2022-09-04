@@ -420,23 +420,41 @@ public class EhEngine {
             body = Objects.requireNonNull(response.body()).string();
             code = response.code();
             headers = response.headers();
+            int pages = GalleryDetailParser.parsePages(body);
+            for (int i = 0; i <= pages / 40; i++) {
+                if (i != 0) {
+                    url = EhUrl.getGalleryDetailUrl(
+                            gid, gtoken, i, false);
+                    referer = EhUrl.getReferer();
 
-            PreviewSet previewSet = GalleryDetailParser.parsePreviewSet(body);
-
-            for (int i = 0, n = previewSet.size(); i < n; i++) {
-                GalleryPageUrlParser.Result result;
-                try {
-                    result = GalleryPageUrlParser.parse(previewSet.getPageUrlAt(i));
-                } catch (ParseException e) {
-                    // TODO 缺页处理
-                    continue;
+                    request = new EhRequestBuilder(url, referer).build();
+                    call = okHttpClient.newCall(request);
+                    response = call.execute();
+                    body = Objects.requireNonNull(response.body()).string();
+                    code = response.code();
+                    headers = response.headers();
                 }
-                pTokenList.add(result.pToken);
+                parseAndGetPToken(body, pTokenList);
             }
+
         } catch (Throwable e) {
             throwException(call, code, headers, body, e);
         }
         return pTokenList;
+    }
+
+    private static void parseAndGetPToken(String body, List<String> pTokenList) throws ParseException {
+        PreviewSet previewSet = GalleryDetailParser.parsePreviewSet(body);
+        for (int i = 0, n = previewSet.size(); i < n; i++) {
+            GalleryPageUrlParser.Result result;
+            try {
+                result = GalleryPageUrlParser.parse(previewSet.getPageUrlAt(i));
+            } catch (ParseException e) {
+                // TODO 缺页处理
+                continue;
+            }
+            pTokenList.add(result.pToken);
+        }
     }
 
 }

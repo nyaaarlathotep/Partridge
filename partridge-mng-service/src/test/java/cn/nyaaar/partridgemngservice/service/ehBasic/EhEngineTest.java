@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -102,9 +103,12 @@ public class EhEngineTest {
         );
     }
 
+    // ["6fd27a8076","a88203ff85","f35631d8f8","ae1d010d2a","a7d73a46af","9d534dae1a","34a8724739","77e9760cb3","d5681a2072","20a475cd31","e7d341827f","6a85b6ae62","02a07dc328","bc4cdd223e","8003d1d2bd","a61845f4bf","54fc2ff829","965c2458b8","6157585b65","02dfe64e0c","57471faf6f","c92649f0f1","4b8d85fee3","98b154b770","caeb035ff4","66c5833ea9","1204d85b78","02e2ed9704","c292adb5a6","7c99554751","c1a63b12f2","63b8eeb8c9","c1de4cfbd5","f86b27596a","97349459a9","9f6a48fd49","c88f09fe63","9b2fce601c","9df8c70eed","1cbb0b536c"]
     @Test
     public void getPTokensTest() {
-        log.info(JSON.toJSONString(ehEngine.getPTokens(2313044, "849f2a02ea")));
+        List<String> pToken=ehEngine.getPTokens(2316851, "7a18d746bd");
+        log.info(pToken.size()+"");
+        log.info(JSON.toJSONString(pToken));
     }
 
 
