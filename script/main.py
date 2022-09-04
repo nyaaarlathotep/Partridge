@@ -1,3 +1,4 @@
+import datetime
 import re
 from zhconv import convert
 import pymysql
@@ -841,32 +842,35 @@ tags = '''
 '''
 
 insert = '''
-INSERT INTO tag (NAME,BIG_TYPE,SOURCE) VALUES (%s,%s,%s);
+INSERT INTO tag (NAME,GROUP_NAME,SOURCE, CREATED_TIME, UPDATED_TIME) VALUES (%s,%s,%s,%s,%s);
 '''
+jav = '001'
 
 
-def insert_tag(cursor):
+# <h4>主題</h4>
+# INSERT INTO TAG (NAME,BIG_NAME) VALUES ()
+def insert_tag(db_cursor):
     tag_re = re.compile(r'>.*</a>')
-    # <h4>主題</h4>
-    # INSERT INTO TAG (NAME,BIG_NAME) VALUES ()
     theme_re = re.compile(r'>.*</h4>')
     lines = tags.split('\n')
-    big_type = ''
+    group_name = ''
+    name = ''
     for line in lines:
         theme_list = theme_re.findall(line)
         for theme in theme_list:
-            big_type = convert(theme[1: -5], 'zh-cn')
+            # group_name = convert(theme[1: -5], 'zh-cn')
+            group_name = theme[1: -5]
         tag_list = tag_re.findall(line)
         for tag in tag_list:
-            # print(tag)
+            print(tag)
             name = tag[1: -4]
-            cursor.execute(insert, (name, big_type, 'javbus'))
+            print('group name:', group_name)
+            print('tag name:', name)
+            db_cursor.execute(insert, (name, group_name, jav, datetime.datetime.now(), datetime.datetime.now()))
 
 
 if __name__ == "__main__":
     try:
-        # connect = pymysql.connect(host='localhost', port=3306, user='root',
-        #                           passwd='''RV39LMgnYKvqpZuNW6R4''', db='ccfdb')
 
         connect = pymysql.connect(host='localhost', port=3306, user='root',
                                   passwd='''12345678''', db='partridge')
