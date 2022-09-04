@@ -16,10 +16,9 @@
 
 package cn.nyaaar.partridgemngservice.util;
 
-import cn.nyaaar.partridgemngservice.constants.EhConfig;
-import cn.nyaaar.partridgemngservice.constants.Settings;
+import cn.nyaaar.partridgemngservice.common.constants.EhConfig;
+import cn.nyaaar.partridgemngservice.common.constants.Settings;
 
-import java.awt.*;
 import java.util.regex.Pattern;
 
 public class EhUtils {

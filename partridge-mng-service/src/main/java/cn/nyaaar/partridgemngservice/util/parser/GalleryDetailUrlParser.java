@@ -17,7 +17,7 @@
 package cn.nyaaar.partridgemngservice.util.parser;
 
 
-import cn.nyaaar.partridgemngservice.constants.EhUrl;
+import cn.nyaaar.partridgemngservice.common.constants.EhUrl;
 import cn.nyaaar.partridgemngservice.util.NumberUtils;
 import org.springframework.lang.Nullable;
 

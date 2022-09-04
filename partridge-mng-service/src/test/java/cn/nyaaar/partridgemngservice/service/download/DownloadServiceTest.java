@@ -2,7 +2,7 @@ package cn.nyaaar.partridgemngservice.service.download;
 
 import cn.hutool.core.thread.ThreadUtil;
 import cn.nyaaar.partridgemngservice.PartridgeMngServiceApplication;
-import cn.nyaaar.partridgemngservice.constants.Settings;
+import cn.nyaaar.partridgemngservice.common.constants.Settings;
 import cn.nyaaar.partridgemngservice.service.file.FileHandleService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;

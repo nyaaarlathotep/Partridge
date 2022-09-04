@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.enums;
+package cn.nyaaar.partridgemngservice.common.enums;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,9 @@ import java.util.Map;
  * @Version $Id: FileTypeEnum.java, v 0.1 2022-01 17:58 yuegenhua Exp $$
  */
 public enum FileTypeEnum {
-    jpg("001", ".jpg"),
+    jpg("1", ".jpg"),
+    mp4("2", ".mp4"),
+    avi("3", ".avi"),
     ;
 
     private final String code;

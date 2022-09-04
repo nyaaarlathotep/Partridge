@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.enums;
+package cn.nyaaar.partridgemngservice.common.enums;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,8 +10,8 @@ import java.util.Map;
  * @Version $Id: SourceCodeEnum.java, v 0.1 2022-01 9:42 yuegenhua Exp $$
  */
 public enum SourceEnum {
-    Jav("001", "Jav"),
-    Ehentai("002", "ehentai"),
+    Jav("1", "Jav"),
+    Ehentai("2", "ehentai"),
     ;
 
     private final String code;

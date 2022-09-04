@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.nyaaar.partridgemngservice.constants;
+package cn.nyaaar.partridgemngservice.common.constants;
 
 
 import cn.hutool.core.util.NumberUtil;

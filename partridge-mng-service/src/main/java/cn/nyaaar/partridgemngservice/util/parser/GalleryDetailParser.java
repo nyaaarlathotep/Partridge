@@ -17,8 +17,8 @@
 package cn.nyaaar.partridgemngservice.util.parser;
 
 
-import cn.nyaaar.partridgemngservice.constants.EhUrl;
-import cn.nyaaar.partridgemngservice.constants.Settings;
+import cn.nyaaar.partridgemngservice.common.constants.EhUrl;
+import cn.nyaaar.partridgemngservice.common.constants.Settings;
 import cn.nyaaar.partridgemngservice.exception.eh.EhException;
 import cn.nyaaar.partridgemngservice.exception.eh.OffensiveException;
 import cn.nyaaar.partridgemngservice.exception.eh.ParseException;

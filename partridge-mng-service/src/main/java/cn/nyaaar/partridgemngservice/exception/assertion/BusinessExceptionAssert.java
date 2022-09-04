@@ -1,6 +1,6 @@
 package cn.nyaaar.partridgemngservice.exception.assertion;
 
-import cn.nyaaar.partridgemngservice.enums.IResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.IResponseEnum;
 import cn.nyaaar.partridgemngservice.exception.BaseException;
 import cn.nyaaar.partridgemngservice.exception.BusinessException;
 

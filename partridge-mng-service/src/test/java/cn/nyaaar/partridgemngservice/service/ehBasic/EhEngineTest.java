@@ -2,7 +2,7 @@ package cn.nyaaar.partridgemngservice.service.ehBasic;
 
 import cn.hutool.core.date.TimeInterval;
 import cn.nyaaar.partridgemngservice.PartridgeMngServiceApplication;
-import cn.nyaaar.partridgemngservice.constants.EhUrl;
+import cn.nyaaar.partridgemngservice.common.constants.EhUrl;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
 import cn.nyaaar.partridgemngservice.service.ehService.ehBasic.EhEngine;
 import cn.nyaaar.partridgemngservice.util.parser.GalleryListParser;

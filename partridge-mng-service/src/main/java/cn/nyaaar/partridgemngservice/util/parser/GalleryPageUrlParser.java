@@ -17,10 +17,9 @@
 package cn.nyaaar.partridgemngservice.util.parser;
 
 
-import cn.nyaaar.partridgemngservice.constants.EhUrl;
+import cn.nyaaar.partridgemngservice.common.constants.EhUrl;
 import cn.nyaaar.partridgemngservice.exception.eh.ParseException;
 import cn.nyaaar.partridgemngservice.util.NumberUtils;
-import org.springframework.lang.Nullable;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

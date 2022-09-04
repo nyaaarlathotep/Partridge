@@ -1,6 +1,6 @@
 package cn.nyaaar.partridgemngservice.exception;
 
-import cn.nyaaar.partridgemngservice.enums.CommonResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.CommonResponseEnum;
 import cn.nyaaar.partridgemngservice.model.response.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

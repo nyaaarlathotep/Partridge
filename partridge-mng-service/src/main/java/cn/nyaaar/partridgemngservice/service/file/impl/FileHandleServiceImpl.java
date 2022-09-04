@@ -1,6 +1,5 @@
 package cn.nyaaar.partridgemngservice.service.file.impl;
 
-import cn.nyaaar.partridgemngservice.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.service.file.FileHandleService;
 import cn.nyaaar.partridgemngservice.util.PathUtil;
 import org.springframework.stereotype.Service;

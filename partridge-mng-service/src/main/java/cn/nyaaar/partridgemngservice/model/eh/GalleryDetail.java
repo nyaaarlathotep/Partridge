@@ -20,7 +20,7 @@ package cn.nyaaar.partridgemngservice.model.eh;
 import cn.hutool.core.date.DateUtil;
 import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
 import cn.nyaaar.partridgemngservice.entity.Tag;
-import cn.nyaaar.partridgemngservice.enums.SourceEnum;
+import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 
 import java.util.ArrayList;
 import java.util.List;

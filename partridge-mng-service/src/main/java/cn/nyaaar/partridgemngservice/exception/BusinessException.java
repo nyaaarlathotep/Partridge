@@ -1,7 +1,7 @@
 package cn.nyaaar.partridgemngservice.exception;
 
 
-import cn.nyaaar.partridgemngservice.enums.IResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.IResponseEnum;
 
 /**
  * <p>业务异常</p>

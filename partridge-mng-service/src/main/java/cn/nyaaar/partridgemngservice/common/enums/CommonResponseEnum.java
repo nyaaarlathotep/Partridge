@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.enums;
+package cn.nyaaar.partridgemngservice.common.enums;
 
 import cn.nyaaar.partridgemngservice.exception.BaseException;
 import cn.nyaaar.partridgemngservice.exception.CommonExceptionAssert;

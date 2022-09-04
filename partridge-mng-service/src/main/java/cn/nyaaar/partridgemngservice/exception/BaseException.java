@@ -1,6 +1,6 @@
 package cn.nyaaar.partridgemngservice.exception;
 
-import cn.nyaaar.partridgemngservice.enums.IResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.IResponseEnum;
 import lombok.Getter;
 
 /**

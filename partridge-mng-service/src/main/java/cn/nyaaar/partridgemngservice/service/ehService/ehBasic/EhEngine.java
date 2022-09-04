@@ -1,8 +1,8 @@
 package cn.nyaaar.partridgemngservice.service.ehService.ehBasic;
 
 import cn.nyaaar.partridgemngservice.common.config.CacheConfig;
-import cn.nyaaar.partridgemngservice.constants.EhUrl;
-import cn.nyaaar.partridgemngservice.constants.Settings;
+import cn.nyaaar.partridgemngservice.common.constants.EhUrl;
+import cn.nyaaar.partridgemngservice.common.constants.Settings;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.exception.eh.ParseException;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
