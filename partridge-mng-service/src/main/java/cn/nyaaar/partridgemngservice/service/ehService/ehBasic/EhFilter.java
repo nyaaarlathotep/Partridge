@@ -17,7 +17,7 @@
 package cn.nyaaar.partridgemngservice.service.ehService.ehBasic;
 
 
-import cn.nyaaar.partridgemngservice.entity.eh.Filter;
+import cn.nyaaar.partridgemngservice.model.eh.Filter;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryInfo;
 import lombok.extern.slf4j.Slf4j;
 

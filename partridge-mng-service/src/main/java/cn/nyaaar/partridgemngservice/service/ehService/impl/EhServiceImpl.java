@@ -1,5 +1,6 @@
 package cn.nyaaar.partridgemngservice.service.ehService.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
@@ -9,6 +10,7 @@ import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
+import cn.nyaaar.partridgemngservice.model.eh.GalleryBasicInfo;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
 import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.download.DownloadService;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * @author yuegenhua
@@ -76,7 +79,6 @@ public class EhServiceImpl implements EhService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    // FIXME max download page 40...
     public void downloadGallery(long gid, String gtoken) {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken);
         List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken);
@@ -93,6 +95,7 @@ public class EhServiceImpl implements EhService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    // FIXME index gtoken
     public void downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes) {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken);
         List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken);
@@ -102,6 +105,28 @@ public class EhServiceImpl implements EhService {
             downloadGalleryPage(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(index), index,
                     null);
         }
+    }
+
+
+    @Override
+    public GalleryBasicInfo getGalleryBasicByGid(long gid) {
+        EhentaiGallery ehentaiGallery = ehentaiGalleryService.findById(gid);
+        BusinessExceptionEnum.GALLERY_NOT_FOUND.assertNotNull(ehentaiGallery);
+        GalleryBasicInfo basicInfo = new GalleryBasicInfo();
+        BeanUtil.copyProperties(ehentaiGallery, basicInfo);
+        List<EleTagRe> eleTagRes = eleTagReService.findList(new EleTagRe().setEleId(basicInfo.getEleId()));
+        List<Integer> tagIds = eleTagRes.stream().map(EleTagRe::getTagId).toList();
+        List<Tag> tags = tagService.list(new LambdaQueryWrapper<Tag>().in(Tag::getId, tagIds));
+        basicInfo.setTags(tags);
+        return basicInfo;
+    }
+
+    @Override
+    public GalleryDetail getGalleryDetailByGid(long gid, String gtoken) {
+        GalleryDetail galleryDetail = ehEngine.getGalleryDetail(gid, gtoken);
+        EhentaiGallery ehentaiGallery = galleryDetail.transToEntity();
+        ehentaiGalleryService.saveOrUpdate(ehentaiGallery);
+        return galleryDetail;
     }
 
     @NotNull
@@ -247,4 +272,5 @@ public class EhServiceImpl implements EhService {
         }
         return downloadingGalleryQueue;
     }
+
 }

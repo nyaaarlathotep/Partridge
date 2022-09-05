@@ -43,8 +43,8 @@ public enum BusinessExceptionEnum implements BusinessExceptionAssert {
     PAGE_NOT_FOUND(200015, "没有找到对应页码"),
     ;
 
-    int code;
+    final int code;
 
-    String message;
+    final String message;
 
 }

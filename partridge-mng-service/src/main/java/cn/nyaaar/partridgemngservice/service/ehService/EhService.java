@@ -1,5 +1,7 @@
 package cn.nyaaar.partridgemngservice.service.ehService;
 
+import cn.nyaaar.partridgemngservice.model.eh.GalleryBasicInfo;
+import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
 import cn.nyaaar.partridgemngservice.service.ehService.impl.EhServiceImpl;
 
 import java.util.List;
@@ -45,4 +47,20 @@ public interface EhService {
      * @return queue
      */
     Map<Long, EhServiceImpl.DownloadingGallery> getDownloadingQueue();
+
+    /**
+     * gid->GalleryBasicInfo
+     *
+     * @param gid gid
+     * @return GalleryBasicInfo
+     */
+    GalleryBasicInfo getGalleryBasicByGid(long gid);
+
+    /**
+     * gid+gtoken->GalleryDetail
+     *
+     * @param gid gid
+     * @return GalleryDetail
+     */
+    GalleryDetail getGalleryDetailByGid(long gid, String gtoken);
 }
