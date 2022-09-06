@@ -18,7 +18,7 @@ import java.util.List;
 @Accessors(chain = true)
 public class GalleryBasicInfo {
 
-    @Schema(name = "ehentai gallery id")
+    @Schema(title = "ehentai gallery id")
     private Long gid;
 
     private Long eleId;
@@ -27,40 +27,40 @@ public class GalleryBasicInfo {
 
     private String titleJpn;
 
-    @Schema(name = "tag")
+    @Schema(title = "tag")
     private List<Tag> tags;
 
-    @Schema(name = "ehentai gallery id")
+    @Schema(title = "ehentai gallery id")
     private Integer category;
 
-    @Schema(name = "上传者")
+    @Schema(title = "上传者")
     private String uploader;
 
-    @Schema(name = "评分")
+    @Schema(title = "评分")
     private String rating;
 
-    @Schema(name = "评分人数")
+    @Schema(title = "评分人数")
     private Integer ratingCount;
 
-    @Schema(name = "总页数")
+    @Schema(title = "总页数")
     private Integer pages;
 
-    @Schema(name = "预览画廊对应页")
+    @Schema(title = "预览画廊对应页")
     private Integer previewPage;
 
-    @Schema(name = "gtoken")
+    @Schema(title = "gtoken")
     private String token;
 
-    @Schema(name = "上传时间")
+    @Schema(title = "上传时间")
     private Date posted;
 
-    @Schema(name = "喜爱数")
+    @Schema(title = "喜爱数")
     private Integer favoriteCount;
 
-    @Schema(name = "(0-否;1-是)")
+    @Schema(title = "(0-否;1-是)")
     private Integer cashedFlag;
 
-    @Schema(name = "(0-否;1-是)")
+    @Schema(title = "(0-否;1-是)")
     private Integer downloadFlag;
 
     private Date createdTime;

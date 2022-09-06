@@ -2,12 +2,16 @@ package cn.nyaaar.partridgemngservice.controller;
 
 import cn.nyaaar.partridgemngservice.model.eh.GalleryBasicInfo;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
+import cn.nyaaar.partridgemngservice.model.eh.EhDownloadReq;
 import cn.nyaaar.partridgemngservice.model.response.R;
+import cn.nyaaar.partridgemngservice.model.validate.EhDownload;
+import cn.nyaaar.partridgemngservice.model.validate.EhPreview;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -45,16 +49,18 @@ public class EhentaiGalleryController {
 
     @Operation(summary = "下载gallery", description = "通过gid与gtoken下载对应gallery")
     @PostMapping(value = "/download")
-    public R<String> downloadGallery(@RequestBody Long gid, @RequestBody String gtoken) {
-        ehService.downloadGallery(gid, gtoken);
+    public R<String> downloadGallery(@RequestBody @Validated(EhDownload.class) EhDownloadReq ehDownloadReq) {
+        log.info(ehDownloadReq.toString());
+//        ehService.downloadGallery(gid, gtoken);
         return new R<>();
     }
 
 
     @Operation(summary = "预览gallery", description = "通过gid与gtoken获取对应页")
     @PostMapping(value = "/view")
-    public R<String> previewGallery(@RequestBody Long gid, @RequestBody String gtoken) {
-        ehService.downloadGallery(gid, gtoken);
+    public R<String> previewGallery(@RequestBody @Validated(EhPreview.class) EhDownloadReq ehDownloadReq) {
+        log.info(ehDownloadReq.toString());
+//        ehService.downloadGallery(gid, gtoken);
         return new R<>();
     }
 }

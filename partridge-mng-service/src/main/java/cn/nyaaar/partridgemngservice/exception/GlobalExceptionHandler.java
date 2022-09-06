@@ -30,7 +30,7 @@ public class GlobalExceptionHandler implements Ordered {
 
         BindingResult bindingResult = e.getBindingResult();
         String errorMsg = "";
-        if (bindingResult != null && bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             List<ObjectError> errorList = bindingResult.getAllErrors();
             for (ObjectError error : errorList) {
                 // 取其中一个错误Message返回给前端

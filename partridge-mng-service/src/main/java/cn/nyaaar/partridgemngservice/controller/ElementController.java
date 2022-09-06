@@ -1,6 +1,7 @@
 package cn.nyaaar.partridgemngservice.controller;
 
 import cn.nyaaar.partridgemngservice.entity.Element;
+import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.ElementDto;
 import cn.nyaaar.partridgemngservice.model.response.R;
 import cn.nyaaar.partridgemngservice.service.ElementService;
@@ -34,6 +35,7 @@ public class ElementController {
     @GetMapping(value = "/element")
     public R<ElementDto> getElementById(@RequestParam Integer elementId) {
         Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, elementId));
+        BusinessExceptionEnum.ELEMENT_NOT_FOUND.assertNotNull(element);
         ElementDto elementDto = new ElementDto()
                 .setId(elementId)
                 .setType(element.getType());
