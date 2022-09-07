@@ -1,7 +1,10 @@
 package cn.nyaaar.partridgemngservice.service.download.impl;
 
+import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.service.download.DownloadService;
 import cn.nyaaar.partridgemngservice.service.file.FileHandleService;
+import cn.nyaaar.partridgemngservice.util.FileUtil;
+import cn.nyaaar.partridgemngservice.util.requestBuilder.EhRequestBuilder;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
@@ -12,8 +15,8 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * @author yuegenhua
- * @Version $Id: DownloadServiceImpl.java, v 0.1 2022-31 17:01 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: DownloadServiceImpl.java, v 0.1 2022-31 17:01 nyaaar Exp $$
  */
 @Service
 @Slf4j
@@ -56,5 +59,18 @@ public class DownloadServiceImpl implements DownloadService {
             });
         });
 
+    }
+
+    @Override
+    public String downloadUrlToBase64(String url) {
+        Request request = new EhRequestBuilder(url, null).build();
+        String urlBase64 = "";
+        try {
+            Response response = okHttpClient.newCall(request).execute();
+            urlBase64 = FileUtil.bytes2Base64(Objects.requireNonNull(response.body()).bytes());
+        } catch (IOException e) {
+            BusinessExceptionEnum.HTTP_REQUEST_FAILED.assertFail();
+        }
+        return urlBase64;
     }
 }

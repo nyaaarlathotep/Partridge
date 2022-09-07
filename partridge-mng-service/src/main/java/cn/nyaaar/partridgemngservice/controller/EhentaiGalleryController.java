@@ -1,5 +1,6 @@
 package cn.nyaaar.partridgemngservice.controller;
 
+import cn.nyaaar.partridgemngservice.model.eh.EhPreviewResp;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryBasicInfo;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
 import cn.nyaaar.partridgemngservice.model.eh.EhDownloadReq;
@@ -17,8 +18,8 @@ import org.springframework.web.bind.annotation.*;
 /**
  * ehentaiController
  *
- * @author yuegenhua
- * @Version $Id: EhentaiGalleryController.java, v 0.1 2022-05 14:32 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: EhentaiGalleryController.java, v 0.1 2022-05 14:32 nyaaar Exp $$
  */
 @Tag(name = "ehentai")
 @RestController
@@ -50,17 +51,15 @@ public class EhentaiGalleryController {
     @Operation(summary = "下载gallery", description = "通过gid与gtoken下载对应gallery")
     @PostMapping(value = "/download")
     public R<String> downloadGallery(@RequestBody @Validated(EhDownload.class) EhDownloadReq ehDownloadReq) {
-        log.info(ehDownloadReq.toString());
-//        ehService.downloadGallery(gid, gtoken);
+        ehService.downloadGallery(ehDownloadReq.getGid(), ehDownloadReq.getGtoken());
         return new R<>();
     }
 
-
     @Operation(summary = "预览gallery", description = "通过gid与gtoken获取对应页")
     @PostMapping(value = "/view")
-    public R<String> previewGallery(@RequestBody @Validated(EhPreview.class) EhDownloadReq ehDownloadReq) {
-        log.info(ehDownloadReq.toString());
-//        ehService.downloadGallery(gid, gtoken);
-        return new R<>();
+    public R<EhPreviewResp> previewGallery(@RequestBody @Validated(EhPreview.class) EhDownloadReq ehDownloadReq) {
+        EhPreviewResp ehPreviewResp = new EhPreviewResp()
+                .setPagesBase64(ehService.downloadGalleryPages(ehDownloadReq.getGid(), ehDownloadReq.getGtoken(), ehDownloadReq.getPageIndexes()));
+        return new R<>(ehPreviewResp);
     }
 }

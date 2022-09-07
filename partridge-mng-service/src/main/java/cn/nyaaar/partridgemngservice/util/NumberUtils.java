@@ -1,8 +1,8 @@
 package cn.nyaaar.partridgemngservice.util;
 
 /**
- * @author yuegenhua
- * @Version $Id: NumberUtils.java, v 0.1 2022-28 16:55 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: NumberUtils.java, v 0.1 2022-28 16:55 nyaaar Exp $$
  */
 
 public final class NumberUtils {

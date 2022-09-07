@@ -10,8 +10,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author yuegenhua
- * @Version $Id: GalleryBasicInfo.java, v 0.1 2022-05 14:39 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: GalleryBasicInfo.java, v 0.1 2022-05 14:39 nyaaar Exp $$
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

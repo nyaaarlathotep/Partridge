@@ -3,8 +3,8 @@ package cn.nyaaar.partridgemngservice.model.response;
 /**
  * 通用返回结果
  *
- * @author yuegenhua
- * @Version $Id: R.java, v 0.1 2022-22 15:08 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: R.java, v 0.1 2022-22 15:08 nyaaar Exp $$
  */
 
 import lombok.EqualsAndHashCode;

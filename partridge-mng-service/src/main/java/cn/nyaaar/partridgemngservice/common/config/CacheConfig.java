@@ -14,17 +14,19 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @Description: Caffeine缓存，本地缓存
- * @author: yuegenhua
+ * @author: nyaaar
  * @date: 2021/7/23
  */
 @Configuration
 @EnableCaching
 public class CacheConfig {
 
-    private static final int DEFAULT_EXPIRE_TIME = 7200;
+    private static final int DEFAULT_EXPIRE_TIME = 3600;
     private static final int DEFAULT_MAX_SIZE = 50000;
 
-    public static final String pToken="PTOKEN";
+    public static final String pToken = "PTOKEN";
+    public static final String pTokenIndex = "PTOKEN_INDEX";
+
     @Bean
     public CacheManager caffeineCacheManager() {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
@@ -46,6 +48,7 @@ public class CacheConfig {
 
         // page token
         PTOKEN(DEFAULT_EXPIRE_TIME, DEFAULT_MAX_SIZE),
+        PTOKEN_INDEX(DEFAULT_EXPIRE_TIME, DEFAULT_MAX_SIZE),
         ;
 
         private final int expires;

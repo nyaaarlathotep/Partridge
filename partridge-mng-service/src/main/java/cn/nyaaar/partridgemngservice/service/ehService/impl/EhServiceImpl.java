@@ -30,11 +30,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
- * @author yuegenhua
- * @Version $Id: EhServiceImpl.java, v 0.1 2022-31 14:32 yuegenhua Exp $$
+ * index 与 pageIndex 为不同的值，index 和 逻辑页码
+ *
+ * @author nyaaar
+ * @Version $Id: EhServiceImpl.java, v 0.1 2022-31 14:32 nyaaar Exp $$
  */
 @Service
 @Slf4j
@@ -78,33 +79,39 @@ public class EhServiceImpl implements EhService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void downloadGallery(long gid, String gtoken) {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken);
         List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken);
 
         DownloadingGallery downloadingGallery = new DownloadingGallery()
                 .setGid(ehentaiGallery.getGid())
-                .setPages(ehentaiGallery.getPages());
+                .setGtoken(gtoken)
+                .setPages(ehentaiGallery.getPages())
+                .setEleId(ehentaiGallery.getEleId());
         downloadingGalleryQueue.put(ehentaiGallery.getGid(), downloadingGallery);
         for (int i = 0; i < galleryTokens.size(); i++) {
-            downloadGalleryPage(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(i), i, downloadingGallery);
+            downloadGalleryPageAsync(galleryTokens.get(i), i, downloadingGallery);
         }
-        ehentaiGalleryService.updateData(ehentaiGallery);
+        ehentaiGalleryService.saveOrUpdate(ehentaiGallery);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    // FIXME index gtoken
-    public void downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes) {
+    public List<String> downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes) {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken);
-        List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken);
-        for (Integer index : pageIndexes) {
-            // TODO download to cache dir or turn to sync
-            // now it's broken
-            downloadGalleryPage(gid, gtoken, ehentaiGallery.getEleId(), galleryTokens.get(index), index,
-                    null);
+        List<String> picBase64List = new ArrayList<>();
+        for (Integer pageIndex : pageIndexes) {
+            int index = pageIndex - 1;
+            if (index < 0 || index >= ehentaiGallery.getPages()) {
+                BusinessExceptionEnum.FIELD_ER_WITH_ER_VALUE.assertFail("页码 ", pageIndex);
+            }
+            int ptokenPageIndex = index / 40;
+            int ptokenListIndex = index % 40;
+
+            List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken, ptokenPageIndex);
+            String picRes = downloadGalleryPageSync(galleryTokens.get(ptokenListIndex), index, gid, gtoken);
+            picBase64List.add(picRes);
         }
+        return picBase64List;
     }
 
 
@@ -196,15 +203,19 @@ public class EhServiceImpl implements EhService {
         return eleId;
     }
 
-    private void downloadGalleryPage(long gid, String gtoken, Long eleId, String pToken, int index,
-                                     DownloadingGallery downloadingGallery) {
+    private void downloadGalleryPageAsync(String pToken, int index,
+                                          DownloadingGallery downloadingGallery) {
+        long gid = downloadingGallery.gid;
+        long eleId = downloadingGallery.eleId;
+        String gtoken = downloadingGallery.gtoken;
+        int pageIndex = index + 1;
         String folder = PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(), String.valueOf(gid));
         EleFile eleFile = new EleFile();
         eleFile.setEleId(eleId);
         eleFile.setType(FileTypeEnum.jpg.getCode());
-        eleFile.setName((index + 1) + FileTypeEnum.jpg.getSuffix());
+        eleFile.setName((pageIndex) + FileTypeEnum.jpg.getSuffix());
         eleFile.setPath(PathUtil.simpleConcatUrl(folder, eleFile.getName()));
-        eleFile.setPageNum(index + 1);
+        eleFile.setPageNum(pageIndex);
         eleFile.setIsAvailableFlag(1);
 
         String pageUrl = EhUrl.getPageUrl(gid, index, pToken);
@@ -212,25 +223,34 @@ public class EhServiceImpl implements EhService {
         downloadService.downloadUrlToDest(pagePicUrl,
                 folder,
                 eleFile.getName(),
-                () -> handlePageDownloadComplete(gid, downloadingGallery),
-                () -> handlePageDownloadFail(gid, gtoken, eleId, pToken, index, downloadingGallery));
+                () -> handlePageDownloadComplete(downloadingGallery),
+                () -> handlePageDownloadFail(pToken, index, downloadingGallery));
         eleFileService.saveOrUpdate(eleFile);
     }
 
-    private void handlePageDownloadFail(long gid, String gtoken, Long eleId, String pToken, int index, DownloadingGallery downloadingGallery) {
+    private String downloadGalleryPageSync(String pToken, int index, long gid, String gtoken) {
+
+        String pageUrl = EhUrl.getPageUrl(gid, index, pToken);
+        String pagePicUrl = ehEngine.getGalleryPage(pageUrl, gid, gtoken).imageUrl;
+        return downloadService.downloadUrlToBase64(pagePicUrl);
+    }
+
+    private void handlePageDownloadFail(String pToken, int index, DownloadingGallery downloadingGallery) {
+        long gid = downloadingGallery.gid;
         Integer failCount = downloadingGallery.downloadFailPageIndex.getOrDefault(index, 0);
         if (failCount > 2) {
-            log.warn("[{}]gallery page download failed...index:{}, fail count:{}, try again...", gid, index, failCount);
+            log.warn("[{}]gallery page download failed...index:{}, fail count:{}", gid, index, failCount);
             downloadingGallery.downloadFailPageIndex.remove(index);
-            handlePageDownloadComplete(gid, downloadingGallery);
+            handlePageDownloadComplete(downloadingGallery);
         } else {
-            log.warn("[{}]gallery page download failed...index:{}, fail count:{}", gid, index, failCount + 1);
+            log.warn("[{}]gallery page download failed...index:{}, fail count:{}, try again...", gid, index, failCount + 1);
             downloadingGallery.downloadFailPageIndex.put(index, failCount + 1);
-            downloadGalleryPage(gid, gtoken, eleId, pToken, index, downloadingGallery);
+            downloadGalleryPageAsync(pToken, index, downloadingGallery);
         }
     }
 
-    private void handlePageDownloadComplete(long gid, DownloadingGallery downloadingGallery) {
+    private void handlePageDownloadComplete(DownloadingGallery downloadingGallery) {
+        long gid = downloadingGallery.gid;
         Integer completeNum = downloadingGallery.downloadCompleteNum.addAndGet(1);
         if (completeNum.equals(downloadingGallery.pages)) {
             downloadingGalleryQueue.remove(gid);
@@ -246,6 +266,9 @@ public class EhServiceImpl implements EhService {
     @Accessors(chain = true)
     public static class DownloadingGallery {
         long gid;
+
+        String gtoken;
+        long eleId;
 
         int pages;
 

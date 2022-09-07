@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author yuegenhua
- * @Version $Id: EhService.java, v 0.1 2022-31 14:31 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: EhService.java, v 0.1 2022-31 14:31 nyaaar Exp $$
  */
 public interface EhService {
 
@@ -36,8 +36,9 @@ public interface EhService {
      * @param gid         gid
      * @param gtoken      gtoken
      * @param pageIndexes 画廊页数
+     * @return picBase64List
      */
-    void downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes);
+    List<String> downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes);
 
     /**
      * 返回当前画廊下载队列

@@ -16,8 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author yuegenhua
- * @Version $Id: DownloadServiceTest.java, v 0.1 2022-31 17:44 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: DownloadServiceTest.java, v 0.1 2022-31 17:44 nyaaar Exp $$
  */
 @RunWith(SpringRunner.class)
 @Slf4j
@@ -44,6 +44,6 @@ public class DownloadServiceTest {
     public void fileSaveTest() throws IOException {
         String sss = "testAppend";
 
-        fileHandleService.saveBytesToFileWithSource(sss.getBytes(StandardCharsets.UTF_8), "C:\\Users\\yuegenhua\\Desktop\\testFile", "test.txt", true);
+        fileHandleService.saveBytesToFileWithSource(sss.getBytes(StandardCharsets.UTF_8), "C:\\Users\\nyaaar\\Desktop\\testFile", "test.txt", true);
     }
 }

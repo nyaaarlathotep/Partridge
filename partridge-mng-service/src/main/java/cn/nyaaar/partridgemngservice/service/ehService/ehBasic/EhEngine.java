@@ -28,8 +28,8 @@ import java.util.Objects;
 
 
 /**
- * @author yuegenhua
- * @Version $Id: EhEngine.java, v 0.1 2022-28 12:03 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: EhEngine.java, v 0.1 2022-28 12:03 nyaaar Exp $$
  */
 @Service
 @Slf4j
@@ -111,7 +111,7 @@ public class EhEngine {
                 doThrowException(call, code, headers, body, (Exception) e);
             } catch (Exception exception) {
                 log.error("unhandled exception", exception);
-                BusinessExceptionEnum.SYSTEM_ERROR_CUSTOM.assertFail(exception.toString());
+                BusinessExceptionEnum.SYSTEM_ERROR_CUSTOM.assertFail("未知异常");
             }
         }
     }
@@ -437,6 +437,32 @@ public class EhEngine {
                 parseAndGetPToken(body, pTokenList);
             }
 
+        } catch (Throwable e) {
+            throwException(call, code, headers, body, e);
+        }
+        return pTokenList;
+    }
+
+    @Cacheable(cacheNames = CacheConfig.pTokenIndex)
+    public List<String> getPTokens(long gid, String gtoken, int index) {
+
+        String url = EhUrl.getGalleryDetailUrl(
+                gid, gtoken, index, false);
+        String referer = EhUrl.getReferer();
+
+        Request request = new EhRequestBuilder(url, referer).build();
+        Call call = okHttpClient.newCall(request);
+
+        String body = null;
+        Headers headers = null;
+        int code = -1;
+        List<String> pTokenList = new LinkedList<>();
+        try {
+            Response response = call.execute();
+            body = Objects.requireNonNull(response.body()).string();
+            code = response.code();
+            headers = response.headers();
+            parseAndGetPToken(body, pTokenList);
         } catch (Throwable e) {
             throwException(call, code, headers, body, e);
         }

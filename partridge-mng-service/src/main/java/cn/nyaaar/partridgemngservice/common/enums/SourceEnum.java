@@ -6,8 +6,8 @@ import java.util.Map;
 /**
  * 来源枚举类
  *
- * @author yuegenhua
- * @Version $Id: SourceCodeEnum.java, v 0.1 2022-01 9:42 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: SourceCodeEnum.java, v 0.1 2022-01 9:42 nyaaar Exp $$
  */
 public enum SourceEnum {
     Jav("1", "Jav"),

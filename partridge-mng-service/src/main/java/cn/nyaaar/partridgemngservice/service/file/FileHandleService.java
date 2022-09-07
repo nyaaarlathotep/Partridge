@@ -4,8 +4,8 @@ package cn.nyaaar.partridgemngservice.service.file;
 import java.io.IOException;
 
 /**
- * @author yuegenhua
- * @Version $Id: FileService.java, v 0.1 2022-01 9:37 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: FileService.java, v 0.1 2022-01 9:37 nyaaar Exp $$
  */
 public interface FileHandleService {
 

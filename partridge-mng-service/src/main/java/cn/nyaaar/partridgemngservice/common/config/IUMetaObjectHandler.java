@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 /**
  * 自定义 MetaObjectHandler 类
  *
- * @author yuegenhua
- * @Version $Id: IUMetaObjectHandler.java, v 0.1 2022-02 11:06 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: IUMetaObjectHandler.java, v 0.1 2022-02 11:06 nyaaar Exp $$
  */
 @Slf4j
 @Component

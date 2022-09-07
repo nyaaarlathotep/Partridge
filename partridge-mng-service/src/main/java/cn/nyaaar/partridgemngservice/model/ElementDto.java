@@ -7,8 +7,8 @@ import lombok.experimental.Accessors;
 
 
 /**
- * @author yuegenhua
- * @Version $Id: ElementDto.java, v 0.1 2022-22 15:50 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: ElementDto.java, v 0.1 2022-22 15:50 nyaaar Exp $$
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

@@ -6,8 +6,8 @@ import java.util.Map;
 /**
  * 文件类型枚举类
  *
- * @author yuegenhua
- * @Version $Id: FileTypeEnum.java, v 0.1 2022-01 17:58 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: FileTypeEnum.java, v 0.1 2022-01 17:58 nyaaar Exp $$
  */
 public enum FileTypeEnum {
     jpg("1", ".jpg"),
