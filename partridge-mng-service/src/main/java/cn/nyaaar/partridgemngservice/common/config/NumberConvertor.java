@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.config.mybatis.extend;
+package cn.nyaaar.partridgemngservice.common.config;
 
 import com.baomidou.mybatisplus.generator.config.GlobalConfig;
 import com.baomidou.mybatisplus.generator.config.ITypeConvert;
@@ -12,7 +12,6 @@ import com.baomidou.mybatisplus.generator.config.rules.IColumnType;
 public class NumberConvertor extends MySqlTypeConvert implements ITypeConvert {
 
     public IColumnType processTypeConvert(GlobalConfig globalConfig, String fieldType) {
-        //System.out.println(fieldType);
 
         String toLow = fieldType.toLowerCase();
         if (toLow.contains("number")) {

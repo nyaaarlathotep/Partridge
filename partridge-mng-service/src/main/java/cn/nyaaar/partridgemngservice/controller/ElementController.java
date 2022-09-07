@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -23,11 +22,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/element")
 @Slf4j
 public class ElementController {
+    // TODO more flag and mng, such as shared, uploader...
 
-    private ElementService elementService;
+    private final ElementService elementService;
 
-    @Autowired
-    public void DI(ElementService elementService) {
+    public ElementController(ElementService elementService) {
         this.elementService = elementService;
     }
 

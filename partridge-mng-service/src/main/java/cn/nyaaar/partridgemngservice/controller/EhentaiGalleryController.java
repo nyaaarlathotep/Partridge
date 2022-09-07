@@ -27,10 +27,9 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class EhentaiGalleryController {
 
-    private EhService ehService;
+    private final EhService ehService;
 
-    @Autowired
-    public void DI(EhService ehService) {
+    public EhentaiGalleryController(EhService ehService) {
         this.ehService = ehService;
     }
 
