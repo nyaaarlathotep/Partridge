@@ -25,7 +25,6 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.*;
@@ -173,13 +172,8 @@ public class EhServiceImpl implements EhService {
 
     private void downloadGalleryThumb(long gid, String thumbUrl, Long eleId) {
         String folder = PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(), String.valueOf(gid));
-        EleFile eleFile = new EleFile();
-        eleFile.setEleId(eleId);
-        eleFile.setType(FileTypeEnum.jpg.getCode());
-        eleFile.setName((0) + FileTypeEnum.jpg.getSuffix());
-        eleFile.setPath(PathUtil.simpleConcatUrl(folder, eleFile.getName()));
-        eleFile.setPageNum(0);
-        eleFile.setIsAvailableFlag(1);
+        FileTypeEnum fileTypeEnum = FileTypeEnum.getTypeBySuffix(thumbUrl);
+        EleFile eleFile= createEleFile(eleId,0,folder,fileTypeEnum);
         downloadService.downloadUrlToDest(thumbUrl,
                 folder,
                 eleFile.getName(),
@@ -210,22 +204,30 @@ public class EhServiceImpl implements EhService {
         String gtoken = downloadingGallery.gtoken;
         int pageIndex = index + 1;
         String folder = PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(), String.valueOf(gid));
-        EleFile eleFile = new EleFile();
-        eleFile.setEleId(eleId);
-        eleFile.setType(FileTypeEnum.jpg.getCode());
-        eleFile.setName((pageIndex) + FileTypeEnum.jpg.getSuffix());
-        eleFile.setPath(PathUtil.simpleConcatUrl(folder, eleFile.getName()));
-        eleFile.setPageNum(pageIndex);
-        eleFile.setIsAvailableFlag(1);
 
         String pageUrl = EhUrl.getPageUrl(gid, index, pToken);
         String pagePicUrl = ehEngine.getGalleryPage(pageUrl, gid, gtoken).imageUrl;
+        FileTypeEnum fileTypeEnum = FileTypeEnum.getTypeBySuffix(pagePicUrl);
+
+        EleFile eleFile = createEleFile(eleId, pageIndex, folder, fileTypeEnum);
         downloadService.downloadUrlToDest(pagePicUrl,
                 folder,
                 eleFile.getName(),
                 () -> handlePageDownloadComplete(downloadingGallery),
                 () -> handlePageDownloadFail(pToken, index, downloadingGallery));
         eleFileService.saveOrUpdate(eleFile);
+    }
+
+    @NotNull
+    private static EleFile createEleFile(long eleId, int pageIndex, String folder, FileTypeEnum fileTypeEnum) {
+        EleFile eleFile = new EleFile();
+        eleFile.setEleId(eleId);
+        eleFile.setName(pageIndex + fileTypeEnum.getSuffix());
+        eleFile.setPath(PathUtil.simpleConcatUrl(folder, eleFile.getName()));
+        eleFile.setPageNum(pageIndex);
+        eleFile.setIsAvailableFlag(1);
+        eleFile.setType(fileTypeEnum.getCode());
+        return eleFile;
     }
 
     private String downloadGalleryPageSync(String pToken, int index, long gid, String gtoken) {

@@ -1,5 +1,6 @@
 package cn.nyaaar.partridgemngservice.common.enums;
 
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,8 +12,9 @@ import java.util.Map;
  */
 public enum FileTypeEnum {
     jpg("1", ".jpg"),
-    mp4("2", ".mp4"),
-    avi("3", ".avi"),
+    gif("2", ".gif"),
+    mp4("3", ".mp4"),
+    avi("4", ".avi"),
     ;
 
     private final String code;
@@ -26,6 +28,16 @@ public enum FileTypeEnum {
 
     public static FileTypeEnum fromCode(String code) {
         return MAP.get(code);
+    }
+
+    public static FileTypeEnum getTypeBySuffix(@NotNull String name) {
+        FileTypeEnum[] fileTypeEnums = values();
+        for (FileTypeEnum e : fileTypeEnums) {
+            if (name.endsWith(e.suffix)) {
+                return e;
+            }
+        }
+        return jpg;
     }
 
     /**
