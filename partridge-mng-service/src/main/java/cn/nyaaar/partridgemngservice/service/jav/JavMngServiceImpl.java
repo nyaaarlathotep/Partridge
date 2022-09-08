@@ -52,7 +52,7 @@ public class JavMngServiceImpl implements JavMngService {
     }
 
     @Override
-    public ListResp<JavBasicInfo> getJavBasicInfoByName(String name, int pageIndex) {
+    public ListResp<JavBasicInfo> getJavList(String name, int pageIndex) {
         Page<Jav> page = new Page<>(pageIndex, 10);
         javService.page(page, new LambdaQueryWrapper<Jav>().like(Jav::getTitle, name).orderByDesc(Jav::getEleId));
 

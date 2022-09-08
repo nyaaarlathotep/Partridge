@@ -3,6 +3,7 @@ package cn.nyaaar.partridgemngservice.service.ehService;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryBasicInfo;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryPage;
+import cn.nyaaar.partridgemngservice.model.jav.ListResp;
 import cn.nyaaar.partridgemngservice.service.ehService.impl.EhServiceImpl;
 
 import java.util.List;
@@ -66,6 +67,23 @@ public interface EhService {
      * @return GalleryBasicInfo
      */
     GalleryBasicInfo getGalleryBasicByGid(long gid);
+
+    /**
+     * 浏览 gallery，返回一个 GalleryBasicInfo 的 list
+     *
+     * @param pageIndex pageIndex
+     * @return ListResp
+     */
+    ListResp<GalleryBasicInfo> getGalleryList(int pageIndex);
+
+    /**
+     * name like ehentai title, titleJpn
+     *
+     * @param name      name
+     * @param pageIndex pageIndex
+     * @return ListResp
+     */
+    ListResp<GalleryBasicInfo> getGalleryList(String name, int pageIndex);
 
     /**
      * gid+gtoken->GalleryDetail

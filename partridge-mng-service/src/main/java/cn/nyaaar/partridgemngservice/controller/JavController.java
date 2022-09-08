@@ -31,10 +31,10 @@ public class JavController {
     @GetMapping(value = "/name/{name}/{pageIndex}")
     public R<ListResp<JavBasicInfo>> getJavBasicInfoList(@PathVariable String name, @PathVariable Integer pageIndex) {
 
-        return new R<>(javMngService.getJavBasicInfoByName(name, pageIndex));
+        return new R<>(javMngService.getJavList(name, pageIndex));
     }
 
-    @Operation(summary = "jav 基本信息列表", description = "获取 jav 基本信息")
+    @Operation(summary = "jav 基本信息列表", description = "获取保存在数据库的 jav 基本信息列表")
     @GetMapping(value = "/list/{pageIndex}")
     public R<ListResp<JavBasicInfo>> getJavBasicInfoList(@PathVariable Integer pageIndex) {
 
