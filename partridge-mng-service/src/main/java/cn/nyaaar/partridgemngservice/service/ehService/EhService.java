@@ -2,6 +2,7 @@ package cn.nyaaar.partridgemngservice.service.ehService;
 
 import cn.nyaaar.partridgemngservice.model.eh.GalleryBasicInfo;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
+import cn.nyaaar.partridgemngservice.model.eh.GalleryPage;
 import cn.nyaaar.partridgemngservice.service.ehService.impl.EhServiceImpl;
 
 import java.util.List;
@@ -36,9 +37,18 @@ public interface EhService {
      * @param gid         gid
      * @param gtoken      gtoken
      * @param pageIndexes 画廊页数
-     * @return picBase64List
+     * @return GalleryPage List
      */
-    List<String> downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes);
+    List<GalleryPage> downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes);
+
+    /**
+     * 获取已经下载画廊的指定页数
+     *
+     * @param gid         gid
+     * @param pageIndexes 画廊页数
+     * @return GalleryPage List
+     */
+    List<GalleryPage> downloadGalleryPages(long gid, List<Integer> pageIndexes);
 
     /**
      * 返回当前画廊下载队列

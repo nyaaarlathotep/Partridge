@@ -12,6 +12,7 @@ import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryBasicInfo;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
+import cn.nyaaar.partridgemngservice.model.eh.GalleryPage;
 import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.download.DownloadService;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
@@ -95,9 +96,9 @@ public class EhServiceImpl implements EhService {
     }
 
     @Override
-    public List<String> downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes) {
+    public List<GalleryPage> downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes) {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken);
-        List<String> picBase64List = new ArrayList<>();
+        List<GalleryPage> pages = new ArrayList<>();
         for (Integer pageIndex : pageIndexes) {
             int index = pageIndex - 1;
             if (index < 0 || index >= ehentaiGallery.getPages()) {
@@ -107,12 +108,17 @@ public class EhServiceImpl implements EhService {
             int ptokenListIndex = index % 40;
 
             List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken, ptokenPageIndex);
-            String picRes = downloadGalleryPageSync(galleryTokens.get(ptokenListIndex), index, gid, gtoken);
-            picBase64List.add(picRes);
+            GalleryPage galleryPage = downloadGalleryPageSync(galleryTokens.get(ptokenListIndex), index, gid, gtoken);
+            galleryPage.setPageIndex(pageIndex);
+            pages.add(galleryPage);
         }
-        return picBase64List;
+        return pages;
     }
 
+    @Override
+    public List<GalleryPage> downloadGalleryPages(long gid, List<Integer> pageIndexes) {
+        return null;
+    }
 
     @Override
     public GalleryBasicInfo getGalleryBasicByGid(long gid) {
@@ -173,7 +179,7 @@ public class EhServiceImpl implements EhService {
     private void downloadGalleryThumb(long gid, String thumbUrl, Long eleId) {
         String folder = PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(), String.valueOf(gid));
         FileTypeEnum fileTypeEnum = FileTypeEnum.getTypeBySuffix(thumbUrl);
-        EleFile eleFile= createEleFile(eleId,0,folder,fileTypeEnum);
+        EleFile eleFile = createEleFile(eleId, 0, folder, fileTypeEnum);
         downloadService.downloadUrlToDest(thumbUrl,
                 folder,
                 eleFile.getName(),
@@ -230,11 +236,14 @@ public class EhServiceImpl implements EhService {
         return eleFile;
     }
 
-    private String downloadGalleryPageSync(String pToken, int index, long gid, String gtoken) {
+    private GalleryPage downloadGalleryPageSync(String pToken, int index, long gid, String gtoken) {
 
         String pageUrl = EhUrl.getPageUrl(gid, index, pToken);
         String pagePicUrl = ehEngine.getGalleryPage(pageUrl, gid, gtoken).imageUrl;
-        return downloadService.downloadUrlToBase64(pagePicUrl);
+        FileTypeEnum fileTypeEnum = FileTypeEnum.getTypeBySuffix(pagePicUrl);
+        return new GalleryPage()
+                .setPageBase64(downloadService.downloadUrlToBase64(pagePicUrl))
+                .setFileSuffix(fileTypeEnum.getSuffix());
     }
 
     private void handlePageDownloadFail(String pToken, int index, DownloadingGallery downloadingGallery) {

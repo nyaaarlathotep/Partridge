@@ -20,7 +20,7 @@ import java.util.List;
 @Tag(name = "预览画廊响应")
 public class EhPreviewResp {
 
-    @Schema(title = "下载图片base64，按 pageIndexes 的顺序排列")
-    List<String> pagesBase64;
+    @Schema(title = "画廊单页 list")
+    List<GalleryPage> pages;
 
 }
