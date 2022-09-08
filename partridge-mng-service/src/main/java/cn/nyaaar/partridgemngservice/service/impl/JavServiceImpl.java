@@ -14,11 +14,11 @@ import java.util.List;
 
 /**
  * <p>
- * 服务实现类
+ * jav 基本信息 服务实现类
  * </p>
  *
  * @author nyaaar
- * @since 2022-08-22
+ * @since 2022-09-08
  */
 @Service
 public class JavServiceImpl extends ServiceImpl<JavMapper, Jav> implements JavService {

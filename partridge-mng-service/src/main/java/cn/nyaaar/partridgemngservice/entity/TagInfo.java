@@ -14,16 +14,16 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 
+ * 元素关联的 tag，多种来源。
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-03
+ * @since 2022-09-08
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class Tag extends Model<Tag> {
+public class TagInfo extends Model<TagInfo> {
 
     @Serial
     private static final long serialVersionUID = 1L;

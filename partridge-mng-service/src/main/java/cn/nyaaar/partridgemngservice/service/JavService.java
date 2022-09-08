@@ -3,48 +3,47 @@ package cn.nyaaar.partridgemngservice.service;
 import cn.nyaaar.partridgemngservice.entity.Jav;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.nyaaar.partridgemngservice.model.QueryData;
-
 import java.util.List;
 
 /**
  * <p>
- * 服务类
+ * jav 基本信息 服务类
  * </p>
  *
  * @author nyaaar
- * @since 2022-08-22
+ * @since 2022-09-08
  */
 public interface JavService extends IService<Jav> {
 
     /**
-     * 查询分页数据
+     * 查询jav 基本信息分页数据
      *
      * @param where     查询条件
      * @param page      页码
      * @param pageCount 每页条数
      * @return QueryData
      */
-    QueryData<Jav> findListByPage(Jav where, Integer page, Integer pageCount);
+    QueryData<Jav> findListByPage(Jav where,Integer page, Integer pageCount);
 
     /**
-     * 查询所有数据
-     *
-     * @param where 查询条件
-     * @return List
-     */
+    * 查询jav 基本信息所有数据
+    *
+    * @param where     查询条件
+    * @return List
+    */
     List<Jav> findList(Jav where);
 
 
     /**
-     * 添加
+     * 添加jav 基本信息
      *
-     * @param jav
+     * @param jav jav 基本信息
      * @return 影响条数
      */
     Integer add(Jav jav);
 
     /**
-     * 删除
+     * 删除jav 基本信息
      *
      * @param id 主键
      * @return 影响条数
@@ -52,9 +51,9 @@ public interface JavService extends IService<Jav> {
     Integer delete(Integer id);
 
     /**
-     * 修改
+     * 修改jav 基本信息
      *
-     * @param jav
+     * @param jav jav 基本信息
      * @return 影响条数
      */
     Integer updateData(Jav jav);

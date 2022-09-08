@@ -19,8 +19,8 @@ package cn.nyaaar.partridgemngservice.model.eh;
 
 import cn.hutool.core.date.DateUtil;
 import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
-import cn.nyaaar.partridgemngservice.entity.Tag;
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
+import cn.nyaaar.partridgemngservice.entity.TagInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,11 +66,11 @@ public class GalleryDetail extends GalleryInfo {
         return ehentaiGallery;
     }
 
-    public List<Tag> getTags() {
-        List<Tag> partridgeTags = new ArrayList<>(tags.length);
+    public List<TagInfo> getTags() {
+        List<TagInfo> partridgeTags = new ArrayList<>(tags.length);
         for (GalleryTagGroup galleryTagGroup : tags) {
             for (String galleryTag : galleryTagGroup.mTagList) {
-                Tag tag = new Tag()
+                TagInfo tag = new TagInfo()
                         .setName(galleryTag)
                         .setGroupName(galleryTagGroup.groupName)
                         .setSource(SourceEnum.Ehentai.getCode());

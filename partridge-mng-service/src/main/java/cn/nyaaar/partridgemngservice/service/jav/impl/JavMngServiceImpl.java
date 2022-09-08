@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.service.jav;
+package cn.nyaaar.partridgemngservice.service.jav.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.nyaaar.partridgemngservice.common.enums.EleOrgReTypeEnum;
@@ -7,6 +7,8 @@ import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.jav.JavBasicInfo;
 import cn.nyaaar.partridgemngservice.model.jav.ListResp;
 import cn.nyaaar.partridgemngservice.service.*;
+import cn.nyaaar.partridgemngservice.service.jav.JavMngService;
+import cn.nyaaar.partridgemngservice.service.tag.TagService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
@@ -30,17 +32,20 @@ public class JavMngServiceImpl implements JavMngService {
 
     private final EleOrgReService eleOrgReService;
 
+    private final TagService tagService;
 
     public JavMngServiceImpl(JavService javService,
                              OrganizationService organizationService,
                              ActorService actorService,
                              EleActorReService eleActorReService,
-                             EleOrgReService eleOrgReService) {
+                             EleOrgReService eleOrgReService,
+                             TagService tagService) {
         this.javService = javService;
         this.organizationService = organizationService;
         this.actorService = actorService;
         this.eleActorReService = eleActorReService;
         this.eleOrgReService = eleOrgReService;
+        this.tagService = tagService;
     }
 
     @Override
@@ -109,6 +114,7 @@ public class JavMngServiceImpl implements JavMngService {
             Organization producer = organizationService.findById(eleOrgRePublisher.getOrgId());
             javBasicInfo.setPublisher(producer.getName());
         }
+        javBasicInfo.setTags(tagService.getTagInfos(javBasicInfo.getEleId()));
         return javBasicInfo;
     }
 }

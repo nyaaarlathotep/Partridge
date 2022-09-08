@@ -1,7 +1,8 @@
 package cn.nyaaar.partridgemngservice.model.eh;
 
-import cn.nyaaar.partridgemngservice.entity.Tag;
+import cn.nyaaar.partridgemngservice.entity.TagInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -16,6 +17,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
+@Tag(name = "galley 基本信息")
 public class GalleryBasicInfo {
 
     @Schema(title = "ehentai gallery id")
@@ -28,7 +30,7 @@ public class GalleryBasicInfo {
     private String titleJpn;
 
     @Schema(title = "tag")
-    private List<Tag> tags;
+    private List<TagInfo> tags;
 
     @Schema(title = "ehentai gallery id")
     private Integer category;
@@ -62,9 +64,5 @@ public class GalleryBasicInfo {
 
     @Schema(title = "(0-否;1-是)")
     private Integer downloadFlag;
-
-    private Date createdTime;
-
-    private Date updatedTime;
 
 }

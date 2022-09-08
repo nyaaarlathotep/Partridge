@@ -4,21 +4,20 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="cn.nyaaar.partridgemngservice.entity.Jav">
-        <id column="ELE_ID" property="eleId"/>
-        <result column="CODE" property="code"/>
-        <result column="TITLE" property="title"/>
-        <result column="PUBLISH_DATE" property="publishDate"/>
-        <result column="LENGTH" property="length"/>
-        <result column="DIRECTOR" property="director"/>
-        <result column="SERIES" property="series"/>
-        <result column="CREATED_TIME" property="createdTime"/>
-        <result column="UPDATED_TIME" property="updatedTime"/>
+        <id column="ELE_ID" property="eleId" />
+        <result column="CODE" property="code" />
+        <result column="TITLE" property="title" />
+        <result column="PUBLISH_DATE" property="publishDate" />
+        <result column="LENGTH" property="length" />
+        <result column="DIRECTOR" property="director" />
+        <result column="SERIES" property="series" />
+        <result column="CREATED_TIME" property="createdTime" />
+        <result column="UPDATED_TIME" property="updatedTime" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        ELE_ID
-        , CODE, TITLE, PUBLISH_DATE, LENGTH, DIRECTOR, SERIES, CREATED_TIME, UPDATED_TIME
+        ELE_ID, CODE, TITLE, PUBLISH_DATE, LENGTH, DIRECTOR, SERIES, CREATED_TIME, UPDATED_TIME
     </sql>
 
 </mapper>
