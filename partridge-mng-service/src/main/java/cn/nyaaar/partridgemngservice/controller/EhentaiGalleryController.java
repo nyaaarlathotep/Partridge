@@ -4,7 +4,7 @@ import cn.nyaaar.partridgemngservice.model.eh.EhPreviewResp;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryBasicInfo;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
 import cn.nyaaar.partridgemngservice.model.eh.EhDownloadReq;
-import cn.nyaaar.partridgemngservice.model.jav.ListResp;
+import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.response.R;
 import cn.nyaaar.partridgemngservice.model.validate.EhDownload;
 import cn.nyaaar.partridgemngservice.model.validate.EhPreview;

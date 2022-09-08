@@ -1,7 +1,7 @@
 package cn.nyaaar.partridgemngservice.controller;
 
 import cn.nyaaar.partridgemngservice.model.jav.JavBasicInfo;
-import cn.nyaaar.partridgemngservice.model.jav.ListResp;
+import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.response.R;
 import cn.nyaaar.partridgemngservice.service.jav.JavMngService;
 import io.swagger.v3.oas.annotations.Operation;

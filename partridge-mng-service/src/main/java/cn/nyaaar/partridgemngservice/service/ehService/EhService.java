@@ -3,7 +3,7 @@ package cn.nyaaar.partridgemngservice.service.ehService;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryBasicInfo;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryPage;
-import cn.nyaaar.partridgemngservice.model.jav.ListResp;
+import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.service.ehService.impl.EhServiceImpl;
 
 import java.util.List;

@@ -5,7 +5,7 @@ import cn.nyaaar.partridgemngservice.common.enums.EleOrgReTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.jav.JavBasicInfo;
-import cn.nyaaar.partridgemngservice.model.jav.ListResp;
+import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.jav.JavMngService;
 import cn.nyaaar.partridgemngservice.service.tag.TagService;

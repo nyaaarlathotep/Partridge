@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.model.jav;
+package cn.nyaaar.partridgemngservice.model;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;

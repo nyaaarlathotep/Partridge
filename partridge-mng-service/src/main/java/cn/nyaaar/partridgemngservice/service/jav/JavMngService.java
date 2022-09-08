@@ -1,7 +1,7 @@
 package cn.nyaaar.partridgemngservice.service.jav;
 
 import cn.nyaaar.partridgemngservice.model.jav.JavBasicInfo;
-import cn.nyaaar.partridgemngservice.model.jav.ListResp;
+import cn.nyaaar.partridgemngservice.model.ListResp;
 
 public interface JavMngService {
 
