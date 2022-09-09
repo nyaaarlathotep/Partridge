@@ -1,10 +1,6 @@
-/**
- * Saicfinance.com Inc.
- * Copyright (c) 1994-2022 All Rights Reserved.
- */
 package cn.nyaaar.partridgemngservice.exception;
 
-import cn.nyaaar.partridgemngservice.enums.IResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.IResponseEnum;
 
 /**
  * <p>参数异常</p>

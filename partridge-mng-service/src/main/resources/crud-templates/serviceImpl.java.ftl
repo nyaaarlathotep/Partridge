@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import cn.nyaaar.partridgemngservice.entity.QueryData;
+import cn.nyaaar.partridgemngservice.model.QueryData;
 import java.util.List;
 
 /**

@@ -2,7 +2,7 @@ package cn.nyaaar.partridgemngservice.service;
 
 import cn.nyaaar.partridgemngservice.entity.Author;
 import com.baomidou.mybatisplus.extension.service.IService;
-import cn.nyaaar.partridgemngservice.entity.QueryData;
+import cn.nyaaar.partridgemngservice.model.QueryData;
 
 import java.util.List;
 

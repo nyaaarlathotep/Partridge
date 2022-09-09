@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * <p>
- * Mapper 接口
+ * jav 基本信息 Mapper 接口
  * </p>
  *
  * @author nyaaar
- * @since 2022-08-22
+ * @since 2022-09-08
  */
 public interface JavMapper extends BaseMapper<Jav> {
 

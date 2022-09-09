@@ -1,6 +1,6 @@
 package cn.nyaaar.partridgemngservice.exception;
 
-import cn.nyaaar.partridgemngservice.enums.CommonResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.CommonResponseEnum;
 import cn.nyaaar.partridgemngservice.model.response.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -14,11 +14,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-/**
- * @Description: 全局异常处理
- * @author: yangyang3
- * @date: 2021/7/22
- */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler implements Ordered {
@@ -35,7 +30,7 @@ public class GlobalExceptionHandler implements Ordered {
 
         BindingResult bindingResult = e.getBindingResult();
         String errorMsg = "";
-        if (bindingResult != null && bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             List<ObjectError> errorList = bindingResult.getAllErrors();
             for (ObjectError error : errorList) {
                 // 取其中一个错误Message返回给前端

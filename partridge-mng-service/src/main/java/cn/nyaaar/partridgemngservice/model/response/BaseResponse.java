@@ -1,11 +1,7 @@
-/**
- * Saicfinance.com Inc.
- * Copyright (c) 1994-2022 All Rights Reserved.
- */
 package cn.nyaaar.partridgemngservice.model.response;
 
-import cn.nyaaar.partridgemngservice.enums.CommonResponseEnum;
-import cn.nyaaar.partridgemngservice.enums.IResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.CommonResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.IResponseEnum;
 import lombok.Data;
 
 /**

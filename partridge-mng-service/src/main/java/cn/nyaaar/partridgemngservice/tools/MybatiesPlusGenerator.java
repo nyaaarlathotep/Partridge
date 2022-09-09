@@ -1,7 +1,7 @@
 package cn.nyaaar.partridgemngservice.tools;
 
 
-import cn.nyaaar.partridgemngservice.config.mybatis.extend.NumberConvertor;
+import cn.nyaaar.partridgemngservice.common.config.NumberConvertor;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -25,11 +25,10 @@ public class MybatiesPlusGenerator {
 
     public static void main(String[] args) {
 
-        //TODO - 按需修改
         //生成到的Package
         String parent = "cn.nyaaar.partridgemngservice";
         //多个用逗号分隔, 表名要大写
-        String tables = "element,actor,author,jav,organization,tag";
+        String tables = "tag_info";
         //数据源
         String db_url = "jdbc:mysql://localhost:3306/partridge?serverTimezone=Asia/Shanghai";
         String db_DriverName = "com.mysql.cj.jdbc.Driver";
@@ -120,7 +119,7 @@ public class MybatiesPlusGenerator {
         InjectionConfig cfg = new InjectionConfig() {
             @Override
             public void initMap() {
-                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> map = new HashMap<>();
                 map.put("abc", this.getConfig().getGlobalConfig().getAuthor() + "-rb");
                 this.setMap(map);
             }
@@ -130,7 +129,7 @@ public class MybatiesPlusGenerator {
                 FileType.CONTROLLER != fileType);
 
         // 7、调整 xml 生成目录演示
-        List<FileOutConfig> focList = new ArrayList<FileOutConfig>();
+        List<FileOutConfig> focList = new ArrayList<>();
         focList.add(new FileOutConfig("/templates/mapper.xml.ftl") {
             @Override
             public String outputFile(TableInfo tableInfo) {

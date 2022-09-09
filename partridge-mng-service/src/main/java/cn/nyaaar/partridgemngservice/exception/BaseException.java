@@ -1,10 +1,6 @@
-/**
- * Saicfinance.com Inc.
- * Copyright (c) 1994-2022 All Rights Reserved.
- */
 package cn.nyaaar.partridgemngservice.exception;
 
-import cn.nyaaar.partridgemngservice.enums.IResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.IResponseEnum;
 import lombok.Getter;
 
 /**
@@ -49,7 +45,10 @@ public class BaseException extends RuntimeException {
         this.responseEnum = responseEnum;
         this.args = args;
     }
-
+    public BaseException(IResponseEnum responseEnum,  String message) {
+        super(message);
+        this.responseEnum = responseEnum;
+    }
     public BaseException(IResponseEnum responseEnum, Object[] args, String message, Throwable cause) {
         super(message, cause);
         this.responseEnum = responseEnum;

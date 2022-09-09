@@ -2,27 +2,23 @@ package cn.nyaaar.partridgemngservice.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-
 import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-
 import java.io.Serializable;
 import java.io.Serial;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
  * <p>
- *
+ * jav 基本信息
  * </p>
  *
  * @author nyaaar
- * @since 2022-08-22
+ * @since 2022-09-08
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -33,7 +29,7 @@ public class Jav extends Model<Jav> {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "ELE_ID", type = IdType.AUTO)
-    private Integer eleId;
+    private Long eleId;
 
     /**
      * 識別碼
