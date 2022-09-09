@@ -44,6 +44,6 @@ public class DownloadServiceTest {
     public void fileSaveTest() throws IOException {
         String sss = "testAppend";
 
-        fileHandleService.saveBytesToFileWithSource(sss.getBytes(StandardCharsets.UTF_8), "C:\\Users\\nyaaar\\Desktop\\testFile", "test.txt", true);
+        fileHandleService.saveBytesToFile(sss.getBytes(StandardCharsets.UTF_8), "C:\\Users\\nyaaar\\Desktop\\testFile", "test.txt", true);
     }
 }

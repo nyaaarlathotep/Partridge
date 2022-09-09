@@ -1,13 +1,15 @@
 package cn.nyaaar.partridgemngservice.service;
 
 import cn.nyaaar.partridgemngservice.entity.EleFile;
+import cn.nyaaar.partridgemngservice.model.eh.GalleryPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.nyaaar.partridgemngservice.model.QueryData;
+
 import java.util.List;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author nyaaar
@@ -23,21 +25,21 @@ public interface EleFileService extends IService<EleFile> {
      * @param pageCount 每页条数
      * @return QueryData
      */
-    QueryData<EleFile> findListByPage(EleFile where,Integer page, Integer pageCount);
+    QueryData<EleFile> findListByPage(EleFile where, Integer page, Integer pageCount);
 
     /**
-    * 查询所有数据
-    *
-    * @param where     查询条件
-    * @return List
-    */
+     * 查询所有数据
+     *
+     * @param where 查询条件
+     * @return List
+     */
     List<EleFile> findList(EleFile where);
 
 
     /**
      * 添加
      *
-     * @param eleFile 
+     * @param eleFile eleFile
      * @return 影响条数
      */
     Integer add(EleFile eleFile);
@@ -53,7 +55,7 @@ public interface EleFileService extends IService<EleFile> {
     /**
      * 修改
      *
-     * @param eleFile 
+     * @param eleFile eleFile
      * @return 影响条数
      */
     Integer updateData(EleFile eleFile);
@@ -65,4 +67,12 @@ public interface EleFileService extends IService<EleFile> {
      * @return EleFile
      */
     EleFile findById(Integer id);
+
+    /**
+     * 通过 eleFile 获得 GalleryPage
+     *
+     * @param eleFile eleFile
+     * @return GalleryPage`
+     */
+    GalleryPage getGalleryPage(EleFile eleFile);
 }

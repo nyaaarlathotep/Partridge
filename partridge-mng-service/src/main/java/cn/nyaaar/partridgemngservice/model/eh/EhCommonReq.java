@@ -2,6 +2,7 @@ package cn.nyaaar.partridgemngservice.model.eh;
 
 import cn.nyaaar.partridgemngservice.model.validate.EhDownload;
 import cn.nyaaar.partridgemngservice.model.validate.EhPreview;
+import cn.nyaaar.partridgemngservice.model.validate.EhView;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
@@ -19,17 +20,21 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @Tag(name = "画廊请求")
-public class EhDownloadReq {
+public class EhCommonReq {
 
     @Schema(title = "gid")
-    @NotNull(groups = {EhDownload.class, EhPreview.class}, message = "请指定eh画廊ID gid")
+    @NotNull(groups = {EhDownload.class, EhPreview.class}, message = "请指定画廊 gid")
     private Long gid;
 
+    @Schema(title = "eleId")
+    @NotNull(groups = {EhView.class}, message = "请指定画廊 eleId")
+    private Long eleId;
+
     @Schema(title = "gtoken")
-    @NotNull(groups = {EhDownload.class, EhPreview.class}, message = "请指定eh画廊token gtoken")
+    @NotNull(groups = {EhDownload.class, EhPreview.class}, message = "请指定画廊 gtoken")
     private String gtoken;
 
     @Schema(title = "预览页码")
-    @NotNull(groups = {EhPreview.class}, message = "请指定eh画廊 预览页码")
+    @NotNull(groups = {EhPreview.class, EhView.class}, message = "请指定画廊 预览页码")
     private List<Integer> pageIndexes;
 }

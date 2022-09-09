@@ -25,6 +25,15 @@ public interface EhService {
     String getGalleryPage(long gid, int pageIndex);
 
     /**
+     * 通过画廊id和页码获得base64的图片
+     *
+     * @param eleId       eleId
+     * @param pageIndexes 画廊图片页码
+     * @return base64图片
+     */
+    List<GalleryPage> getGalleryPage(long eleId, List<Integer> pageIndexes);
+
+    /**
      * 下载画廊
      *
      * @param gid    画廊id
@@ -43,15 +52,6 @@ public interface EhService {
     List<GalleryPage> downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes);
 
     /**
-     * 获取已经下载画廊的指定页数
-     *
-     * @param gid         gid
-     * @param pageIndexes 画廊页数
-     * @return GalleryPage List
-     */
-    List<GalleryPage> downloadGalleryPages(long gid, List<Integer> pageIndexes);
-
-    /**
      * 返回当前画廊下载队列
      * key: gid
      * value: gallery download status
@@ -61,12 +61,12 @@ public interface EhService {
     Map<Long, EhServiceImpl.DownloadingGallery> getDownloadingQueue();
 
     /**
-     * gid->GalleryBasicInfo
+     * eleId->GalleryBasicInfo
      *
-     * @param gid gid
+     * @param eleId eleId
      * @return GalleryBasicInfo
      */
-    GalleryBasicInfo getGalleryBasicByGid(long gid);
+    GalleryBasicInfo getGalleryBasicByGid(long eleId);
 
     /**
      * 浏览 gallery，返回一个 GalleryBasicInfo 的 list

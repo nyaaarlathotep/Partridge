@@ -9,5 +9,5 @@ import java.io.IOException;
  */
 public interface FileHandleService {
 
-    void saveBytesToFileWithSource(byte[] bytes, String destDic, String fileName, boolean reDownload) throws IOException;
+    void saveBytesToFile(byte[] bytes, String destDic, String fileName, boolean reDownload) throws IOException;
 }

@@ -51,7 +51,7 @@ public class DownloadServiceImpl implements DownloadService {
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                     byte[] bytes = Objects.requireNonNull(response.body()).bytes();
-                    fileHandleService.saveBytesToFileWithSource(bytes, destDic, fileName, false);
+                    fileHandleService.saveBytesToFile(bytes, destDic, fileName, false);
                     if (successHandle != null) {
                         successHandle.run();
                     }

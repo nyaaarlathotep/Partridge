@@ -18,9 +18,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @Tag(name = "预览画廊响应")
-public class EhPreviewResp {
+public class EhViewResp {
 
-    @Schema(title = "画廊单页 list")
+    @Schema(title = "画廊单页")
     List<GalleryPage> pages;
 
 }

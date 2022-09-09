@@ -11,6 +11,7 @@ import java.util.Map;
  * @Version $Id: FileTypeEnum.java, v 0.1 2022-01 17:58 nyaaar Exp $$
  */
 public enum FileTypeEnum {
+    unknown("0", ".jpg"),
     jpg("1", ".jpg"),
     gif("2", ".gif"),
     mp4("3", ".mp4"),

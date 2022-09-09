@@ -1,13 +1,14 @@
 package cn.nyaaar.partridgemngservice.controller;
 
-import cn.nyaaar.partridgemngservice.model.eh.EhPreviewResp;
+import cn.nyaaar.partridgemngservice.model.eh.EhViewResp;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryBasicInfo;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
-import cn.nyaaar.partridgemngservice.model.eh.EhDownloadReq;
+import cn.nyaaar.partridgemngservice.model.eh.EhCommonReq;
 import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.response.R;
 import cn.nyaaar.partridgemngservice.model.validate.EhDownload;
 import cn.nyaaar.partridgemngservice.model.validate.EhPreview;
+import cn.nyaaar.partridgemngservice.model.validate.EhView;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,11 +34,19 @@ public class EhentaiGalleryController {
         this.ehService = ehService;
     }
 
-    @Operation(summary = "gallery 基本信息", description = "通过 gid 获取 gallery 被保存在数据库的基本信息")
+    @Operation(summary = "gallery 基本信息", description = "通过 eleId 获取 gallery 被保存在数据库的基本信息")
     @GetMapping(value = "/basic")
-    public R<GalleryBasicInfo> getGalleryBasic(@RequestParam Long gid) {
+    public R<GalleryBasicInfo> getGalleryBasic(@RequestParam Long eleId) {
 
-        return new R<>(ehService.getGalleryBasicByGid(gid));
+        return new R<>(ehService.getGalleryBasicByGid(eleId));
+    }
+
+    @Operation(summary = "预览 gallery", description = "通过 eleId 获得 下载好的画廊对应页")
+    @PostMapping(value = "/view")
+    public R<EhViewResp> getGalleryPages(@RequestBody @Validated(EhView.class) EhCommonReq ehCommonReq) {
+        EhViewResp ehViewResp = new EhViewResp()
+                .setPages(ehService.getGalleryPage(ehCommonReq.getEleId(), ehCommonReq.getPageIndexes()));
+        return new R<>(ehViewResp);
     }
 
     @Operation(summary = "gallery 详细信息", description = "通过 gid 与 gtoken 请求 ehentai 获得 galleryDetail 信息")
@@ -63,24 +72,17 @@ public class EhentaiGalleryController {
 
     @Operation(summary = "下载 gallery", description = "通过 gid 与 gtoken 异步下载对应 gallery")
     @PostMapping(value = "/download")
-    public R<String> downloadGallery(@RequestBody @Validated(EhDownload.class) EhDownloadReq ehDownloadReq) {
-        ehService.downloadGallery(ehDownloadReq.getGid(), ehDownloadReq.getGtoken());
+    public R<String> downloadGallery(@RequestBody @Validated(EhDownload.class) EhCommonReq ehCommonReq) {
+        ehService.downloadGallery(ehCommonReq.getGid(), ehCommonReq.getGtoken());
         return new R<>();
     }
 
     @Operation(summary = "预览 gallery", description = "通过 gid 与 gtoken 获取对应页")
     @PostMapping(value = "/preview")
-    public R<EhPreviewResp> previewGallery(@RequestBody @Validated(EhPreview.class) EhDownloadReq ehDownloadReq) {
-        EhPreviewResp ehPreviewResp = new EhPreviewResp()
-                .setPages(ehService.downloadGalleryPages(ehDownloadReq.getGid(), ehDownloadReq.getGtoken(), ehDownloadReq.getPageIndexes()));
-        return new R<>(ehPreviewResp);
+    public R<EhViewResp> previewGallery(@RequestBody @Validated(EhPreview.class) EhCommonReq ehCommonReq) {
+        EhViewResp ehViewResp = new EhViewResp()
+                .setPages(ehService.downloadGalleryPages(ehCommonReq.getGid(), ehCommonReq.getGtoken(), ehCommonReq.getPageIndexes()));
+        return new R<>(ehViewResp);
     }
 
-    @Operation(summary = "预览 gallery", description = "通过 gid 获得 下载好的画廊对应页")
-    @GetMapping(value = "/view")
-    public R<EhPreviewResp> getGalleryPages(@RequestBody @Validated(EhPreview.class)  EhDownloadReq ehDownloadReq) {
-        // TODO
-        EhPreviewResp ehPreviewResp = new EhPreviewResp();
-        return new R<>(ehPreviewResp);
-    }
 }

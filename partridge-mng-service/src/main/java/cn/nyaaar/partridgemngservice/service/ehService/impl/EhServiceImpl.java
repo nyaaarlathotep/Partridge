@@ -81,7 +81,20 @@ public class EhServiceImpl implements EhService {
     }
 
     @Override
+    public List<GalleryPage> getGalleryPage(long eleId, List<Integer> pageIndexes) {
+        if (pageIndexes.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<EleFile> eleFiles = eleFileService.list(new LambdaQueryWrapper<EleFile>()
+                .eq(EleFile::getEleId, eleId)
+                .in(EleFile::getPageNum, pageIndexes));
+
+        return eleFiles.stream().map(eleFileService::getGalleryPage).toList();
+    }
+
+    @Override
     public void downloadGallery(long gid, String gtoken) {
+        // TODO idempotence...
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken);
         List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken);
 
@@ -118,13 +131,9 @@ public class EhServiceImpl implements EhService {
     }
 
     @Override
-    public List<GalleryPage> downloadGalleryPages(long gid, List<Integer> pageIndexes) {
-        return null;
-    }
-
-    @Override
-    public GalleryBasicInfo getGalleryBasicByGid(long gid) {
-        EhentaiGallery ehentaiGallery = ehentaiGalleryService.findById(gid);
+    public GalleryBasicInfo getGalleryBasicByGid(long eleId) {
+        EhentaiGallery ehentaiGallery = ehentaiGalleryService.getOne(new LambdaQueryWrapper<EhentaiGallery>().
+                eq(EhentaiGallery::getEleId, eleId));
         BusinessExceptionEnum.GALLERY_NOT_FOUND.assertNotNull(ehentaiGallery);
         return getGalleryBasicInfo(ehentaiGallery);
     }
