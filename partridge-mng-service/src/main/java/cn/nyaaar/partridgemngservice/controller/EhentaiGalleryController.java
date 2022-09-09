@@ -55,8 +55,8 @@ public class EhentaiGalleryController {
     }
 
     @Operation(summary = "gallery 基本信息列表", description = "通过 name 模糊搜索 title 或者 titleJpn 的 gallery 基本信息列表")
-    @GetMapping(value = "/basic/nameSearch/{name}/{pageIndex}")
-    public R<ListResp<GalleryBasicInfo>> getGalleryBasic(@PathVariable String name, @PathVariable Integer pageIndex) {
+    @GetMapping(value = "/basic/nameSearch/{pageIndex}")
+    public R<ListResp<GalleryBasicInfo>> getGalleryBasic(@RequestParam String name, @PathVariable Integer pageIndex) {
 
         return new R<>(ehService.getGalleryList(name, pageIndex));
     }
@@ -78,7 +78,7 @@ public class EhentaiGalleryController {
 
     @Operation(summary = "预览 gallery", description = "通过 gid 获得 下载好的画廊对应页")
     @GetMapping(value = "/view")
-    public R<EhPreviewResp> getGalleryPages(@RequestBody EhDownloadReq ehDownloadReq) {
+    public R<EhPreviewResp> getGalleryPages(@RequestBody @Validated(EhPreview.class)  EhDownloadReq ehDownloadReq) {
         // TODO
         EhPreviewResp ehPreviewResp = new EhPreviewResp();
         return new R<>(ehPreviewResp);

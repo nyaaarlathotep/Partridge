@@ -21,15 +21,16 @@ public class JavController {
     }
 
     @Operation(summary = "jav 基本信息", description = "通过 code 获取 jav 基本信息")
-    @GetMapping(value = "/code/{code}")
-    public R<JavBasicInfo> getJavBasicInfoById(@PathVariable String code) {
+    @GetMapping(value = "/code")
+    public R<JavBasicInfo> getJavBasicInfoById(@RequestParam String code) {
 
         return new R<>(javMngService.getJavBasicInfoByCode(code));
     }
 
     @Operation(summary = "jav 基本信息列表", description = "通过 name 模糊搜索获取 jav 基本信息")
-    @GetMapping(value = "/name/{name}/{pageIndex}")
-    public R<ListResp<JavBasicInfo>> getJavBasicInfoList(@PathVariable String name, @PathVariable Integer pageIndex) {
+    @GetMapping(value = "/name/{pageIndex}")
+    // TODO fix to query...
+    public R<ListResp<JavBasicInfo>> getJavBasicInfoList(@RequestParam String name, @PathVariable Integer pageIndex) {
 
         return new R<>(javMngService.getJavList(name, pageIndex));
     }
