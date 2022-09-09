@@ -10,17 +10,18 @@ import java.util.Map;
  * @Version $Id: SourceCodeEnum.java, v 0.1 2022-01 9:42 nyaaar Exp $$
  */
 public enum SourceEnum {
+    Unknown("","未录入"),
     Jav("1", "Jav"),
     Ehentai("2", "ehentai"),
     ;
 
     private final String code;
-    private final String msg;
+    private final String desc;
     private static final Map<String, SourceEnum> MAP = new HashMap<>(10);
 
-    SourceEnum(String code, String msg) {
+    SourceEnum(String code, String desc) {
         this.code = code;
-        this.msg = msg;
+        this.desc = desc;
     }
 
     public static SourceEnum fromCode(String code) {
@@ -41,8 +42,8 @@ public enum SourceEnum {
      *
      * @return property value of msg
      */
-    public String getMsg() {
-        return msg;
+    public String getDesc() {
+        return desc;
     }
 
     static {

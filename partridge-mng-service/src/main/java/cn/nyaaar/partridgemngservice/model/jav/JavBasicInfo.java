@@ -1,6 +1,6 @@
 package cn.nyaaar.partridgemngservice.model.jav;
 
-import cn.nyaaar.partridgemngservice.entity.TagInfo;
+import cn.nyaaar.partridgemngservice.model.TagDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
@@ -47,5 +47,5 @@ public class JavBasicInfo {
     private String producer;
 
     @Schema(title = "tag")
-    private List<TagInfo> tags;
+    private List<TagDto> tags;
 }

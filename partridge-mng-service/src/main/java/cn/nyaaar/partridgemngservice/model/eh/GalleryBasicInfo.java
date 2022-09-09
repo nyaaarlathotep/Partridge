@@ -1,6 +1,6 @@
 package cn.nyaaar.partridgemngservice.model.eh;
 
-import cn.nyaaar.partridgemngservice.entity.TagInfo;
+import cn.nyaaar.partridgemngservice.model.TagDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
@@ -30,7 +30,7 @@ public class GalleryBasicInfo {
     private String titleJpn;
 
     @Schema(title = "tag")
-    private List<TagInfo> tags;
+    private List<TagDto> tags;
 
     @Schema(title = "ehentai gallery id")
     private Integer category;

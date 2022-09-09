@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.nyaaar.partridgemngservice.common.enums.EleOrgReTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
+import cn.nyaaar.partridgemngservice.model.TagDto;
 import cn.nyaaar.partridgemngservice.model.jav.JavBasicInfo;
 import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.service.*;
@@ -114,7 +115,8 @@ public class JavMngServiceImpl implements JavMngService {
             Organization producer = organizationService.findById(eleOrgRePublisher.getOrgId());
             javBasicInfo.setPublisher(producer.getName());
         }
-        javBasicInfo.setTags(tagService.getTagInfos(javBasicInfo.getEleId()));
+        List<TagInfo> tagInfos = tagService.getTagInfos(javBasicInfo.getEleId());
+        javBasicInfo.setTags(tagInfos.stream().map(TagDto::new).toList());
         return javBasicInfo;
     }
 }

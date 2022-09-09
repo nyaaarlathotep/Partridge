@@ -10,6 +10,7 @@ import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
+import cn.nyaaar.partridgemngservice.model.TagDto;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryBasicInfo;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryPage;
@@ -187,7 +188,8 @@ public class EhServiceImpl implements EhService {
     private GalleryBasicInfo getGalleryBasicInfo(EhentaiGallery ehentaiGallery) {
         GalleryBasicInfo basicInfo = new GalleryBasicInfo();
         BeanUtil.copyProperties(ehentaiGallery, basicInfo);
-        basicInfo.setTags(tagService.getTagInfos(basicInfo.getEleId()));
+        List<TagInfo> tagInfos = tagService.getTagInfos(basicInfo.getEleId());
+        basicInfo.setTags(tagInfos.stream().map(TagDto::new).toList());
         return basicInfo;
     }
 
