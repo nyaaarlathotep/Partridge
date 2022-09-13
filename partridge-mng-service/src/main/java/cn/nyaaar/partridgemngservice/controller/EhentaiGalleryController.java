@@ -1,9 +1,7 @@
 package cn.nyaaar.partridgemngservice.controller;
 
-import cn.nyaaar.partridgemngservice.model.eh.EhViewResp;
-import cn.nyaaar.partridgemngservice.model.eh.GalleryBasicInfo;
-import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
-import cn.nyaaar.partridgemngservice.model.eh.EhCommonReq;
+import cn.nyaaar.partridgemngservice.common.annotation.LogAnnotation;
+import cn.nyaaar.partridgemngservice.model.eh.*;
 import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.response.R;
 import cn.nyaaar.partridgemngservice.model.validate.EhDownload;
@@ -64,10 +62,11 @@ public class EhentaiGalleryController {
     }
 
     @Operation(summary = "gallery 基本信息列表", description = "通过 name 模糊搜索 title 或者 titleJpn 的 gallery 基本信息列表")
-    @GetMapping(value = "/basic/nameSearch/{pageIndex}")
-    public R<ListResp<GalleryBasicInfo>> getGalleryBasic(@RequestParam String name, @PathVariable Integer pageIndex) {
+    @PostMapping(value = "/basic/search/{pageIndex}")
+    @LogAnnotation
+    public R<ListResp<GalleryBasicInfo>> getGalleryBasic(@RequestBody GalleryQuery galleryQuery, @PathVariable Integer pageIndex) {
 
-        return new R<>(ehService.getGalleryList(name, pageIndex));
+        return new R<>(ehService.getGalleryList(galleryQuery, pageIndex));
     }
 
     @Operation(summary = "下载 gallery", description = "通过 gid 与 gtoken 异步下载对应 gallery")
