@@ -59,7 +59,7 @@ public class EhentaiGallery extends Model<EhentaiGallery> {
      * 评分
      */
     @TableField("RATING")
-    private String rating;
+    private Double rating;
 
     /**
      * 评分人数

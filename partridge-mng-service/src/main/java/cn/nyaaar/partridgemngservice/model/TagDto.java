@@ -36,4 +36,13 @@ public class TagDto {
                 (SourceEnum.fromCode(tagInfo.getSource()), SourceEnum.Unknown).getDesc();
 
     }
+
+    public TagInfo transToEntity() {
+        return new TagInfo()
+                .setName(name)
+                .setGroupName(groupName);
+    }
+
+    public TagDto() {
+    }
 }

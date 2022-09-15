@@ -56,7 +56,7 @@ public class GalleryDetail extends GalleryInfo {
         ehentaiGallery.setTitleJpn(this.titleJpn);
         ehentaiGallery.setCategory(this.category);
         ehentaiGallery.setUploader(this.uploader);
-        ehentaiGallery.setRating(String.valueOf(this.rating));
+        ehentaiGallery.setRating((double) this.rating);
         ehentaiGallery.setRatingCount(this.ratingCount);
         ehentaiGallery.setPages(this.pages);
         ehentaiGallery.setPreviewPage(this.previewPages);

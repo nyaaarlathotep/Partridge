@@ -9,7 +9,6 @@ import cn.nyaaar.partridgemngservice.model.jav.JavBasicInfo;
 import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.jav.JavMngService;
-import cn.nyaaar.partridgemngservice.service.tag.TagService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
@@ -33,20 +32,20 @@ public class JavMngServiceImpl implements JavMngService {
 
     private final EleOrgReService eleOrgReService;
 
-    private final TagService tagService;
+    private final TagInfoService tagInfoService;
 
     public JavMngServiceImpl(JavService javService,
                              OrganizationService organizationService,
                              ActorService actorService,
                              EleActorReService eleActorReService,
                              EleOrgReService eleOrgReService,
-                             TagService tagService) {
+                             TagInfoService tagInfoService) {
         this.javService = javService;
         this.organizationService = organizationService;
         this.actorService = actorService;
         this.eleActorReService = eleActorReService;
         this.eleOrgReService = eleOrgReService;
-        this.tagService = tagService;
+        this.tagInfoService = tagInfoService;
     }
 
     @Override
@@ -115,7 +114,7 @@ public class JavMngServiceImpl implements JavMngService {
             Organization producer = organizationService.findById(eleOrgRePublisher.getOrgId());
             javBasicInfo.setPublisher(producer.getName());
         }
-        List<TagInfo> tagInfos = tagService.getTagInfos(javBasicInfo.getEleId());
+        List<TagInfo> tagInfos = tagInfoService.getTagInfos(javBasicInfo.getEleId());
         javBasicInfo.setTags(tagInfos.stream().map(TagDto::new).toList());
         return javBasicInfo;
     }

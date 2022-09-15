@@ -20,7 +20,7 @@ import java.util.List;
 @Tag(name = "galley 基本信息")
 public class GalleryBasicInfo {
 
-    @Schema(title = "ehentai gallery id")
+    @Schema(title = "ehentai id")
     private Long gid;
 
     private Long eleId;
@@ -32,14 +32,14 @@ public class GalleryBasicInfo {
     @Schema(title = "tag")
     private List<TagDto> tags;
 
-    @Schema(title = "ehentai gallery id")
+    @Schema(title = "ehentai category")
     private Integer category;
 
     @Schema(title = "上传者")
     private String uploader;
 
     @Schema(title = "评分")
-    private String rating;
+    private Double rating;
 
     @Schema(title = "评分人数")
     private Integer ratingCount;
@@ -47,10 +47,10 @@ public class GalleryBasicInfo {
     @Schema(title = "总页数")
     private Integer pages;
 
-    @Schema(title = "预览画廊对应页")
+    @Schema(title = "预览画廊对应页?")
     private Integer previewPage;
 
-    @Schema(title = "gtoken")
+    @Schema(title = "ehentai gtoken")
     private String token;
 
     @Schema(title = "上传时间")

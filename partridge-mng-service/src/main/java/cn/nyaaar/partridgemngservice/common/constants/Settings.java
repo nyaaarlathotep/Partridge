@@ -258,7 +258,10 @@ public class Settings {
     private static final String KEY_REQUEST_NEWS = "request_news";
     private static final boolean DEFAULT_REQUEST_NEWS = true;
     private static final String DEFAULT_DOWNLOAD_ROOT_PATH = "../test/mngDownload";
-    private static final String DOWNLOAD_ROOT_PATH = "../test/mngDownload";
+    private static final String DOWNLOAD_ROOT_PATH = "download_root_path";
+
+    private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final String PAGE_SIZE = "page_size";
     //    private static Context sContext;
     private static Map<String, Object> sSettingsPre = new HashMap<>();
     private static EhConfig sEhConfig;
@@ -1170,5 +1173,9 @@ public class Settings {
 
     public static String getDownloadRootPath() {
         return getString(DOWNLOAD_ROOT_PATH, DEFAULT_DOWNLOAD_ROOT_PATH);
+    }
+
+    public static int getPageSize() {
+        return getInt(PAGE_SIZE, DEFAULT_PAGE_SIZE);
     }
 }

@@ -34,6 +34,7 @@ public class EhentaiGalleryController {
 
     @Operation(summary = "gallery 基本信息", description = "通过 eleId 获取 gallery 被保存在数据库的基本信息")
     @GetMapping(value = "/basic")
+    @LogAnnotation
     public R<GalleryBasicInfo> getGalleryBasic(@RequestParam Long eleId) {
 
         return new R<>(ehService.getGalleryBasicByGid(eleId));
@@ -41,6 +42,7 @@ public class EhentaiGalleryController {
 
     @Operation(summary = "预览 gallery", description = "通过 eleId 获得 下载好的画廊对应页")
     @PostMapping(value = "/view")
+    @LogAnnotation
     public R<EhViewResp> getGalleryPages(@RequestBody @Validated(EhView.class) EhCommonReq ehCommonReq) {
         EhViewResp ehViewResp = new EhViewResp()
                 .setPages(ehService.getGalleryPage(ehCommonReq.getEleId(), ehCommonReq.getPageIndexes()));
@@ -49,6 +51,7 @@ public class EhentaiGalleryController {
 
     @Operation(summary = "gallery 详细信息", description = "通过 gid 与 gtoken 请求 ehentai 获得 galleryDetail 信息")
     @GetMapping(value = "/detail")
+    @LogAnnotation
     public R<GalleryDetail> getGalleryDetail(@RequestParam Long gid, @RequestParam String gtoken) {
 
         return new R<>(ehService.getGalleryDetailByGid(gid, gtoken));
@@ -56,6 +59,7 @@ public class EhentaiGalleryController {
 
     @Operation(summary = "gallery 基本信息列表", description = "获取保存在数据库的 gallery 基本信息列表")
     @GetMapping(value = "/basic/list/{pageIndex}")
+    @LogAnnotation
     public R<ListResp<GalleryBasicInfo>> getGalleryBasic(@PathVariable Integer pageIndex) {
 
         return new R<>(ehService.getGalleryList(pageIndex));
@@ -71,6 +75,7 @@ public class EhentaiGalleryController {
 
     @Operation(summary = "下载 gallery", description = "通过 gid 与 gtoken 异步下载对应 gallery")
     @PostMapping(value = "/download")
+    @LogAnnotation
     public R<String> downloadGallery(@RequestBody @Validated(EhDownload.class) EhCommonReq ehCommonReq) {
         ehService.downloadGallery(ehCommonReq.getGid(), ehCommonReq.getGtoken());
         return new R<>();
@@ -78,6 +83,7 @@ public class EhentaiGalleryController {
 
     @Operation(summary = "预览 gallery", description = "通过 gid 与 gtoken 获取对应页")
     @PostMapping(value = "/preview")
+    @LogAnnotation(omitRes = true)
     public R<EhViewResp> previewGallery(@RequestBody @Validated(EhPreview.class) EhCommonReq ehCommonReq) {
         EhViewResp ehViewResp = new EhViewResp()
                 .setPages(ehService.downloadGalleryPages(ehCommonReq.getGid(), ehCommonReq.getGtoken(), ehCommonReq.getPageIndexes()));

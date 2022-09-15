@@ -1,14 +1,19 @@
 package cn.nyaaar.partridgemngservice.service.impl;
 
+import cn.nyaaar.partridgemngservice.entity.EleTagRe;
 import cn.nyaaar.partridgemngservice.entity.TagInfo;
 import cn.nyaaar.partridgemngservice.mapper.TagInfoMapper;
+import cn.nyaaar.partridgemngservice.service.EleTagReService;
 import cn.nyaaar.partridgemngservice.service.TagInfoService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import cn.nyaaar.partridgemngservice.model.QueryData;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +26,13 @@ import java.util.List;
  */
 @Service
 public class TagInfoServiceImpl extends ServiceImpl<TagInfoMapper, TagInfo> implements TagInfoService {
+
+
+    private final EleTagReService eleTagReService;
+
+    public TagInfoServiceImpl(EleTagReService eleTagReService) {
+        this.eleTagReService = eleTagReService;
+    }
 
     @Override
     public QueryData<TagInfo> findListByPage(TagInfo where, Integer page, Integer pageCount){
@@ -61,5 +73,41 @@ public class TagInfoServiceImpl extends ServiceImpl<TagInfoMapper, TagInfo> impl
     public TagInfo findById(Integer id){
     
         return baseMapper.selectById(id);
+    }
+
+
+
+    @Override
+    public List<TagInfo> getTagInfos(long eleId) {
+        List<EleTagRe> eleTagRes = eleTagReService.list(
+                new LambdaQueryWrapper<EleTagRe>().eq(EleTagRe::getEleId, eleId));
+        if (eleTagRes.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Integer> tagIds = eleTagRes.stream().map(EleTagRe::getTagId).toList();
+        return this.list(new LambdaQueryWrapper<TagInfo>().in(TagInfo::getId, tagIds));
+    }
+
+    @Override
+    public void saveOrUpdateTagInfo(List<TagInfo> galleryTags, Long eleId) {
+        for (TagInfo tagInfo : galleryTags) {
+            TagInfo oldTag = this.getOne(
+                    new LambdaQueryWrapper<TagInfo>()
+                            .eq(TagInfo::getName, tagInfo.getName())
+                            .eq(TagInfo::getGroupName, tagInfo.getGroupName())
+                            .eq(TagInfo::getSource, tagInfo.getSource()));
+            if (oldTag == null) {
+                this.add(tagInfo);
+                EleTagRe eleTagRe = new EleTagRe()
+                        .setEleId(eleId)
+                        .setTagId(tagInfo.getId());
+                eleTagReService.add(eleTagRe);
+            } else {
+                EleTagRe eleTagRe = new EleTagRe()
+                        .setEleId(eleId)
+                        .setTagId(oldTag.getId());
+                eleTagReService.add(eleTagRe);
+            }
+        }
     }
 }
