@@ -10,26 +10,35 @@ import lombok.experimental.Accessors;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * @author yuegenhua
+ * @Version $Id: JavQuery.java, v 0.1 2022-15 15:16 yuegenhua Exp $$
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@Tag(name = "jav 基本信息")
-public class JavBasicInfo {
-
+@Tag(name = "jav 查询 DTO 类")
+public class JavQuery {
     @Schema(title = "ELE_ID")
     private Integer eleId;
 
     @Schema(title = "識別碼")
     private String code;
 
-    @Schema(title = "TITLE")
+    @Schema(title = "模糊搜索 TITLE")
     private String title;
 
-    @Schema(title = "發行日期")
-    private Date publishDate;
+    @Schema(title = "發行日期起始")
+    private Date publishDateStart;
 
-    @Schema(title = "長度")
-    private Integer length;
+    @Schema(title = "發行日期结束")
+    private Date publishDateEnd;
+
+    @Schema(title = "长度上限")
+    private String lengthCeiling;
+
+    @Schema(title = "长度下限")
+    private String lengthFloor;
 
     @Schema(title = "导演")
     private String director;
@@ -41,10 +50,7 @@ public class JavBasicInfo {
     private List<String> actors;
 
     @Schema(title = "发行商")
-    private String publisher;
-
-    @Schema(title = "制作商")
-    private String producer;
+    private List<String> organizations;
 
     @Schema(title = "tag")
     private List<TagDto> tags;

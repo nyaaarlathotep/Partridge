@@ -1,5 +1,6 @@
 package cn.nyaaar.partridgemngservice.mapper;
 
+import cn.nyaaar.partridgemngservice.common.constants.RawSql;
 import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -21,11 +22,10 @@ import java.util.List;
  */
 public interface EhentaiGalleryMapper extends BaseMapper<EhentaiGallery> {
 
-    String querySql = "SELECT DISTINCT g.* FROM ehentai_gallery g WHERE" +
-            "<foreach item = 'tagId' collection = 'tagIds' index = 'index' open = '' separator = 'and' close = ''>" +
-            "EXISTS( SELECT * FROM  tag_info t, ele_tag_re r  WHERE  g.ELE_ID=r.ELE_ID AND r.TAG_ID = #{tagId} )" +
-            "</foreach>";
-    String wrapperSql = "<script>SELECT * FROM (" + querySql + ") as q  ${ew.customSqlSegment}</script>";
+    String querySql = "SELECT DISTINCT e.* FROM ehentai_gallery e ";
+    String wrapperSql = "<script>SELECT * FROM (" +
+            querySql + RawSql.whereStart + RawSql.tagIdsSql + RawSql.whereEnd +
+            ") as q  ${ew.customSqlSegment}</script>";
 
     @Select(wrapperSql)
     Page<EhentaiGallery> pageWithTag(Page<EhentaiGallery> page, @Param(Constants.WRAPPER) Wrapper<EhentaiGallery> wrapper,

@@ -3,6 +3,7 @@ package cn.nyaaar.partridgemngservice.controller;
 import cn.nyaaar.partridgemngservice.common.annotation.LogAnnotation;
 import cn.nyaaar.partridgemngservice.model.jav.JavBasicInfo;
 import cn.nyaaar.partridgemngservice.model.ListResp;
+import cn.nyaaar.partridgemngservice.model.jav.JavQuery;
 import cn.nyaaar.partridgemngservice.model.response.R;
 import cn.nyaaar.partridgemngservice.service.jav.JavMngService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,13 +30,12 @@ public class JavController {
         return new R<>(javMngService.getJavBasicInfoByCode(code));
     }
 
-    @Operation(summary = "jav 基本信息列表", description = "通过 name 模糊搜索获取 jav 基本信息")
-    @GetMapping(value = "/name/{pageIndex}")
+    @Operation(summary = "jav 基本信息列表", description = "通过高级搜索获取 jav 基本信息")
+    @PostMapping(value = "/search/{pageIndex}")
     @LogAnnotation
-    // TODO fix to query...
-    public R<ListResp<JavBasicInfo>> getJavBasicInfoList(@RequestParam String name, @PathVariable Integer pageIndex) {
+    public R<ListResp<JavBasicInfo>> getJavBasicInfoList(@RequestBody JavQuery javQuery, @PathVariable Integer pageIndex) {
 
-        return new R<>(javMngService.getJavList(name, pageIndex));
+        return new R<>(javMngService.getJavList(javQuery, pageIndex));
     }
 
     @Operation(summary = "jav 基本信息列表", description = "获取保存在数据库的 jav 基本信息列表")
