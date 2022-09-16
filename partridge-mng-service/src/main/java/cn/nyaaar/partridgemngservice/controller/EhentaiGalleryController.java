@@ -65,7 +65,7 @@ public class EhentaiGalleryController {
         return new R<>(ehService.getGalleryList(pageIndex));
     }
 
-    @Operation(summary = "gallery 基本信息列表", description = "通过高级搜索获得 gallery 基本信息列表")
+    @Operation(summary = "gallery 基本信息列表", description = "通过高级搜索获得 gallery 基本信息列表，不存在的 tag 等信息不会加入搜索条件")
     @PostMapping(value = "/basic/search/{pageIndex}")
     @LogAnnotation
     public R<ListResp<GalleryBasicInfo>> getGalleryBasic(@RequestBody GalleryQuery galleryQuery, @PathVariable Integer pageIndex) {

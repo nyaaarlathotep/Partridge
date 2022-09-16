@@ -30,7 +30,7 @@ public class JavController {
         return new R<>(javMngService.getJavBasicInfoByCode(code));
     }
 
-    @Operation(summary = "jav 基本信息列表", description = "通过高级搜索获取 jav 基本信息")
+    @Operation(summary = "jav 基本信息列表", description = "通过高级搜索获取 jav 基本信息，不存在的演员，机构等信息不会加入搜索条件")
     @PostMapping(value = "/search/{pageIndex}")
     @LogAnnotation
     public R<ListResp<JavBasicInfo>> getJavBasicInfoList(@RequestBody JavQuery javQuery, @PathVariable Integer pageIndex) {

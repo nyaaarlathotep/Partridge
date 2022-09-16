@@ -49,9 +49,9 @@ public class JavQuery {
     @Schema(title = "演员")
     private List<String> actors;
 
-    @Schema(title = "发行商")
+    @Schema(title = "相关组织")
     private List<String> organizations;
 
     @Schema(title = "tag")
-    private List<TagDto> tags;
+    private List<TagDto> tagDtos;
 }

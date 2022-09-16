@@ -156,6 +156,11 @@ public class EhServiceImpl implements EhService {
     public ListResp<GalleryBasicInfo> getGalleryList(GalleryQuery galleryQuery, int pageIndex) {
         Page<EhentaiGallery> page = new Page<>(pageIndex, Settings.getPageSize());
         LambdaQueryWrapper<EhentaiGallery> ehentaiGalleryLambdaQueryWrapper = getQueryWrapper(galleryQuery);
+        queryPage(galleryQuery, page, ehentaiGalleryLambdaQueryWrapper);
+        return getGalleryBasicInfoListResp(page);
+    }
+
+    private void queryPage(GalleryQuery galleryQuery, Page<EhentaiGallery> page, LambdaQueryWrapper<EhentaiGallery> ehentaiGalleryLambdaQueryWrapper) {
         List<Integer> tagInfoIds = null;
         if (Objects.nonNull(galleryQuery.getTagDtos()) && !galleryQuery.getTagDtos().isEmpty()) {
             tagInfoIds = galleryQuery.getTagDtos()
@@ -166,7 +171,6 @@ public class EhServiceImpl implements EhService {
                     .toList();
         }
         ehentaiGalleryService.pageWithTag(page, ehentaiGalleryLambdaQueryWrapper, tagInfoIds);
-        return getGalleryBasicInfoListResp(page);
     }
 
     private static LambdaQueryWrapper<EhentaiGallery> getQueryWrapper(GalleryQuery galleryQuery) {

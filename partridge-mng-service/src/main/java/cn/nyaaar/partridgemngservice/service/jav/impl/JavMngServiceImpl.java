@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -60,6 +61,46 @@ public class JavMngServiceImpl implements JavMngService {
     @Override
     public ListResp<JavBasicInfo> getJavList(JavQuery javQuery, int pageIndex) {
         Page<Jav> page = new Page<>(pageIndex, 10);
+        LambdaQueryWrapper<Jav> lambdaQueryWrapper = getJavLambdaQueryWrapper(javQuery);
+        queryPage(javQuery, page, lambdaQueryWrapper);
+        return getJInfoListResp(page);
+    }
+
+    private void queryPage(JavQuery javQuery, Page<Jav> page, LambdaQueryWrapper<Jav> lambdaQueryWrapper) {
+        List<Integer> actorIds = null;
+        if (Objects.nonNull(javQuery.getActors()) && !javQuery.getActors().isEmpty()) {
+            actorIds = javQuery.getActors()
+                    .parallelStream()
+                    .map(queryActorName -> actorService.getOne
+                            (Wrappers.lambdaQuery(Actor.class).eq(Actor::getName, queryActorName)))
+                    .filter(Objects::nonNull)
+                    .map(Actor::getId)
+                    .toList();
+        }
+        List<Integer> organIds = null;
+        if (Objects.nonNull(javQuery.getOrganizations()) && !javQuery.getOrganizations().isEmpty()) {
+            organIds = javQuery.getOrganizations()
+                    .parallelStream()
+                    .map(queryOrganName -> organizationService.getOne
+                            (Wrappers.lambdaQuery(Organization.class).eq(Organization::getName, queryOrganName)))
+                    .filter(Objects::nonNull)
+                    .map(Organization::getId)
+                    .toList();
+        }
+        List<Integer> tagInfoIds = null;
+        if (Objects.nonNull(javQuery.getTagDtos()) && !javQuery.getTagDtos().isEmpty()) {
+            tagInfoIds = javQuery.getTagDtos()
+                    .parallelStream()
+                    .map(queryTagInfo -> tagInfoService.getOne(Wrappers.query(queryTagInfo.transToEntity())))
+                    .filter(Objects::nonNull)
+                    .map(TagInfo::getId)
+                    .toList();
+        }
+        javService.pageWithTag(page, lambdaQueryWrapper, tagInfoIds, actorIds, organIds);
+    }
+
+    @NotNull
+    private static LambdaQueryWrapper<Jav> getJavLambdaQueryWrapper(JavQuery javQuery) {
         LambdaQueryWrapper<Jav> lambdaQueryWrapper = Wrappers.lambdaQuery(Jav.class);
 
         if (javQuery.getCode() != null) {
@@ -89,12 +130,7 @@ public class JavMngServiceImpl implements JavMngService {
         if (javQuery.getSeries() != null) {
             lambdaQueryWrapper.eq(Jav::getSeries, javQuery.getSeries());
         }
-        // TODO
-//        List<Integer> actorIds=
-//        javService.pageWithTag(page,)
-        
-        
-        return getJInfoListResp(page);
+        return lambdaQueryWrapper;
     }
 
 
