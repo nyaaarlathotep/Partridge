@@ -67,7 +67,8 @@ public interface TagInfoService extends IService<TagInfo> {
     TagInfo findById(Integer id);
 
 
+    // TODO cache and comment
     List<TagInfo> getTagInfos(long eleId);
 
-    void saveOrUpdateTagInfo(List<TagInfo> galleryTags, Long eleId);
+    void saveOrUpdateTagInfoWithRe(List<TagInfo> galleryTags, Long eleId);
 }

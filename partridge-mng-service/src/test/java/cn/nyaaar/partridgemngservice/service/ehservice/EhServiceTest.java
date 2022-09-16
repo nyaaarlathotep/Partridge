@@ -6,6 +6,7 @@ import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
 import cn.nyaaar.partridgemngservice.service.EhentaiGalleryService;
 import cn.nyaaar.partridgemngservice.service.ElementService;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
+import cn.nyaaar.partridgemngservice.service.ehService.ehBasic.EhDownload;
 import cn.nyaaar.partridgemngservice.service.ehService.impl.EhServiceImpl;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +58,7 @@ public class EhServiceTest {
     @Test
     public void downloadGalleryQueueTest() {
         log.info("------before start-------");
-        Map<Long, EhServiceImpl.DownloadingGallery> queue = ehService.getDownloadingQueue();
+        Map<Long, EhDownload.DownloadingGallery> queue = ehService.getDownloadingQueue();
         log.info(JSON.toJSONString(queue));
         log.info("------before start-------");
         ehService.downloadGallery(2315232, "c4fdf93bea");

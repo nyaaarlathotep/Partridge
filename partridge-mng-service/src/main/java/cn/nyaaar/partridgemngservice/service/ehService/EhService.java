@@ -5,7 +5,7 @@ import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryPage;
 import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryQuery;
-import cn.nyaaar.partridgemngservice.service.ehService.impl.EhServiceImpl;
+import cn.nyaaar.partridgemngservice.service.ehService.ehBasic.EhDownload;
 
 import java.util.List;
 import java.util.Map;
@@ -59,7 +59,7 @@ public interface EhService {
      *
      * @return queue
      */
-    Map<Long, EhServiceImpl.DownloadingGallery> getDownloadingQueue();
+    Map<Long, EhDownload.DownloadingGallery> getDownloadingQueue();
 
     /**
      * eleId->GalleryBasicInfo

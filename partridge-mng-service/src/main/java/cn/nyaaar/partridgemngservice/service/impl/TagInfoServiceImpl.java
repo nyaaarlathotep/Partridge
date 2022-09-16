@@ -89,7 +89,7 @@ public class TagInfoServiceImpl extends ServiceImpl<TagInfoMapper, TagInfo> impl
     }
 
     @Override
-    public void saveOrUpdateTagInfo(List<TagInfo> galleryTags, Long eleId) {
+    public void saveOrUpdateTagInfoWithRe(List<TagInfo> galleryTags, Long eleId) {
         for (TagInfo tagInfo : galleryTags) {
             TagInfo oldTag = this.getOne(
                     new LambdaQueryWrapper<TagInfo>()
