@@ -370,7 +370,6 @@ public class GalleryDetailParser {
             return parseTagGroups(tagGroups);
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
-            e.printStackTrace();
             return EMPTY_GALLERY_TAG_GROUP_ARRAY;
         }
     }

@@ -1,6 +1,5 @@
 package cn.nyaaar.partridgemngservice.service.ehService.ehBasic;
 
-import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.nyaaar.partridgemngservice.common.constants.EhUrl;
@@ -9,14 +8,13 @@ import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
 import cn.nyaaar.partridgemngservice.entity.EleFile;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
+import cn.nyaaar.partridgemngservice.model.eh.DownloadingGallery;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryPage;
 import cn.nyaaar.partridgemngservice.service.EhentaiGalleryService;
 import cn.nyaaar.partridgemngservice.service.EleFileService;
 import cn.nyaaar.partridgemngservice.service.download.DownloadService;
 import cn.nyaaar.partridgemngservice.util.PathUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import lombok.Data;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.NonNull;
@@ -24,7 +22,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author yuegenhua
@@ -86,24 +83,24 @@ public class EhDownload {
     }
 
     private void handlePageDownloadFail(String pToken, int index, DownloadingGallery downloadingGallery) {
-        long gid = downloadingGallery.gid;
-        Integer failCount = downloadingGallery.downloadFailPageIndex.getOrDefault(index, 0);
+        long gid = downloadingGallery.getGid();
+        Integer failCount = downloadingGallery.getDownloadFailPageIndex().getOrDefault(index, 0);
         if (failCount > maxFailCount) {
             log.warn("[{}]gallery page download failed...index:{}, fail count:{}", gid, index, failCount);
-            downloadingGallery.downloadFailPageIndex.remove(index);
+            downloadingGallery.getDownloadFailPageIndex().remove(index);
             handlePageDownloadComplete(downloadingGallery);
         } else {
             log.warn("[{}]gallery page download failed...index:{}, fail count:{}, try again...", gid, index, failCount + 1);
-            downloadingGallery.downloadFailPageIndex.put(index, failCount + 1);
+            downloadingGallery.getDownloadFailPageIndex().put(index, failCount + 1);
             downloadGalleryPageAsync(pToken, index, downloadingGallery);
         }
     }
 
     private void downloadGalleryPageAsync(String pToken, int index,
                                           DownloadingGallery downloadingGallery) {
-        long gid = downloadingGallery.gid;
-        long eleId = downloadingGallery.eleId;
-        String gtoken = downloadingGallery.gtoken;
+        long gid = downloadingGallery.getGid();
+        long eleId = downloadingGallery.getEleId();
+        String gtoken = downloadingGallery.getGtoken();
         int pageIndex = index + 1;
         String folder = PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(), String.valueOf(gid));
 
@@ -133,9 +130,9 @@ public class EhDownload {
     }
 
     private void handlePageDownloadComplete(DownloadingGallery downloadingGallery) {
-        long gid = downloadingGallery.gid;
-        Integer completeNum = downloadingGallery.downloadCompleteNum.addAndGet(1);
-        if (completeNum.equals(downloadingGallery.pages)) {
+        long gid = downloadingGallery.getGid();
+        Integer completeNum = downloadingGallery.getDownloadCompleteNum().addAndGet(1);
+        if (completeNum.equals(downloadingGallery.getPages())) {
             downloadingGalleryQueue.remove(gid);
 
             ehentaiGalleryService.update(new LambdaUpdateWrapper<EhentaiGallery>()
@@ -176,24 +173,12 @@ public class EhDownload {
         return pages;
     }
 
-    @Data
-    @Accessors(chain = true)
-    public static class DownloadingGallery {
-        long gid;
-        String gtoken;
-        long eleId;
-        int pages;
-        Date deadline = DateUtil.date().offset(DateField.HOUR, 1);
-        AtomicInteger downloadCompleteNum = new AtomicInteger();
-        Map<Integer, Integer> downloadFailPageIndex = new HashMap<>();
-    }
-
     public Map<Long, DownloadingGallery> getDownloadingQueue() {
         DateTime now = DateUtil.date();
         List<Long> deadGalleries = new ArrayList<>();
         for (DownloadingGallery downloadingGallery : downloadingGalleryQueue.values()) {
-            if (downloadingGallery.deadline.before(now)) {
-                deadGalleries.add(downloadingGallery.gid);
+            if (downloadingGallery.getDeadline().before(now)) {
+                deadGalleries.add(downloadingGallery.getGid());
             }
         }
         if (!deadGalleries.isEmpty()) {

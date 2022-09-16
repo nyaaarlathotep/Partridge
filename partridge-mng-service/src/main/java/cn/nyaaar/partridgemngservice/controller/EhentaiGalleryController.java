@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+
 /**
  * ehentaiController
  *
@@ -63,6 +65,13 @@ public class EhentaiGalleryController {
     public R<ListResp<GalleryBasicInfo>> getGalleryBasic(@PathVariable Integer pageIndex) {
 
         return new R<>(ehService.getGalleryList(pageIndex));
+    }
+    @Operation(summary = "gallery 基本信息列表", description = "获取保存在数据库的 gallery 基本信息列表")
+    @GetMapping(value = "/download/queue")
+    @LogAnnotation
+    public R<Collection<DownloadingGallery>> getDownloadQueue() {
+
+        return new R<>(ehService.getDownloadingQueue().values());
     }
 
     @Operation(summary = "gallery 基本信息列表", description = "通过高级搜索获得 gallery 基本信息列表，不存在的 tag 等信息不会加入搜索条件")

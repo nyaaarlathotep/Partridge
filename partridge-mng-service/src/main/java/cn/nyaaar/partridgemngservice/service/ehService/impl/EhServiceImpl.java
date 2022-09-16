@@ -6,11 +6,8 @@ import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.TagDto;
-import cn.nyaaar.partridgemngservice.model.eh.GalleryBasicInfo;
-import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
-import cn.nyaaar.partridgemngservice.model.eh.GalleryPage;
+import cn.nyaaar.partridgemngservice.model.eh.*;
 import cn.nyaaar.partridgemngservice.model.ListResp;
-import cn.nyaaar.partridgemngservice.model.eh.GalleryQuery;
 import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
 import cn.nyaaar.partridgemngservice.service.ehService.ehBasic.EhDownload;
@@ -260,7 +257,7 @@ public class EhServiceImpl implements EhService {
     }
 
     @Override
-    public Map<Long, EhDownload.DownloadingGallery> getDownloadingQueue() {
+    public Map<Long, DownloadingGallery> getDownloadingQueue() {
         return ehDownload.getDownloadingQueue();
     }
 }

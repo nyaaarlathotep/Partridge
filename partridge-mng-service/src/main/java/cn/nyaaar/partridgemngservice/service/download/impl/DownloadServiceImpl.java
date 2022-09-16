@@ -49,11 +49,16 @@ public class DownloadServiceImpl implements DownloadService {
                 }
 
                 @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                    byte[] bytes = Objects.requireNonNull(response.body()).bytes();
-                    fileHandleService.saveBytesToFile(bytes, destDic, fileName, false);
-                    if (successHandle != null) {
-                        successHandle.run();
+                public void onResponse(@NotNull Call call, @NotNull Response response) {
+                    try {
+                        byte[] bytes = Objects.requireNonNull(response.body()).bytes();
+                        fileHandleService.saveBytesToFile(bytes, destDic, fileName, false);
+                        if (successHandle != null) {
+                            successHandle.run();
+                        }
+                    } catch (IOException e) {
+                        log.error("read response or save error, url:{}", url, e);
+                        failHandle.run();
                     }
                 }
             });
