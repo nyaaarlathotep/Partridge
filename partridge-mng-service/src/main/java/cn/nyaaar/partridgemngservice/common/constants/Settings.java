@@ -27,7 +27,6 @@ import java.util.Map;
 
 @Slf4j
 public class Settings {
-    // TODO size of page
     // TODO proxy
 
     /********************

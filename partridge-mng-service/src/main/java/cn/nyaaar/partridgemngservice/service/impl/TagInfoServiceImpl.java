@@ -35,7 +35,7 @@ public class TagInfoServiceImpl extends ServiceImpl<TagInfoMapper, TagInfo> impl
     }
 
     @Override
-    public QueryData<TagInfo> findListByPage(TagInfo where, Integer page, Integer pageCount){
+    public QueryData<TagInfo> findListByPage(TagInfo where, Integer page, Integer pageCount) {
         IPage<TagInfo> wherePage = new Page<>(page, pageCount);
 
         IPage<TagInfo> iPage = baseMapper.selectPage(wherePage, Wrappers.query(where));
@@ -44,37 +44,35 @@ public class TagInfoServiceImpl extends ServiceImpl<TagInfoMapper, TagInfo> impl
     }
 
     @Override
-    public List<TagInfo> findList(TagInfo where){
+    public List<TagInfo> findList(TagInfo where) {
 
-        return baseMapper.selectList( Wrappers.query(where));
+        return baseMapper.selectList(Wrappers.query(where));
     }
 
 
-
     @Override
-    public Integer add(TagInfo tagInfo){
- 
+    public Integer add(TagInfo tagInfo) {
+
         return baseMapper.insert(tagInfo);
     }
 
     @Override
-    public Integer delete(Integer id){
-    
+    public Integer delete(Integer id) {
+
         return baseMapper.deleteById(id);
     }
 
     @Override
-    public Integer updateData(TagInfo tagInfo){
-    
+    public Integer updateData(TagInfo tagInfo) {
+
         return baseMapper.updateById(tagInfo);
     }
 
     @Override
-    public TagInfo findById(Integer id){
-    
+    public TagInfo findById(Integer id) {
+
         return baseMapper.selectById(id);
     }
-
 
 
     @Override
@@ -106,7 +104,12 @@ public class TagInfoServiceImpl extends ServiceImpl<TagInfoMapper, TagInfo> impl
                 EleTagRe eleTagRe = new EleTagRe()
                         .setEleId(eleId)
                         .setTagId(oldTag.getId());
-                eleTagReService.add(eleTagRe);
+                EleTagRe eleTagReQuery = eleTagReService.getOne(Wrappers.lambdaQuery(EleTagRe.class)
+                        .eq(EleTagRe::getEleId, eleId)
+                        .eq(EleTagRe::getTagId, oldTag.getId()));
+                if (eleTagReQuery == null) {
+                    eleTagReService.save(eleTagRe);
+                }
             }
         }
     }

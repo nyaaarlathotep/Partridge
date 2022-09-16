@@ -3,6 +3,7 @@ package cn.nyaaar.partridgemngservice.service;
 import cn.nyaaar.partridgemngservice.entity.TagInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.nyaaar.partridgemngservice.model.QueryData;
+
 import java.util.List;
 
 /**
@@ -23,14 +24,14 @@ public interface TagInfoService extends IService<TagInfo> {
      * @param pageCount 每页条数
      * @return QueryData
      */
-    QueryData<TagInfo> findListByPage(TagInfo where,Integer page, Integer pageCount);
+    QueryData<TagInfo> findListByPage(TagInfo where, Integer page, Integer pageCount);
 
     /**
-    * 查询元素关联的 tag，多种来源。所有数据
-    *
-    * @param where     查询条件
-    * @return List
-    */
+     * 查询元素关联的 tag，多种来源。所有数据
+     *
+     * @param where 查询条件
+     * @return List
+     */
     List<TagInfo> findList(TagInfo where);
 
 
@@ -67,8 +68,19 @@ public interface TagInfoService extends IService<TagInfo> {
     TagInfo findById(Integer id);
 
 
-    // TODO cache and comment
+    /**
+     * 获取 eleId 对应的所有 tagInfo
+     *
+     * @param eleId eleId
+     * @return List<TagInfo>
+     */
     List<TagInfo> getTagInfos(long eleId);
 
+    /**
+     * 保存或更新 tagInfo，并新增对应的关系
+     *
+     * @param galleryTags galleryTags
+     * @param eleId       eleId
+     */
     void saveOrUpdateTagInfoWithRe(List<TagInfo> galleryTags, Long eleId);
 }
