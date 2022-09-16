@@ -112,9 +112,8 @@ public class EhDownload {
         downloadService.downloadUrlToDest(pagePicUrl,
                 folder,
                 eleFile.getName(),
-                () -> handlePageDownloadComplete(downloadingGallery),
+                () -> handlePageDownloadSuccess(eleFile, downloadingGallery),
                 () -> handlePageDownloadFail(pToken, index, downloadingGallery));
-        eleFileService.saveOrUpdate(eleFile);
     }
 
     @NotNull
@@ -127,6 +126,11 @@ public class EhDownload {
         eleFile.setIsAvailableFlag(1);
         eleFile.setType(fileTypeEnum.getCode());
         return eleFile;
+    }
+
+    private void handlePageDownloadSuccess(EleFile eleFile, DownloadingGallery downloadingGallery) {
+        eleFileService.saveOrUpdate(eleFile);
+        handlePageDownloadComplete(downloadingGallery);
     }
 
     private void handlePageDownloadComplete(DownloadingGallery downloadingGallery) {

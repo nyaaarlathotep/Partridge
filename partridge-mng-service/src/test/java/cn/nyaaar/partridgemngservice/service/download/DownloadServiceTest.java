@@ -3,7 +3,6 @@ package cn.nyaaar.partridgemngservice.service.download;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.nyaaar.partridgemngservice.PartridgeMngServiceApplication;
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
-import cn.nyaaar.partridgemngservice.service.file.FileHandleService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -27,10 +24,6 @@ public class DownloadServiceTest {
     @Autowired
     private DownloadService downloadService;
 
-
-    @Autowired
-    private FileHandleService fileHandleService;
-
     @Test
     public void downloadTest() {
         downloadService.downloadUrlToDest("https://iymlvib.fawvwgxlrdfx.hath.network/" +
@@ -38,12 +31,5 @@ public class DownloadServiceTest {
                 "fileindex=113277182;xres=org/1211145_80751202_p1.jpg", Settings.getDownloadRootPath() + "2313044\\", "2", null, null);
 
         ThreadUtil.sleep(3, TimeUnit.SECONDS);
-    }
-
-    @Test
-    public void fileSaveTest() throws IOException {
-        String sss = "testAppend";
-
-        fileHandleService.saveBytesToFile(sss.getBytes(StandardCharsets.UTF_8), "C:\\Users\\nyaaar\\Desktop\\testFile", "test.txt", true);
     }
 }

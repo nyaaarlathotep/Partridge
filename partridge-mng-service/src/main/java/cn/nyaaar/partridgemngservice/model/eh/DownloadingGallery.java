@@ -2,6 +2,7 @@ package cn.nyaaar.partridgemngservice.model.eh;
 
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
+import cn.nyaaar.partridgemngservice.common.constants.Settings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
@@ -35,7 +36,7 @@ public class DownloadingGallery {
     private int pages;
 
     @Schema(title = "画廊下载最后期限")
-    private Date deadline = DateUtil.date().offset(DateField.HOUR, 1);
+    private Date deadline = DateUtil.date().offset(DateField.MINUTE, Settings.getDownloadQueueExpireTime());
 
     @Schema(title = "画廊下载成功页数")
     private AtomicInteger downloadCompleteNum = new AtomicInteger();
