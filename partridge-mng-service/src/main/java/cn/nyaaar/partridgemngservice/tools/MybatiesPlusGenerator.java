@@ -28,7 +28,7 @@ public class MybatiesPlusGenerator {
         //生成到的Package
         String parent = "cn.nyaaar.partridgemngservice";
         //多个用逗号分隔, 表名要大写
-        String tables = "element";
+        String tables = "pr_user";
         //数据源
         String db_url = "jdbc:mysql://localhost:3306/partridge?serverTimezone=Asia/Shanghai";
         String db_DriverName = "com.mysql.cj.jdbc.Driver";
