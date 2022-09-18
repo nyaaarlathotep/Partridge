@@ -2,7 +2,10 @@ package cn.nyaaar.partridgemngservice.service.user.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
+import cn.nyaaar.partridgemngservice.common.enums.PrivilegeEnum;
 import cn.nyaaar.partridgemngservice.entity.PrUser;
+import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
+import cn.nyaaar.partridgemngservice.exception.ValidationException;
 import cn.nyaaar.partridgemngservice.model.user.RegistrationRequest;
 import cn.nyaaar.partridgemngservice.service.PrUserService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
@@ -13,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.regex.Pattern;
 
 @Service
 public class AppUserServiceImpl implements UserDetailsService, AppUserService {
@@ -36,27 +41,23 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
         if (prUser.getValidated() != PrConstant.VALIDATED) {
             throw new UsernameNotFoundException(username + " invalided...");
         }
-        return User.withUsername(prUser.getUserName()).password(prUser.getPassword()).build();
+        PrivilegeEnum privilegeEnum;
+        if (username.equals("root")){
+            privilegeEnum=PrivilegeEnum.ROOT;
+        }else {
+            privilegeEnum=PrivilegeEnum.USER;
+        }
+        return User.withUsername(prUser.getUserName()).password(prUser.getPassword()).authorities(privilegeEnum.getCode()).build();
     }
 
     @Override
     public String register(RegistrationRequest request) {
+        String pattern = "[^@ \\t\\r\\n]+@[^@ \\t\\r\\n]+\\.[^@ \\t\\r\\n]+";
+        boolean isValidEmail = Pattern.matches(pattern, request.getEmail());
 
-//        boolean isValidEmail = emailValidator.test(request.getEmail());
-
-//        if (isValidEmail) {
-//            throw new IllegalStateException("Email is not valid!");
-//        }
-//        String token = appUserService.signUpUser(
-//                new AppUser(
-//                        request.getFirstName(),
-//                        request.getLastName(),
-//                        request.getEmail(),
-//                        request.getPassword(),
-//                        AppUserRole.USER
-//                )
-//        );
-//        String link = "http://localhost:8080/api/v1/registration/confirm/?token=" + token;
+        if (!isValidEmail) {
+            throw new ValidationException(BusinessExceptionEnum.FIELD_ERROR, null, "邮箱格式异常");
+        }
 //        emailSender.send(
 //                request.getEmail(),
 //                buildEmail(request.getFirstName(), link) );
