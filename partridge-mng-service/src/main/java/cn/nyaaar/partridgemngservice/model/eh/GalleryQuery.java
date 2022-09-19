@@ -13,8 +13,8 @@ import java.util.List;
 /**
  * gallery 查询 DTO 类
  *
- * @author yuegenhua
- * @Version $Id: GalleryQuery.java, v 0.1 2022-13 10:34 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: GalleryQuery.java, v 0.1 2022-13 10:34 nyaaar Exp $$
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

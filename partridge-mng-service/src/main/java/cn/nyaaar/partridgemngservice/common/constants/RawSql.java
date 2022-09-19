@@ -1,8 +1,8 @@
 package cn.nyaaar.partridgemngservice.common.constants;
 
 /**
- * @author yuegenhua
- * @Version $Id: rawSql.java, v 0.1 2022-15 16:58 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: rawSql.java, v 0.1 2022-15 16:58 nyaaar Exp $$
  */
 public class RawSql {
 

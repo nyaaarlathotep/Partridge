@@ -35,4 +35,13 @@ public class UserController {
     public R<Boolean> confirm(@RequestParam("token") String token) {
         return new R<>(appUserServiceImpl.confirmToken(token));
     }
+
+
+    @Operation(summary = "test", description = "test")
+    @GetMapping(value = "/test")
+    @LogAnnotation
+    public R<Boolean> test() {
+        log.info("test");
+        return new R<>();
+    }
 }

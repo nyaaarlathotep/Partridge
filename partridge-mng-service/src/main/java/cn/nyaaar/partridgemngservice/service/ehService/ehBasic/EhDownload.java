@@ -24,8 +24,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 /**
- * @author yuegenhua
- * @Version $Id: EhDownload.java, v 0.1 2022-16 10:42 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: EhDownload.java, v 0.1 2022-16 10:42 nyaaar Exp $$
  */
 @Slf4j
 @Service

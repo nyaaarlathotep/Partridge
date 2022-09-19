@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public enum PrivilegeEnum {
 
-    USER("user", "user"),
-    ROOT("root", "root"),
+    USER("USER", "user"),
+    ROOT("ROOT", "root"),
     ;
 
     private final String code;

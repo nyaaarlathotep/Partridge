@@ -10,6 +10,7 @@ import cn.nyaaar.partridgemngservice.model.user.RegistrationRequest;
 import cn.nyaaar.partridgemngservice.service.PrUserService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.regex.Pattern;
 
 @Service
+@Slf4j
 public class AppUserServiceImpl implements UserDetailsService, AppUserService {
 
     private final PrUserService prUserService;
@@ -41,11 +43,12 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
         if (prUser.getValidated() != PrConstant.VALIDATED) {
             throw new UsernameNotFoundException(username + " invalided...");
         }
+        // TODO user roles
         PrivilegeEnum privilegeEnum;
-        if (username.equals("root")){
-            privilegeEnum=PrivilegeEnum.ROOT;
-        }else {
-            privilegeEnum=PrivilegeEnum.USER;
+        if (username.equals("root")) {
+            privilegeEnum = PrivilegeEnum.ROOT;
+        } else {
+            privilegeEnum = PrivilegeEnum.USER;
         }
         return User.withUsername(prUser.getUserName()).password(prUser.getPassword()).authorities(privilegeEnum.getCode()).build();
     }
@@ -58,6 +61,8 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
         if (!isValidEmail) {
             throw new ValidationException(BusinessExceptionEnum.FIELD_ERROR, null, "邮箱格式异常");
         }
+        BusinessExceptionEnum.USER_EXIST.assertIsNull(prUserService.getOne(Wrappers.lambdaQuery(PrUser.class)
+                .eq(PrUser::getUserName, request.getUserName())));
 //        emailSender.send(
 //                request.getEmail(),
 //                buildEmail(request.getFirstName(), link) );
@@ -74,7 +79,7 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
         return "token";
     }
 
-    // TODO
+    // TODO emailConfirm
 //    @Transactional
     @Override
     public boolean confirmToken(String token) {

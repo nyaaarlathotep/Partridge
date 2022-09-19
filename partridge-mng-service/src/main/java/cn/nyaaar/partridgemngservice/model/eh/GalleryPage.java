@@ -9,8 +9,8 @@ import lombok.experimental.Accessors;
 /**
  * 画廊单页DTO类
  *
- * @author yuegenhua
- * @Version $Id: GalleryPage.java, v 0.1 2022-08 9:04 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: GalleryPage.java, v 0.1 2022-08 9:04 nyaaar Exp $$
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

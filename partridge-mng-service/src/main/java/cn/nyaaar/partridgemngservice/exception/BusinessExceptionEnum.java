@@ -28,12 +28,11 @@ public enum BusinessExceptionEnum implements BusinessExceptionAssert {
     ENCRYPTION_ERROR(1000017, "发送数据错误，无法加密"),
 
     // 特殊业务异常
-    IDPIC_TYPE_ERROR(200002, "{0}"),
-    IDPIC_OCR_ERROR(200003, "{0}"),
-    ID_NO_ERROR(200004, "{0}"),
-
-    ID_VERIFY_FAIL(200007, "{0}"),
-    PHONE_NO_ERROR(200008, "{0}"),
+    
+    USER_CUSTOM(200006, "{0}"),
+    USER_EXPIRE(200007, "用户登录过期"),
+    USER_NOT_EXIST(200008, "用户名不存在"),
+    USER_EXIST(200009, "用户名已存在"),
     PARSE_ERROR(200010, "parse error, {0}"),
     SAD_PANDA(200011, "Sad Panda"),
     SAD_PANDA_WITHOUT(200011, "Sad Panda(without panda)"),

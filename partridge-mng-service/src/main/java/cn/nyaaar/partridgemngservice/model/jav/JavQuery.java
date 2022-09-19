@@ -11,8 +11,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author yuegenhua
- * @Version $Id: JavQuery.java, v 0.1 2022-15 15:16 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: JavQuery.java, v 0.1 2022-15 15:16 nyaaar Exp $$
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

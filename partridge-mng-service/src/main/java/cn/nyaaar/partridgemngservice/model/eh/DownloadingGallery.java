@@ -17,8 +17,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 下载中的 gallery
  *
- * @author yuegenhua
- * @Version $Id: DownloadingGallery.java, v 0.1 2022-16 14:39 yuegenhua Exp $$
+ * @author nyaaar
+ * @Version $Id: DownloadingGallery.java, v 0.1 2022-16 14:39 nyaaar Exp $$
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
