@@ -30,8 +30,6 @@ public enum BusinessExceptionEnum implements BusinessExceptionAssert {
     // 特殊业务异常
     
     USER_CUSTOM(200006, "{0}"),
-    USER_EXPIRE(200007, "用户登录过期"),
-    USER_NOT_EXIST(200008, "用户名不存在"),
     USER_EXIST(200009, "用户名已存在"),
     PARSE_ERROR(200010, "parse error, {0}"),
     SAD_PANDA(200011, "Sad Panda"),

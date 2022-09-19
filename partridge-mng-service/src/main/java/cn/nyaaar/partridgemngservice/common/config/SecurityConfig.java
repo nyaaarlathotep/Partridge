@@ -3,6 +3,7 @@ package cn.nyaaar.partridgemngservice.common.config;
 import cn.nyaaar.partridgemngservice.common.enums.PrivilegeEnum;
 import cn.nyaaar.partridgemngservice.service.user.impl.CustomizeAuthenticationFailureHandler;
 import cn.nyaaar.partridgemngservice.service.user.impl.CustomizeAuthenticationSuccessHandler;
+import cn.nyaaar.partridgemngservice.service.user.impl.CustomizeSessionInformationExpiredStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
