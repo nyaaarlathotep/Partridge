@@ -7,6 +7,7 @@ import cn.nyaaar.partridgemngservice.model.response.BaseResponse;
 import cn.nyaaar.partridgemngservice.service.PrUserService;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -24,6 +25,7 @@ import java.io.IOException;
  * @Version $Id: CustomizeAuthenticationSuccessHandler.java, v 0.1 2022-19 17:48 nyaaar Exp $$
  */
 @Component
+@Slf4j
 public class CustomizeAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final PrUserService prUserService;
@@ -41,6 +43,7 @@ public class CustomizeAuthenticationSuccessHandler implements AuthenticationSucc
         if (prUser == null) {
             baseResponse = new BaseResponse(BusinessExceptionEnum.USER_CUSTOM.getCode(), "用户名不存在");
         } else {
+            log.info("[{}] login, time:{}", prUser.getUserName(), DateUtil.date());
             baseResponse = new BaseResponse();
             prUser.setLastLoginTime(DateUtil.date());
         }

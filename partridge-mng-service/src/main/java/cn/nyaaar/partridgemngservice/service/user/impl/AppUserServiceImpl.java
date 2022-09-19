@@ -50,7 +50,7 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
         } else {
             privilegeEnum = PrivilegeEnum.USER;
         }
-        return User.withUsername(prUser.getUserName()).password(prUser.getPassword()).authorities(privilegeEnum.getCode()).build();
+        return User.withUsername(prUser.getUserName()).password(prUser.getPassword()).roles(privilegeEnum.getCode()).build();
     }
 
     @Override
