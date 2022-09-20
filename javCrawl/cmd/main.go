@@ -6,7 +6,7 @@ import (
 	"github.com/antchfx/htmlquery"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"io/ioutil"
+	"javCrawl/internal/scan"
 	"log"
 	"os"
 	"regexp"
@@ -31,9 +31,6 @@ const (
 )
 
 var spaceReg = regexp.MustCompile("\\s+")
-var movieReg = regexp.MustCompile(".*[a-zA-Z]{3,5}[-_]?[0-9]{3}.*(avi|mp4)$")
-var codeReg = regexp.MustCompile("[a-zA-Z]{3,5}[-_]?[0-9]{3}")
-var bigLetter = regexp.MustCompile("[A-Z]+")
 
 func main() {
 	bT := time.Now()
@@ -43,8 +40,8 @@ func main() {
 			log.Println(err)
 		}
 	}(db)
-	//count := scanJavDir(javDir)
-	//log.Printf("update or insert jav num: %v", count)
+	count := scanJavDir(javDir)
+	log.Printf("update or insert jav num: %v", count)
 	log.Println(runtime.GOOS)
 	eT := time.Since(bT)
 	log.Printf("run time: %v", eT)
@@ -52,7 +49,7 @@ func main() {
 
 func scanJavDir(scanDir string) int {
 	codeFPathMap := make(map[string]string)
-	scanDic(scanDir, &codeFPathMap)
+	scan.JavDic(scanDir, &codeFPathMap)
 	count := 0
 	for code := range codeFPathMap {
 		log.Printf("%s has matched string: %v", code, codeFPathMap[code])
@@ -67,8 +64,7 @@ func scanJavDir(scanDir string) int {
 }
 
 func insertEleFile(path string, eleId int) {
-	insertEleFile := "INSERT INTO ele_file(ele_id,name,type,path,IS_AVAILABLE_FLAG ,CREATED_TIME, UPDATED_TIME)" +
-		" VALUES(?,?,?,?,?,?,?)"
+	insertEleFile := "INSERT INTO ele_file(ele_id,name,type,path,IS_AVAILABLE_FLAG ,CREATED_TIME, UPDATED_TIME) VALUES(?,?,?,?,?,?,?)"
 	selectEleFIle := "select ID from ele_file where path=?"
 	name := path[strings.LastIndex(path, string(os.PathSeparator))+1:]
 	eleFileType := getEleFileType(name)
@@ -94,58 +90,18 @@ func getEleFileType(name string) int {
 	return eleFileType
 }
 
-func scanDic(dir string, codeFPathMap *map[string]string) {
-	log.Printf("start to scan %v...", dir)
-	files, err := ioutil.ReadDir(dir)
-	if err != nil {
-		log.Printf("read dir error, dir: %v", dir)
-		log.Fatal(err)
-	}
-	smallCodeFPathMap := make(map[string]string)
-	for _, file := range files {
-		if file.IsDir() {
-			fileDir := dir + string(os.PathSeparator) + file.Name()
-			scanDic(fileDir, codeFPathMap)
-		}
-		matches := movieReg.FindAllString(file.Name(), -1)
-		if len(matches) == 0 {
-			log.Printf("no match for name: %v", file.Name())
-			continue
-		}
-		code := getAndFormatCode(matches, file.Name())
-		smallCodeFPathMap[code] = dir + string(os.PathSeparator) + file.Name()
-	}
-	if len(smallCodeFPathMap) < 1 {
-		log.Printf("match error! file path:%s", dir)
-	}
-	for code := range smallCodeFPathMap {
-		(*codeFPathMap)[code] = smallCodeFPathMap[code]
-	}
-}
-
-func getAndFormatCode(matches []string, fileName string) string {
-	matches = codeReg.FindAllString(fileName, -1)
-	code := matches[len(matches)-1]
-	code = strings.ToUpper(code)
-	if !strings.ContainsRune(code, '-') {
-		index := bigLetter.FindAllStringIndex(code, 1)
-		code = code[0:index[0][1]] + "-" + code[index[0][1]:]
-	}
-	return code
-}
-
 func updateOrInsertJav(jav *jav) int {
 	insertOrgReSql := "INSERT INTO ele_org_re(ELE_ID,ORG_ID,RE_TYPE) VALUES(?,?,?)"
 	insertOrganSql := "INSERT INTO organization(name, CREATED_TIME, UPDATED_TIME) VALUES(?,?,?)"
 	selectOrganSql := "select ID from organization where NAME=?"
 	insertActorSql := "INSERT INTO actor(name, CREATED_TIME, UPDATED_TIME) VALUES(?,?,?)"
-	insertTagSql := "INSERT INTO tag(name, CREATED_TIME, UPDATED_TIME) VALUES(?,?,?)"
+	insertTagSql := "INSERT INTO tag_info(name, CREATED_TIME, UPDATED_TIME) VALUES(?,?,?)"
 	selectActorSql := "SELECT ID from actor where NAME=?"
 	insertActorReSql := "INSERT INTO ele_actor_re(ELE_ID,ACTOR_ID) VALUES(?,?)"
-	selectTagSql := "SELECT ID from tag where NAME=?"
+	selectTagSql := "SELECT ID from tag_info where NAME=?"
 	insertTagReSql := "INSERT INTO ele_tag_re(ELE_ID,TAG_ID) VALUES(?,?)"
 	insertEleSql := "INSERT INTO element(TYPE, CREATED_TIME, UPDATED_TIME) VALUES(" + Jav + ", ?, ?)"
-	insertJavSql := "INSERT INTO jav(ELE_ID, CODE, TITLE, PUBLISH_DATE, LENGTH, DIRECTOR, SERIES, CREATED_TIME, UPDATED_TIME) VALUES(?,?,?,?,?,?,?, ?, ?)"
+	insertJavSql := "CREATED_TIME, UPDATED_TIME) VALUES(?,?,?,?,?,?,?, ?, ?)" + "INSERT INTO jav(ELE_ID, CODE, TITLE, PUBLISH_DATE, LENGTH, DIRECTOR, SERIES, "
 	selectJavSql := "SELECT ELE_ID AS ID from jav where TITLE=?"
 	var eleId = new(dbId)
 	err := db.Get(eleId, selectJavSql, jav.title)
@@ -184,9 +140,9 @@ func updateOrInsertJav(jav *jav) int {
 
 		}
 		if len(jav.tags) != 0 {
-			for _, tag := range jav.tags {
+			for _, tag_info := range jav.tags {
 				var tagId int64
-				getOrInsertGetId(&tagId, selectTagSql, tag, insertTagSql)
+				getOrInsertGetId(&tagId, selectTagSql, tag_info, insertTagSql)
 				insertDoubleRe(insertTagReSql, int(newEleId), int(tagId))
 			}
 		}
