@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 会话信息过期策略
+ * 会话信息过期处理
  *
  * @author nyaaar
  * @Version $Id: CustomizeSessionInformationExpiredStrategy.java, v 0.1 2022-19 16:59 nyaaar Exp $$

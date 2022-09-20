@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -23,9 +24,10 @@ var (
 
 const urlPrefix = "https://www.javbus.com/"
 const YYYYMMDD = "2006-01-02"
+const javDir = "/media/nyaaar/bigbro/stream/movies"
 const (
-	Jav     string = "001"
-	eHentai string = "002"
+	Jav     string = "1"
+	eHentai string = "2"
 )
 
 var spaceReg = regexp.MustCompile("\\s+")
@@ -41,8 +43,16 @@ func main() {
 			log.Println(err)
 		}
 	}(db)
+	//count := scanJavDir(javDir)
+	//log.Printf("update or insert jav num: %v", count)
+	log.Println(runtime.GOOS)
+	eT := time.Since(bT)
+	log.Printf("run time: %v", eT)
+}
+
+func scanJavDir(scanDir string) int {
 	codeFPathMap := make(map[string]string)
-	scanDic("/media/nyaaar/bigbro/stream/movies", &codeFPathMap)
+	scanDic(scanDir, &codeFPathMap)
 	count := 0
 	for code := range codeFPathMap {
 		log.Printf("%s has matched string: %v", code, codeFPathMap[code])
@@ -53,9 +63,7 @@ func main() {
 		log.Printf("eleId: %d", eleId)
 		insertEleFile(codeFPathMap[code], eleId)
 	}
-	log.Printf("update or insert jav num: %v", count)
-	eT := time.Since(bT)
-	log.Printf("run time: %v", eT)
+	return count
 }
 
 func insertEleFile(path string, eleId int) {

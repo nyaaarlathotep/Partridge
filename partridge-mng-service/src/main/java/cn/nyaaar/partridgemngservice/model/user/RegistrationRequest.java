@@ -11,9 +11,12 @@ import lombok.experimental.Accessors;
 @Schema(name = "RegisterDto")
 public class RegistrationRequest {
 
+    @Schema(name = "邮箱")
     private String email;
 
+    @Schema(name = "用户名")
     private String userName;
 
+    @Schema(name = "密码")
     private String password;
 }

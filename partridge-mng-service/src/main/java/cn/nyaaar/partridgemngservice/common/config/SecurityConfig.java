@@ -49,8 +49,8 @@ public class SecurityConfig {
                 .anyRequest()
                 .hasAnyRole(PrivilegeEnum.USER.getCode(), PrivilegeEnum.ROOT.getCode())
                 .and()
-                .logout().
-                permitAll().//允许所有用户
+                .logout()
+                .permitAll().//允许所有用户
                         logoutSuccessHandler((request, response, authentication) -> {
                     if (authentication != null) {
                         log.info("[{}] logout, time:{}", ((UserDetails) authentication.getPrincipal()).getUsername(),
@@ -58,8 +58,8 @@ public class SecurityConfig {
                     }
                     response.setContentType("text/json;charset=utf-8");
                     response.getWriter().write(JSON.toJSONString(new BaseResponse()));
-                }).//登出成功处理逻辑
-                        deleteCookies("JSESSIONID")//登出之后删除cookie
+                })
+                .deleteCookies("JSESSIONID")//登出之后删除cookie
                 //登入
                 .and().formLogin().
                 permitAll().//允许所有用户
