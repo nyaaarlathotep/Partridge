@@ -44,7 +44,7 @@ func main() {
 	// 如果是想直接生成表的model和crud方法，则可以指定表的名称，例如g.GenerateModel("company")
 	// 想自定义某个表生成特性，比如struct的名称/字段类型/tag等，可以指定opt，例如g.GenerateModel("company",gen.FieldIgnore("address")), g.GenerateModelAs("people", "Person", gen.FieldIgnore("address"))
 	g.ApplyBasic(dao.Actor{}, dao.Jav{}, dao.EhentaiGallery{}, dao.TagInfo{}, dao.Organization{}, dao.Author{},
-		dao.EleActorRe{}, dao.EleFile{}, dao.EleAuthorRe{}, dao.EleOrgRe{}, dao.EleTagRe{}, dao.PrUser{})
+		dao.EleActorRe{}, dao.EleFile{}, dao.EleAuthorRe{}, dao.EleOrgRe{}, dao.EleTagRe{}, dao.PrUser{}, dao.Element{})
 	//g.ApplyBasic(g.GenerateAllTable())
 	// apply diy interfaces on structs or table models
 	// 如果想给某些表或者model生成自定义方法，可以用ApplyInterface，第一个参数是方法接口，可以参考DIY部分文档定义

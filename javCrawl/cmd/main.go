@@ -6,11 +6,13 @@ import (
 	"github.com/antchfx/htmlquery"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"javCrawl/internal/dal/query"
 	"javCrawl/internal/scan"
 	"log"
 	"os"
 	"regexp"
-	"runtime"
 	"strings"
 	"time"
 )
@@ -40,9 +42,15 @@ func main() {
 			log.Println(err)
 		}
 	}(db)
-	count := scanJavDir(javDir)
-	log.Printf("update or insert jav num: %v", count)
-	log.Println(runtime.GOOS)
+	ormDb, _ := gorm.Open(mysql.Open("root:12345678@tcp(127.0.0.1:3306)/partridge?charset=utf8mb4&parseTime=True&loc=Local"))
+	u := query.Use(ormDb).Element
+	te, err := u.Where(u.ID.Eq(2)).First()
+	if err != nil {
+		log.Println(err)
+	}
+	log.Printf("%+v", te)
+	//count := scanJavDir(javDir)
+	//log.Printf("update or insert jav num: %v", count)
 	eT := time.Since(bT)
 	log.Printf("run time: %v", eT)
 }
@@ -68,7 +76,6 @@ func insertEleFile(path string, eleId int) {
 	selectEleFIle := "select ID from ele_file where path=?"
 	name := path[strings.LastIndex(path, string(os.PathSeparator))+1:]
 	eleFileType := getEleFileType(name)
-
 	log.Printf("file name: %v", name)
 	var fileId = new(dbId)
 	err := db.Get(fileId, selectEleFIle, path)
@@ -288,6 +295,7 @@ func init() {
 		log.Println("open mysql failed,", err)
 		panic(fmt.Sprintf("invalid database %q", err))
 	}
+
 	time.Now()
 	db = database
 	log.Println("open mysql succeed")

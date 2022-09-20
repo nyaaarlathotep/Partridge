@@ -21,6 +21,7 @@ var (
 	EleFile        *eleFile
 	EleOrgRe       *eleOrgRe
 	EleTagRe       *eleTagRe
+	Element        *element
 	Jav            *jav
 	Organization   *organization
 	PrUser         *prUser
@@ -37,6 +38,7 @@ func SetDefault(db *gorm.DB) {
 	EleFile = &Q.EleFile
 	EleOrgRe = &Q.EleOrgRe
 	EleTagRe = &Q.EleTagRe
+	Element = &Q.Element
 	Jav = &Q.Jav
 	Organization = &Q.Organization
 	PrUser = &Q.PrUser
@@ -54,6 +56,7 @@ func Use(db *gorm.DB) *Query {
 		EleFile:        newEleFile(db),
 		EleOrgRe:       newEleOrgRe(db),
 		EleTagRe:       newEleTagRe(db),
+		Element:        newElement(db),
 		Jav:            newJav(db),
 		Organization:   newOrganization(db),
 		PrUser:         newPrUser(db),
@@ -72,6 +75,7 @@ type Query struct {
 	EleFile        eleFile
 	EleOrgRe       eleOrgRe
 	EleTagRe       eleTagRe
+	Element        element
 	Jav            jav
 	Organization   organization
 	PrUser         prUser
@@ -91,6 +95,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		EleFile:        q.EleFile.clone(db),
 		EleOrgRe:       q.EleOrgRe.clone(db),
 		EleTagRe:       q.EleTagRe.clone(db),
+		Element:        q.Element.clone(db),
 		Jav:            q.Jav.clone(db),
 		Organization:   q.Organization.clone(db),
 		PrUser:         q.PrUser.clone(db),
@@ -107,6 +112,7 @@ type queryCtx struct {
 	EleFile        *eleFileDo
 	EleOrgRe       *eleOrgReDo
 	EleTagRe       *eleTagReDo
+	Element        *elementDo
 	Jav            *javDo
 	Organization   *organizationDo
 	PrUser         *prUserDo
@@ -123,6 +129,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		EleFile:        q.EleFile.WithContext(ctx),
 		EleOrgRe:       q.EleOrgRe.WithContext(ctx),
 		EleTagRe:       q.EleTagRe.WithContext(ctx),
+		Element:        q.Element.WithContext(ctx),
 		Jav:            q.Jav.WithContext(ctx),
 		Organization:   q.Organization.WithContext(ctx),
 		PrUser:         q.PrUser.WithContext(ctx),

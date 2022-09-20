@@ -3,6 +3,7 @@ package cn.nyaaar.partridgemngservice.controller;
 import cn.nyaaar.partridgemngservice.common.annotation.LogAnnotation;
 import cn.nyaaar.partridgemngservice.model.response.R;
 import cn.nyaaar.partridgemngservice.model.user.RegistrationRequest;
+import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.service.user.impl.AppUserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,10 +16,10 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class UserController {
 
-    private final AppUserServiceImpl appUserServiceImpl;
+    private final AppUserService appUserService;
 
-    public UserController(AppUserServiceImpl appUserServiceImpl) {
-        this.appUserServiceImpl = appUserServiceImpl;
+    public UserController(AppUserService appUserService) {
+        this.appUserService = appUserService;
     }
 
     @Operation(summary = "注册", description = "注册")
@@ -26,14 +27,14 @@ public class UserController {
     @LogAnnotation
     public R<String> register(@RequestBody RegistrationRequest request) {
 
-        return new R<>(appUserServiceImpl.register(request));
+        return new R<>(appUserService.register(request));
     }
 
     @Operation(summary = "验证 token", description = "验证 token")
     @GetMapping(value = "/confirm")
     @LogAnnotation
     public R<Boolean> confirm(@RequestParam("token") String token) {
-        return new R<>(appUserServiceImpl.confirmToken(token));
+        return new R<>(appUserService.confirmToken(token));
     }
 
 
