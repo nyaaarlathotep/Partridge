@@ -40,19 +40,17 @@ func main() {
 	bT := time.Now()
 
 	elementQ := queries.Element
-	ele1, _ := elementQ.Where(elementQ.ID.Eq(2)).First()
-	authors, _ := elementQ.Author.Model(ele1).Find()
-	log.Printf("%+v", ele1)
-
-	for _, author := range authors {
-		log.Printf("%+v", author)
+	newElement := &dao.Element{
+		TYPE:       Jav,
+		SHAREDFLAG: 1,
+		UPLOADER:   "",
 	}
-	//u := queries.EleFile
-	//te, err := u.Where(u.ID.Eq(2)).First()
-	//if err != nil {
-	//	log.Println(err)
-	//}
-	//log.Printf("%+v", te)
+	err := elementQ.Create(newElement)
+	if err != nil {
+		return
+	}
+	log.Printf("%+v", newElement)
+
 	//count := scanJavDir(javDir)
 	//log.Printf("update or insert jav num: %v", count)
 	eT := time.Since(bT)
@@ -110,7 +108,7 @@ func getEleFileType(name string) string {
 	return eleFileType
 }
 
-func updateOrInsertJav(jav *jav) int {
+func updateOrInsertJav(jav *jav) int64 {
 	insertOrgReSql := "INSERT INTO ele_org_re(ELE_ID,ORG_ID,RE_TYPE) VALUES(?,?,?)"
 	insertOrganSql := "INSERT INTO organization(name, CREATED_TIME, UPDATED_TIME) VALUES(?,?,?)"
 	selectOrganSql := "select ID from organization where NAME=?"
@@ -125,6 +123,16 @@ func updateOrInsertJav(jav *jav) int {
 	selectJavSql := "SELECT ELE_ID AS ID from jav where TITLE=?"
 	var eleId = new(dbId)
 	err := db.Get(eleId, selectJavSql, jav.title)
+	javQ := queries.Jav
+	//eleQ := queries.Element
+	oldJavs, err := javQ.Where(javQ.TITLE.Eq(jav.title)).Find()
+	if err == nil {
+		log.Fatal("db exec failed, ", err)
+	}
+	if len(oldJavs) != 0 {
+		return oldJavs[0].ELEID
+	}
+
 	if err != nil && errors.As(err, &NotFound) {
 		eleRes, err := db.Exec(insertEleSql, time.Now(), time.Now())
 		if err != nil {
@@ -174,7 +182,7 @@ func updateOrInsertJav(jav *jav) int {
 	}
 	log.Printf("eleId: %v", eleId)
 
-	return eleId.Id
+	return int64(eleId.Id)
 }
 
 func insertDoubleRe(insertSql string, idOne int, idTwo int) {
