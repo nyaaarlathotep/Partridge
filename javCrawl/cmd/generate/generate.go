@@ -51,7 +51,24 @@ func main() {
 		gen.FieldRename("UPDATED_TIME", "UpdatedAt"),
 		gen.FieldRelateModel(field.HasMany, "EleFile", dao.EleFile{}, &field.RelateConfig{
 			GORMTag: "foreignKey:ELE_ID",
-		})))
+		}),
+		gen.FieldRelateModel(field.Many2Many, "Actor", dao.Actor{}, &field.RelateConfig{
+			GORMTag: "many2many:ele_actor_re;" +
+				"foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:ACTOR_ID",
+		}),
+		gen.FieldRelateModel(field.HasMany, "Author", dao.Author{}, &field.RelateConfig{
+			GORMTag: "many2many:ele_author_re;" +
+				"foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:AUTHOR_ID",
+		}),
+		gen.FieldRelateModel(field.HasMany, "Organization", dao.Organization{}, &field.RelateConfig{
+			GORMTag: "many2many:ele_org_re;" +
+				"foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:ORG_ID",
+		}),
+		gen.FieldRelateModel(field.HasMany, "TagInfo", dao.TagInfo{}, &field.RelateConfig{
+			GORMTag: "many2many:ele_tag_re;" +
+				"foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:TAG_ID",
+		}),
+	))
 	g.ApplyBasic(g.GenerateModelAs("actor", "Actor",
 		gen.FieldRename("CREATED_TIME", "CreatedAt"),
 		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))

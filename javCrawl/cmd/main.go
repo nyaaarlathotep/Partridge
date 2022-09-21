@@ -41,13 +41,11 @@ func main() {
 
 	elementQ := queries.Element
 	ele1, _ := elementQ.Where(elementQ.ID.Eq(2)).First()
-	eleFiles, _ := elementQ.EleFile.Model(ele1).Find()
+	authors, _ := elementQ.Author.Model(ele1).Find()
 	log.Printf("%+v", ele1)
-	log.Printf("%#v", ele1)
 
-	for _, eleFile := range eleFiles {
-		log.Printf("%+v", eleFile)
-		log.Printf("%#v", eleFile)
+	for _, author := range authors {
+		log.Printf("%+v", author)
 	}
 	//u := queries.EleFile
 	//te, err := u.Where(u.ID.Eq(2)).First()

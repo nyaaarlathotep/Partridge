@@ -12,13 +12,17 @@ const TableNameElement = "element"
 
 // Element mapped from table <element>
 type Element struct {
-	ID         int64     `gorm:"column:ID;type:bigint;primaryKey;autoIncrement:true" json:"ID"`
-	TYPE       string    `gorm:"column:TYPE;type:varchar(32);not null" json:"TYPE"`
-	SHAREDFLAG int32     `gorm:"column:SHARED_FLAG;type:tinyint" json:"SHARED_FLAG"` // (0-否;1-是)
-	UPLOADER   string    `gorm:"column:UPLOADER;type:varchar(128)" json:"UPLOADER"`  // 上传用户
-	CreatedAt  time.Time `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`
-	UpdatedAt  time.Time `gorm:"column:UPDATED_TIME;type:datetime" json:"UPDATED_TIME"`
-	EleFile    []EleFile `gorm:"foreignKey:ELE_ID" json:"ele_file"`
+	ID           int64          `gorm:"column:ID;type:bigint;primaryKey;autoIncrement:true" json:"ID"`
+	TYPE         string         `gorm:"column:TYPE;type:varchar(32);not null" json:"TYPE"`
+	SHAREDFLAG   int32          `gorm:"column:SHARED_FLAG;type:tinyint" json:"SHARED_FLAG"` // (0-否;1-是)
+	UPLOADER     string         `gorm:"column:UPLOADER;type:varchar(128)" json:"UPLOADER"`  // 上传用户
+	CreatedAt    time.Time      `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`
+	UpdatedAt    time.Time      `gorm:"column:UPDATED_TIME;type:datetime" json:"UPDATED_TIME"`
+	EleFile      []EleFile      `gorm:"foreignKey:ELE_ID" json:"ele_file"`
+	Actor        []Actor        `gorm:"many2many:ele_actor_re;foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:ACTOR_ID" json:"actor"`
+	Author       []Author       `gorm:"many2many:ele_author_re;foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:AUTHOR_ID" json:"author"`
+	Organization []Organization `gorm:"many2many:ele_org_re;foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:ORG_ID" json:"organization"`
+	TagInfo      []TagInfo      `gorm:"many2many:ele_tag_re;foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:TAG_ID" json:"tag_info"`
 }
 
 // TableName Element's table name
