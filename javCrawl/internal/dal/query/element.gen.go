@@ -31,8 +31,13 @@ func newElement(db *gorm.DB) element {
 	_element.TYPE = field.NewString(tableName, "TYPE")
 	_element.SHAREDFLAG = field.NewInt32(tableName, "SHARED_FLAG")
 	_element.UPLOADER = field.NewString(tableName, "UPLOADER")
-	_element.CREATEDTIME = field.NewTime(tableName, "CREATED_TIME")
-	_element.UPDATEDTIME = field.NewTime(tableName, "UPDATED_TIME")
+	_element.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
+	_element.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
+	_element.EleFile = elementHasManyEleFile{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("EleFile", "dao.EleFile"),
+	}
 
 	_element.fillFieldMap()
 
@@ -42,13 +47,14 @@ func newElement(db *gorm.DB) element {
 type element struct {
 	elementDo
 
-	ALL         field.Asterisk
-	ID          field.Int64
-	TYPE        field.String
-	SHAREDFLAG  field.Int32
-	UPLOADER    field.String
-	CREATEDTIME field.Time
-	UPDATEDTIME field.Time
+	ALL        field.Asterisk
+	ID         field.Int64
+	TYPE       field.String
+	SHAREDFLAG field.Int32  // (0-否;1-是)
+	UPLOADER   field.String // 上传用户
+	CreatedAt  field.Time
+	UpdatedAt  field.Time
+	EleFile    elementHasManyEleFile
 
 	fieldMap map[string]field.Expr
 }
@@ -69,8 +75,8 @@ func (e *element) updateTableName(table string) *element {
 	e.TYPE = field.NewString(table, "TYPE")
 	e.SHAREDFLAG = field.NewInt32(table, "SHARED_FLAG")
 	e.UPLOADER = field.NewString(table, "UPLOADER")
-	e.CREATEDTIME = field.NewTime(table, "CREATED_TIME")
-	e.UPDATEDTIME = field.NewTime(table, "UPDATED_TIME")
+	e.CreatedAt = field.NewTime(table, "CREATED_TIME")
+	e.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
 	e.fillFieldMap()
 
@@ -87,18 +93,85 @@ func (e *element) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (e *element) fillFieldMap() {
-	e.fieldMap = make(map[string]field.Expr, 6)
+	e.fieldMap = make(map[string]field.Expr, 7)
 	e.fieldMap["ID"] = e.ID
 	e.fieldMap["TYPE"] = e.TYPE
 	e.fieldMap["SHARED_FLAG"] = e.SHAREDFLAG
 	e.fieldMap["UPLOADER"] = e.UPLOADER
-	e.fieldMap["CREATED_TIME"] = e.CREATEDTIME
-	e.fieldMap["UPDATED_TIME"] = e.UPDATEDTIME
+	e.fieldMap["CREATED_TIME"] = e.CreatedAt
+	e.fieldMap["UPDATED_TIME"] = e.UpdatedAt
+
 }
 
 func (e element) clone(db *gorm.DB) element {
 	e.elementDo.ReplaceDB(db)
 	return e
+}
+
+type elementHasManyEleFile struct {
+	db *gorm.DB
+
+	field.RelationField
+}
+
+func (a elementHasManyEleFile) Where(conds ...field.Expr) *elementHasManyEleFile {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a elementHasManyEleFile) WithContext(ctx context.Context) *elementHasManyEleFile {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a elementHasManyEleFile) Model(m *dao.Element) *elementHasManyEleFileTx {
+	return &elementHasManyEleFileTx{a.db.Model(m).Association(a.Name())}
+}
+
+type elementHasManyEleFileTx struct{ tx *gorm.Association }
+
+func (a elementHasManyEleFileTx) Find() (result []*dao.EleFile, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a elementHasManyEleFileTx) Append(values ...*dao.EleFile) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a elementHasManyEleFileTx) Replace(values ...*dao.EleFile) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a elementHasManyEleFileTx) Delete(values ...*dao.EleFile) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a elementHasManyEleFileTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a elementHasManyEleFileTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type elementDo struct{ gen.DO }

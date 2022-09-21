@@ -31,8 +31,8 @@ func newTagInfo(db *gorm.DB) tagInfo {
 	_tagInfo.NAME = field.NewString(tableName, "NAME")
 	_tagInfo.GROUPNAME = field.NewString(tableName, "GROUP_NAME")
 	_tagInfo.SOURCE = field.NewString(tableName, "SOURCE")
-	_tagInfo.CREATEDTIME = field.NewTime(tableName, "CREATED_TIME")
-	_tagInfo.UPDATEDTIME = field.NewTime(tableName, "UPDATED_TIME")
+	_tagInfo.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
+	_tagInfo.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
 
 	_tagInfo.fillFieldMap()
 
@@ -42,13 +42,13 @@ func newTagInfo(db *gorm.DB) tagInfo {
 type tagInfo struct {
 	tagInfoDo
 
-	ALL         field.Asterisk
-	ID          field.Int32
-	NAME        field.String
-	GROUPNAME   field.String
-	SOURCE      field.String
-	CREATEDTIME field.Time
-	UPDATEDTIME field.Time
+	ALL       field.Asterisk
+	ID        field.Int32
+	NAME      field.String
+	GROUPNAME field.String
+	SOURCE    field.String
+	CreatedAt field.Time
+	UpdatedAt field.Time
 
 	fieldMap map[string]field.Expr
 }
@@ -69,8 +69,8 @@ func (t *tagInfo) updateTableName(table string) *tagInfo {
 	t.NAME = field.NewString(table, "NAME")
 	t.GROUPNAME = field.NewString(table, "GROUP_NAME")
 	t.SOURCE = field.NewString(table, "SOURCE")
-	t.CREATEDTIME = field.NewTime(table, "CREATED_TIME")
-	t.UPDATEDTIME = field.NewTime(table, "UPDATED_TIME")
+	t.CreatedAt = field.NewTime(table, "CREATED_TIME")
+	t.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
 	t.fillFieldMap()
 
@@ -92,8 +92,8 @@ func (t *tagInfo) fillFieldMap() {
 	t.fieldMap["NAME"] = t.NAME
 	t.fieldMap["GROUP_NAME"] = t.GROUPNAME
 	t.fieldMap["SOURCE"] = t.SOURCE
-	t.fieldMap["CREATED_TIME"] = t.CREATEDTIME
-	t.fieldMap["UPDATED_TIME"] = t.UPDATEDTIME
+	t.fieldMap["CREATED_TIME"] = t.CreatedAt
+	t.fieldMap["UPDATED_TIME"] = t.UpdatedAt
 }
 
 func (t tagInfo) clone(db *gorm.DB) tagInfo {

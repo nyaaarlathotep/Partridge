@@ -3,6 +3,7 @@ package main
 import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gen"
+	"gorm.io/gen/field"
 	"gorm.io/gorm"
 	"javCrawl/internal/dal/dao"
 )
@@ -43,8 +44,38 @@ func main() {
 	// 想对已有的model生成crud等基础方法可以直接指定model struct ，例如model.User{}
 	// 如果是想直接生成表的model和crud方法，则可以指定表的名称，例如g.GenerateModel("company")
 	// 想自定义某个表生成特性，比如struct的名称/字段类型/tag等，可以指定opt，例如g.GenerateModel("company",gen.FieldIgnore("address")), g.GenerateModelAs("people", "Person", gen.FieldIgnore("address"))
-	g.ApplyBasic(dao.Actor{}, dao.Jav{}, dao.EhentaiGallery{}, dao.TagInfo{}, dao.Organization{}, dao.Author{},
-		dao.EleActorRe{}, dao.EleFile{}, dao.EleAuthorRe{}, dao.EleOrgRe{}, dao.EleTagRe{}, dao.PrUser{}, dao.Element{})
+	g.ApplyBasic(dao.EleActorRe{}, dao.EleAuthorRe{}, dao.EleOrgRe{}, dao.EleTagRe{})
+
+	g.ApplyBasic(g.GenerateModelAs("element", "Element",
+		gen.FieldRename("CREATED_TIME", "CreatedAt"),
+		gen.FieldRename("UPDATED_TIME", "UpdatedAt"),
+		gen.FieldRelateModel(field.HasMany, "EleFile", dao.EleFile{}, &field.RelateConfig{
+			GORMTag: "foreignKey:ELE_ID",
+		})))
+	g.ApplyBasic(g.GenerateModelAs("actor", "Actor",
+		gen.FieldRename("CREATED_TIME", "CreatedAt"),
+		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))
+	g.ApplyBasic(g.GenerateModelAs("jav", "Jav",
+		gen.FieldRename("CREATED_TIME", "CreatedAt"),
+		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))
+	g.ApplyBasic(g.GenerateModelAs("ehentai_gallery", "EhentaiGallery",
+		gen.FieldRename("CREATED_TIME", "CreatedAt"),
+		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))
+	g.ApplyBasic(g.GenerateModelAs("ele_file", "EleFile",
+		gen.FieldRename("CREATED_TIME", "CreatedAt"),
+		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))
+	g.ApplyBasic(g.GenerateModelAs("organization", "Organization",
+		gen.FieldRename("CREATED_TIME", "CreatedAt"),
+		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))
+	g.ApplyBasic(g.GenerateModelAs("author", "Author",
+		gen.FieldRename("CREATED_TIME", "CreatedAt"),
+		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))
+	g.ApplyBasic(g.GenerateModelAs("tag_info", "TagInfo",
+		gen.FieldRename("CREATED_TIME", "CreatedAt"),
+		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))
+	g.ApplyBasic(g.GenerateModelAs("pr_user", "PrUser",
+		gen.FieldRename("CREATED_TIME", "CreatedAt"),
+		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))
 	//g.ApplyBasic(g.GenerateAllTable())
 	// apply diy interfaces on structs or table models
 	// 如果想给某些表或者model生成自定义方法，可以用ApplyInterface，第一个参数是方法接口，可以参考DIY部分文档定义

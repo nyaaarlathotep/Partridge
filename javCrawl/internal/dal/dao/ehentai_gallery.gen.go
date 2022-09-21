@@ -27,8 +27,8 @@ type EhentaiGallery struct {
 	FAVORITECOUNT int32     `gorm:"column:FAVORITE_COUNT;type:int" json:"FAVORITE_COUNT"`   // 喜爱数
 	CASHEDFLAG    int32     `gorm:"column:CASHED_FLAG;type:tinyint" json:"CASHED_FLAG"`     // (0-否;1-是)
 	DOWNLOADFLAG  int32     `gorm:"column:DOWNLOAD_FLAG;type:tinyint" json:"DOWNLOAD_FLAG"` // (0-否;1-是)
-	CREATEDTIME   time.Time `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`
-	UPDATEDTIME   time.Time `gorm:"column:UPDATED_TIME;type:datetime" json:"UPDATED_TIME"`
+	CreatedAt     time.Time `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`
+	UpdatedAt     time.Time `gorm:"column:UPDATED_TIME;type:datetime" json:"UPDATED_TIME"`
 }
 
 // TableName EhentaiGallery's table name

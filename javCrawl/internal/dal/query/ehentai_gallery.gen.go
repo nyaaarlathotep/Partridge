@@ -42,8 +42,8 @@ func newEhentaiGallery(db *gorm.DB) ehentaiGallery {
 	_ehentaiGallery.FAVORITECOUNT = field.NewInt32(tableName, "FAVORITE_COUNT")
 	_ehentaiGallery.CASHEDFLAG = field.NewInt32(tableName, "CASHED_FLAG")
 	_ehentaiGallery.DOWNLOADFLAG = field.NewInt32(tableName, "DOWNLOAD_FLAG")
-	_ehentaiGallery.CREATEDTIME = field.NewTime(tableName, "CREATED_TIME")
-	_ehentaiGallery.UPDATEDTIME = field.NewTime(tableName, "UPDATED_TIME")
+	_ehentaiGallery.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
+	_ehentaiGallery.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
 
 	_ehentaiGallery.fillFieldMap()
 
@@ -54,23 +54,23 @@ type ehentaiGallery struct {
 	ehentaiGalleryDo
 
 	ALL           field.Asterisk
-	GID           field.Int64
+	GID           field.Int64 // ehentai gallery id
 	ELEID         field.Int64
 	TITLE         field.String
 	TITLEJPN      field.String
-	CATEGORY      field.Int32
-	UPLOADER      field.String
-	RATING        field.Float64
-	RATINGCOUNT   field.Int32
-	PAGES         field.Int32
-	PREVIEWPAGE   field.Int32
-	TOKEN         field.String
-	POSTED        field.Time
-	FAVORITECOUNT field.Int32
-	CASHEDFLAG    field.Int32
-	DOWNLOADFLAG  field.Int32
-	CREATEDTIME   field.Time
-	UPDATEDTIME   field.Time
+	CATEGORY      field.Int32   // gallery分类
+	UPLOADER      field.String  // 上传者
+	RATING        field.Float64 // 评分
+	RATINGCOUNT   field.Int32   // 评分人数
+	PAGES         field.Int32   // 总页数
+	PREVIEWPAGE   field.Int32   // 预览画廊对应页
+	TOKEN         field.String  // gtoken
+	POSTED        field.Time    // 上传时间
+	FAVORITECOUNT field.Int32   // 喜爱数
+	CASHEDFLAG    field.Int32   // (0-否;1-是)
+	DOWNLOADFLAG  field.Int32   // (0-否;1-是)
+	CreatedAt     field.Time
+	UpdatedAt     field.Time
 
 	fieldMap map[string]field.Expr
 }
@@ -102,8 +102,8 @@ func (e *ehentaiGallery) updateTableName(table string) *ehentaiGallery {
 	e.FAVORITECOUNT = field.NewInt32(table, "FAVORITE_COUNT")
 	e.CASHEDFLAG = field.NewInt32(table, "CASHED_FLAG")
 	e.DOWNLOADFLAG = field.NewInt32(table, "DOWNLOAD_FLAG")
-	e.CREATEDTIME = field.NewTime(table, "CREATED_TIME")
-	e.UPDATEDTIME = field.NewTime(table, "UPDATED_TIME")
+	e.CreatedAt = field.NewTime(table, "CREATED_TIME")
+	e.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
 	e.fillFieldMap()
 
@@ -136,8 +136,8 @@ func (e *ehentaiGallery) fillFieldMap() {
 	e.fieldMap["FAVORITE_COUNT"] = e.FAVORITECOUNT
 	e.fieldMap["CASHED_FLAG"] = e.CASHEDFLAG
 	e.fieldMap["DOWNLOAD_FLAG"] = e.DOWNLOADFLAG
-	e.fieldMap["CREATED_TIME"] = e.CREATEDTIME
-	e.fieldMap["UPDATED_TIME"] = e.UPDATEDTIME
+	e.fieldMap["CREATED_TIME"] = e.CreatedAt
+	e.fieldMap["UPDATED_TIME"] = e.UpdatedAt
 }
 
 func (e ehentaiGallery) clone(db *gorm.DB) ehentaiGallery {

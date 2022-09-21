@@ -29,8 +29,8 @@ func newActor(db *gorm.DB) actor {
 	_actor.ALL = field.NewAsterisk(tableName)
 	_actor.ID = field.NewInt32(tableName, "ID")
 	_actor.NAME = field.NewString(tableName, "NAME")
-	_actor.CREATEDTIME = field.NewTime(tableName, "CREATED_TIME")
-	_actor.UPDATEDTIME = field.NewTime(tableName, "UPDATED_TIME")
+	_actor.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
+	_actor.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
 
 	_actor.fillFieldMap()
 
@@ -40,11 +40,11 @@ func newActor(db *gorm.DB) actor {
 type actor struct {
 	actorDo
 
-	ALL         field.Asterisk
-	ID          field.Int32
-	NAME        field.String
-	CREATEDTIME field.Time
-	UPDATEDTIME field.Time
+	ALL       field.Asterisk
+	ID        field.Int32
+	NAME      field.String
+	CreatedAt field.Time
+	UpdatedAt field.Time
 
 	fieldMap map[string]field.Expr
 }
@@ -63,8 +63,8 @@ func (a *actor) updateTableName(table string) *actor {
 	a.ALL = field.NewAsterisk(table)
 	a.ID = field.NewInt32(table, "ID")
 	a.NAME = field.NewString(table, "NAME")
-	a.CREATEDTIME = field.NewTime(table, "CREATED_TIME")
-	a.UPDATEDTIME = field.NewTime(table, "UPDATED_TIME")
+	a.CreatedAt = field.NewTime(table, "CREATED_TIME")
+	a.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
 	a.fillFieldMap()
 
@@ -84,8 +84,8 @@ func (a *actor) fillFieldMap() {
 	a.fieldMap = make(map[string]field.Expr, 4)
 	a.fieldMap["ID"] = a.ID
 	a.fieldMap["NAME"] = a.NAME
-	a.fieldMap["CREATED_TIME"] = a.CREATEDTIME
-	a.fieldMap["UPDATED_TIME"] = a.UPDATEDTIME
+	a.fieldMap["CREATED_TIME"] = a.CreatedAt
+	a.fieldMap["UPDATED_TIME"] = a.UpdatedAt
 }
 
 func (a actor) clone(db *gorm.DB) actor {

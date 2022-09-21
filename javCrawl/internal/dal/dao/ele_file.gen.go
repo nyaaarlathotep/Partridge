@@ -19,8 +19,8 @@ type EleFile struct {
 	PATH            string    `gorm:"column:PATH;type:varchar(255)" json:"PATH"`
 	PAGENUM         int32     `gorm:"column:PAGE_NUM;type:tinyint" json:"PAGE_NUM"`                   // ehentai_gallery 对应画廊文件页码
 	ISAVAILABLEFLAG int32     `gorm:"column:IS_AVAILABLE_FLAG;type:tinyint" json:"IS_AVAILABLE_FLAG"` // 启用标志(0-禁用;1-启用)
-	CREATEDTIME     time.Time `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`
-	UPDATEDTIME     time.Time `gorm:"column:UPDATED_TIME;type:datetime" json:"UPDATED_TIME"`
+	CreatedAt       time.Time `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`
+	UpdatedAt       time.Time `gorm:"column:UPDATED_TIME;type:datetime" json:"UPDATED_TIME"`
 }
 
 // TableName EleFile's table name

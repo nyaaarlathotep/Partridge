@@ -29,8 +29,8 @@ func newOrganization(db *gorm.DB) organization {
 	_organization.ALL = field.NewAsterisk(tableName)
 	_organization.ID = field.NewInt32(tableName, "ID")
 	_organization.NAME = field.NewString(tableName, "NAME")
-	_organization.CREATEDTIME = field.NewTime(tableName, "CREATED_TIME")
-	_organization.UPDATEDTIME = field.NewTime(tableName, "UPDATED_TIME")
+	_organization.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
+	_organization.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
 
 	_organization.fillFieldMap()
 
@@ -40,11 +40,11 @@ func newOrganization(db *gorm.DB) organization {
 type organization struct {
 	organizationDo
 
-	ALL         field.Asterisk
-	ID          field.Int32
-	NAME        field.String
-	CREATEDTIME field.Time
-	UPDATEDTIME field.Time
+	ALL       field.Asterisk
+	ID        field.Int32
+	NAME      field.String
+	CreatedAt field.Time
+	UpdatedAt field.Time
 
 	fieldMap map[string]field.Expr
 }
@@ -63,8 +63,8 @@ func (o *organization) updateTableName(table string) *organization {
 	o.ALL = field.NewAsterisk(table)
 	o.ID = field.NewInt32(table, "ID")
 	o.NAME = field.NewString(table, "NAME")
-	o.CREATEDTIME = field.NewTime(table, "CREATED_TIME")
-	o.UPDATEDTIME = field.NewTime(table, "UPDATED_TIME")
+	o.CreatedAt = field.NewTime(table, "CREATED_TIME")
+	o.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
 	o.fillFieldMap()
 
@@ -84,8 +84,8 @@ func (o *organization) fillFieldMap() {
 	o.fieldMap = make(map[string]field.Expr, 4)
 	o.fieldMap["ID"] = o.ID
 	o.fieldMap["NAME"] = o.NAME
-	o.fieldMap["CREATED_TIME"] = o.CREATEDTIME
-	o.fieldMap["UPDATED_TIME"] = o.UPDATEDTIME
+	o.fieldMap["CREATED_TIME"] = o.CreatedAt
+	o.fieldMap["UPDATED_TIME"] = o.UpdatedAt
 }
 
 func (o organization) clone(db *gorm.DB) organization {

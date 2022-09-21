@@ -29,8 +29,8 @@ func newAuthor(db *gorm.DB) author {
 	_author.ALL = field.NewAsterisk(tableName)
 	_author.ID = field.NewInt32(tableName, "ID")
 	_author.NAME = field.NewString(tableName, "NAME")
-	_author.CREATEDTIME = field.NewTime(tableName, "CREATED_TIME")
-	_author.UPDATEDTIME = field.NewTime(tableName, "UPDATED_TIME")
+	_author.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
+	_author.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
 
 	_author.fillFieldMap()
 
@@ -40,11 +40,11 @@ func newAuthor(db *gorm.DB) author {
 type author struct {
 	authorDo
 
-	ALL         field.Asterisk
-	ID          field.Int32
-	NAME        field.String
-	CREATEDTIME field.Time
-	UPDATEDTIME field.Time
+	ALL       field.Asterisk
+	ID        field.Int32
+	NAME      field.String
+	CreatedAt field.Time
+	UpdatedAt field.Time
 
 	fieldMap map[string]field.Expr
 }
@@ -63,8 +63,8 @@ func (a *author) updateTableName(table string) *author {
 	a.ALL = field.NewAsterisk(table)
 	a.ID = field.NewInt32(table, "ID")
 	a.NAME = field.NewString(table, "NAME")
-	a.CREATEDTIME = field.NewTime(table, "CREATED_TIME")
-	a.UPDATEDTIME = field.NewTime(table, "UPDATED_TIME")
+	a.CreatedAt = field.NewTime(table, "CREATED_TIME")
+	a.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
 	a.fillFieldMap()
 
@@ -84,8 +84,8 @@ func (a *author) fillFieldMap() {
 	a.fieldMap = make(map[string]field.Expr, 4)
 	a.fieldMap["ID"] = a.ID
 	a.fieldMap["NAME"] = a.NAME
-	a.fieldMap["CREATED_TIME"] = a.CREATEDTIME
-	a.fieldMap["UPDATED_TIME"] = a.UPDATEDTIME
+	a.fieldMap["CREATED_TIME"] = a.CreatedAt
+	a.fieldMap["UPDATED_TIME"] = a.UpdatedAt
 }
 
 func (a author) clone(db *gorm.DB) author {

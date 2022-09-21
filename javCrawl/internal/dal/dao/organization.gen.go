@@ -12,10 +12,10 @@ const TableNameOrganization = "organization"
 
 // Organization mapped from table <organization>
 type Organization struct {
-	ID          int32     `gorm:"column:ID;type:int;primaryKey;autoIncrement:true" json:"ID"`
-	NAME        string    `gorm:"column:NAME;type:varchar(255)" json:"NAME"`
-	CREATEDTIME time.Time `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`
-	UPDATEDTIME time.Time `gorm:"column:UPDATED_TIME;type:datetime" json:"UPDATED_TIME"`
+	ID        int32     `gorm:"column:ID;type:int;primaryKey;autoIncrement:true" json:"ID"`
+	NAME      string    `gorm:"column:NAME;type:varchar(255)" json:"NAME"`
+	CreatedAt time.Time `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`
+	UpdatedAt time.Time `gorm:"column:UPDATED_TIME;type:datetime" json:"UPDATED_TIME"`
 }
 
 // TableName Organization's table name

@@ -34,8 +34,8 @@ func newEleFile(db *gorm.DB) eleFile {
 	_eleFile.PATH = field.NewString(tableName, "PATH")
 	_eleFile.PAGENUM = field.NewInt32(tableName, "PAGE_NUM")
 	_eleFile.ISAVAILABLEFLAG = field.NewInt32(tableName, "IS_AVAILABLE_FLAG")
-	_eleFile.CREATEDTIME = field.NewTime(tableName, "CREATED_TIME")
-	_eleFile.UPDATEDTIME = field.NewTime(tableName, "UPDATED_TIME")
+	_eleFile.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
+	_eleFile.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
 
 	_eleFile.fillFieldMap()
 
@@ -51,10 +51,10 @@ type eleFile struct {
 	NAME            field.String
 	TYPE            field.String
 	PATH            field.String
-	PAGENUM         field.Int32
-	ISAVAILABLEFLAG field.Int32
-	CREATEDTIME     field.Time
-	UPDATEDTIME     field.Time
+	PAGENUM         field.Int32 // ehentai_gallery 对应画廊文件页码
+	ISAVAILABLEFLAG field.Int32 // 启用标志(0-禁用;1-启用)
+	CreatedAt       field.Time
+	UpdatedAt       field.Time
 
 	fieldMap map[string]field.Expr
 }
@@ -78,8 +78,8 @@ func (e *eleFile) updateTableName(table string) *eleFile {
 	e.PATH = field.NewString(table, "PATH")
 	e.PAGENUM = field.NewInt32(table, "PAGE_NUM")
 	e.ISAVAILABLEFLAG = field.NewInt32(table, "IS_AVAILABLE_FLAG")
-	e.CREATEDTIME = field.NewTime(table, "CREATED_TIME")
-	e.UPDATEDTIME = field.NewTime(table, "UPDATED_TIME")
+	e.CreatedAt = field.NewTime(table, "CREATED_TIME")
+	e.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
 	e.fillFieldMap()
 
@@ -104,8 +104,8 @@ func (e *eleFile) fillFieldMap() {
 	e.fieldMap["PATH"] = e.PATH
 	e.fieldMap["PAGE_NUM"] = e.PAGENUM
 	e.fieldMap["IS_AVAILABLE_FLAG"] = e.ISAVAILABLEFLAG
-	e.fieldMap["CREATED_TIME"] = e.CREATEDTIME
-	e.fieldMap["UPDATED_TIME"] = e.UPDATEDTIME
+	e.fieldMap["CREATED_TIME"] = e.CreatedAt
+	e.fieldMap["UPDATED_TIME"] = e.UpdatedAt
 }
 
 func (e eleFile) clone(db *gorm.DB) eleFile {

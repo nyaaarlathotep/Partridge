@@ -34,8 +34,8 @@ func newPrUser(db *gorm.DB) prUser {
 	_prUser.VALIDATED = field.NewInt32(tableName, "VALIDATED")
 	_prUser.LASTLOGINTIME = field.NewTime(tableName, "LAST_LOGIN_TIME")
 	_prUser.LASTLOGINIP = field.NewString(tableName, "LAST_LOGIN_IP")
-	_prUser.CREATEDTIME = field.NewTime(tableName, "CREATED_TIME")
-	_prUser.UPDATEDTIME = field.NewTime(tableName, "UPDATED_TIME")
+	_prUser.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
+	_prUser.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
 
 	_prUser.fillFieldMap()
 
@@ -50,11 +50,11 @@ type prUser struct {
 	EMAIL         field.String
 	USERNAME      field.String
 	PASSWORD      field.String
-	VALIDATED     field.Int32
-	LASTLOGINTIME field.Time
-	LASTLOGINIP   field.String
-	CREATEDTIME   field.Time
-	UPDATEDTIME   field.Time
+	VALIDATED     field.Int32  // (0-否;1-是) 是否为有效账户
+	LASTLOGINTIME field.Time   // 上次登陆时间
+	LASTLOGINIP   field.String // 上次登陆ip
+	CreatedAt     field.Time
+	UpdatedAt     field.Time
 
 	fieldMap map[string]field.Expr
 }
@@ -78,8 +78,8 @@ func (p *prUser) updateTableName(table string) *prUser {
 	p.VALIDATED = field.NewInt32(table, "VALIDATED")
 	p.LASTLOGINTIME = field.NewTime(table, "LAST_LOGIN_TIME")
 	p.LASTLOGINIP = field.NewString(table, "LAST_LOGIN_IP")
-	p.CREATEDTIME = field.NewTime(table, "CREATED_TIME")
-	p.UPDATEDTIME = field.NewTime(table, "UPDATED_TIME")
+	p.CreatedAt = field.NewTime(table, "CREATED_TIME")
+	p.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
 	p.fillFieldMap()
 
@@ -104,8 +104,8 @@ func (p *prUser) fillFieldMap() {
 	p.fieldMap["VALIDATED"] = p.VALIDATED
 	p.fieldMap["LAST_LOGIN_TIME"] = p.LASTLOGINTIME
 	p.fieldMap["LAST_LOGIN_IP"] = p.LASTLOGINIP
-	p.fieldMap["CREATED_TIME"] = p.CREATEDTIME
-	p.fieldMap["UPDATED_TIME"] = p.UPDATEDTIME
+	p.fieldMap["CREATED_TIME"] = p.CreatedAt
+	p.fieldMap["UPDATED_TIME"] = p.UpdatedAt
 }
 
 func (p prUser) clone(db *gorm.DB) prUser {

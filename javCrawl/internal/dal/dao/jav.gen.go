@@ -19,8 +19,8 @@ type Jav struct {
 	LENGTH      int32     `gorm:"column:LENGTH;type:int" json:"LENGTH"`                  // 長度
 	DIRECTOR    string    `gorm:"column:DIRECTOR;type:varchar(255)" json:"DIRECTOR"`
 	SERIES      string    `gorm:"column:SERIES;type:varchar(255)" json:"SERIES"`
-	CREATEDTIME time.Time `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`
-	UPDATEDTIME time.Time `gorm:"column:UPDATED_TIME;type:datetime" json:"UPDATED_TIME"`
+	CreatedAt   time.Time `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`
+	UpdatedAt   time.Time `gorm:"column:UPDATED_TIME;type:datetime" json:"UPDATED_TIME"`
 }
 
 // TableName Jav's table name

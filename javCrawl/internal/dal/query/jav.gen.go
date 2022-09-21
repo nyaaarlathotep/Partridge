@@ -34,8 +34,8 @@ func newJav(db *gorm.DB) jav {
 	_jav.LENGTH = field.NewInt32(tableName, "LENGTH")
 	_jav.DIRECTOR = field.NewString(tableName, "DIRECTOR")
 	_jav.SERIES = field.NewString(tableName, "SERIES")
-	_jav.CREATEDTIME = field.NewTime(tableName, "CREATED_TIME")
-	_jav.UPDATEDTIME = field.NewTime(tableName, "UPDATED_TIME")
+	_jav.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
+	_jav.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
 
 	_jav.fillFieldMap()
 
@@ -47,14 +47,14 @@ type jav struct {
 
 	ALL         field.Asterisk
 	ELEID       field.Int64
-	CODE        field.String
+	CODE        field.String // 識別碼
 	TITLE       field.String
-	PUBLISHDATE field.Time
-	LENGTH      field.Int32
+	PUBLISHDATE field.Time  // 發行日期
+	LENGTH      field.Int32 // 長度
 	DIRECTOR    field.String
 	SERIES      field.String
-	CREATEDTIME field.Time
-	UPDATEDTIME field.Time
+	CreatedAt   field.Time
+	UpdatedAt   field.Time
 
 	fieldMap map[string]field.Expr
 }
@@ -78,8 +78,8 @@ func (j *jav) updateTableName(table string) *jav {
 	j.LENGTH = field.NewInt32(table, "LENGTH")
 	j.DIRECTOR = field.NewString(table, "DIRECTOR")
 	j.SERIES = field.NewString(table, "SERIES")
-	j.CREATEDTIME = field.NewTime(table, "CREATED_TIME")
-	j.UPDATEDTIME = field.NewTime(table, "UPDATED_TIME")
+	j.CreatedAt = field.NewTime(table, "CREATED_TIME")
+	j.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
 	j.fillFieldMap()
 
@@ -104,8 +104,8 @@ func (j *jav) fillFieldMap() {
 	j.fieldMap["LENGTH"] = j.LENGTH
 	j.fieldMap["DIRECTOR"] = j.DIRECTOR
 	j.fieldMap["SERIES"] = j.SERIES
-	j.fieldMap["CREATED_TIME"] = j.CREATEDTIME
-	j.fieldMap["UPDATED_TIME"] = j.UPDATEDTIME
+	j.fieldMap["CREATED_TIME"] = j.CreatedAt
+	j.fieldMap["UPDATED_TIME"] = j.UpdatedAt
 }
 
 func (j jav) clone(db *gorm.DB) jav {

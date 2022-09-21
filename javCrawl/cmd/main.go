@@ -8,6 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"javCrawl/internal/dal/dao"
 	"javCrawl/internal/dal/query"
 	"javCrawl/internal/scan"
 	"log"
@@ -20,6 +21,7 @@ import (
 // TODO transactional support
 // TODO or maybe multi thread
 var db *sqlx.DB
+var queries *query.Query
 var (
 	NotFound = errors.New("sql: no rows in result set")
 )
@@ -36,19 +38,23 @@ var spaceReg = regexp.MustCompile("\\s+")
 
 func main() {
 	bT := time.Now()
-	defer func(db *sqlx.DB) {
-		err := db.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(db)
-	ormDb, _ := gorm.Open(mysql.Open("root:12345678@tcp(127.0.0.1:3306)/partridge?charset=utf8mb4&parseTime=True&loc=Local"))
-	u := query.Use(ormDb).Element
-	te, err := u.Where(u.ID.Eq(2)).First()
-	if err != nil {
-		log.Println(err)
+
+	elementQ := queries.Element
+	ele1, _ := elementQ.Where(elementQ.ID.Eq(2)).First()
+	eleFiles, _ := elementQ.EleFile.Model(ele1).Find()
+	log.Printf("%+v", ele1)
+	log.Printf("%#v", ele1)
+
+	for _, eleFile := range eleFiles {
+		log.Printf("%+v", eleFile)
+		log.Printf("%#v", eleFile)
 	}
-	log.Printf("%+v", te)
+	//u := queries.EleFile
+	//te, err := u.Where(u.ID.Eq(2)).First()
+	//if err != nil {
+	//	log.Println(err)
+	//}
+	//log.Printf("%+v", te)
 	//count := scanJavDir(javDir)
 	//log.Printf("update or insert jav num: %v", count)
 	eT := time.Since(bT)
@@ -66,31 +72,40 @@ func scanJavDir(scanDir string) int {
 		count++
 		eleId := updateOrInsertJav(jav)
 		log.Printf("eleId: %d", eleId)
-		insertEleFile(codeFPathMap[code], eleId)
+		insertEleFile(codeFPathMap[code], int64(eleId))
 	}
 	return count
 }
 
-func insertEleFile(path string, eleId int) {
-	insertEleFile := "INSERT INTO ele_file(ele_id,name,type,path,IS_AVAILABLE_FLAG ,CREATED_TIME, UPDATED_TIME) VALUES(?,?,?,?,?,?,?)"
-	selectEleFIle := "select ID from ele_file where path=?"
+func insertEleFile(path string, eleId int64) {
+	eleFileQ := queries.EleFile
 	name := path[strings.LastIndex(path, string(os.PathSeparator))+1:]
 	eleFileType := getEleFileType(name)
 	log.Printf("file name: %v", name)
-	var fileId = new(dbId)
-	err := db.Get(fileId, selectEleFIle, path)
-	_, err = db.Exec(insertEleFile, eleId, name, eleFileType, path, 1, time.Now(), time.Now())
+	oldEleFiles, err := eleFileQ.Where(eleFileQ.PATH.Eq(path), eleFileQ.ELEID.Eq(eleId)).Find()
 	if err != nil {
-		log.Fatal("db exec failed, ", err)
+		log.Printf("db error:%v", err)
 	}
+	if len(oldEleFiles) == 0 {
+		_ = eleFileQ.Create(&dao.EleFile{
+			ELEID:           eleId,
+			NAME:            name,
+			TYPE:            eleFileType,
+			PATH:            path,
+			ISAVAILABLEFLAG: 1,
+		})
+	} else {
+		log.Fatalf(" eleFile already exist...eleId: %v, path: %v", eleId, path)
+	}
+
 }
 
-func getEleFileType(name string) int {
-	eleFileType := 0
+func getEleFileType(name string) string {
+	eleFileType := "0"
 	if strings.Contains(name, "mp4") {
-		eleFileType = 2
+		eleFileType = "2"
 	} else if strings.Contains(name, "avi") {
-		eleFileType = 3
+		eleFileType = "3"
 	} else {
 		panic("type not found: " + name)
 	}
@@ -290,14 +305,13 @@ func removeSpace(c string) string {
 	return content
 }
 func init() {
-	database, err := sqlx.Open("mysql", "root:12345678@tcp(127.0.0.1:3306)/partridge")
+	// TODO config
+	ormDb, err := gorm.Open(mysql.Open("root:12345678@tcp(127.0.0.1:3306)/partridge?charset=utf8mb4&parseTime=True&loc=Local"))
 	if err != nil {
 		log.Println("open mysql failed,", err)
 		panic(fmt.Sprintf("invalid database %q", err))
 	}
-
-	time.Now()
-	db = database
+	queries = query.Use(ormDb)
 	log.Println("open mysql succeed")
 }
 
