@@ -27,7 +27,6 @@ import java.util.Map;
 
 @Slf4j
 public class Settings {
-    // TODO size of page
     // TODO proxy
 
     /********************
@@ -258,7 +257,12 @@ public class Settings {
     private static final String KEY_REQUEST_NEWS = "request_news";
     private static final boolean DEFAULT_REQUEST_NEWS = true;
     private static final String DEFAULT_DOWNLOAD_ROOT_PATH = "../test/mngDownload";
-    private static final String DOWNLOAD_ROOT_PATH = "../test/mngDownload";
+    private static final String DOWNLOAD_ROOT_PATH = "download_root_path";
+
+    private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final String PAGE_SIZE = "page_size";
+    private static final int DEFAULT_DOWNLOAD_QUEUE_EXPIRE_TIME = 30;
+    private static final String DOWNLOAD_QUEUE_EXPIRE_TIME = "download_queue_expire_time";
     //    private static Context sContext;
     private static Map<String, Object> sSettingsPre = new HashMap<>();
     private static EhConfig sEhConfig;
@@ -1170,5 +1174,13 @@ public class Settings {
 
     public static String getDownloadRootPath() {
         return getString(DOWNLOAD_ROOT_PATH, DEFAULT_DOWNLOAD_ROOT_PATH);
+    }
+
+    public static int getPageSize() {
+        return getInt(PAGE_SIZE, DEFAULT_PAGE_SIZE);
+    }
+    
+    public static int getDownloadQueueExpireTime(){
+        return getInt(DOWNLOAD_QUEUE_EXPIRE_TIME,DEFAULT_DOWNLOAD_QUEUE_EXPIRE_TIME);
     }
 }

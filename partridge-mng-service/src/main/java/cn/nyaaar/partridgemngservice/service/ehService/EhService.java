@@ -1,10 +1,7 @@
 package cn.nyaaar.partridgemngservice.service.ehService;
 
-import cn.nyaaar.partridgemngservice.model.eh.GalleryBasicInfo;
-import cn.nyaaar.partridgemngservice.model.eh.GalleryDetail;
-import cn.nyaaar.partridgemngservice.model.eh.GalleryPage;
+import cn.nyaaar.partridgemngservice.model.eh.*;
 import cn.nyaaar.partridgemngservice.model.ListResp;
-import cn.nyaaar.partridgemngservice.service.ehService.impl.EhServiceImpl;
 
 import java.util.List;
 import java.util.Map;
@@ -58,7 +55,7 @@ public interface EhService {
      *
      * @return queue
      */
-    Map<Long, EhServiceImpl.DownloadingGallery> getDownloadingQueue();
+    Map<Long, DownloadingGallery> getDownloadingQueue();
 
     /**
      * eleId->GalleryBasicInfo
@@ -77,13 +74,13 @@ public interface EhService {
     ListResp<GalleryBasicInfo> getGalleryList(int pageIndex);
 
     /**
-     * name like ehentai title, titleJpn
+     * 搜索符合相关条件的 ehentai gallery
      *
-     * @param name      name
-     * @param pageIndex pageIndex
+     * @param galleryQuery galleryQuery
+     * @param pageIndex    pageIndex
      * @return ListResp
      */
-    ListResp<GalleryBasicInfo> getGalleryList(String name, int pageIndex);
+    ListResp<GalleryBasicInfo> getGalleryList(GalleryQuery galleryQuery, int pageIndex);
 
     /**
      * gid+gtoken->GalleryDetail

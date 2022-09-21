@@ -3,6 +3,7 @@ package cn.nyaaar.partridgemngservice.service.impl;
 import cn.nyaaar.partridgemngservice.entity.Jav;
 import cn.nyaaar.partridgemngservice.mapper.JavMapper;
 import cn.nyaaar.partridgemngservice.service.JavService;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -61,5 +62,11 @@ public class JavServiceImpl extends ServiceImpl<JavMapper, Jav> implements JavSe
     public Jav findById(Integer id) {
 
         return baseMapper.selectById(id);
+    }
+
+    @Override
+    public Page<Jav> pageWithTag(Page<Jav> page, Wrapper<Jav> wrapper,
+                                 List<Integer> tagIds, List<Integer> actorIds, List<Integer> organIds) {
+        return baseMapper.pageWithTag(page, wrapper, tagIds, actorIds, organIds);
     }
 }

@@ -2,27 +2,23 @@ package cn.nyaaar.partridgemngservice.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-
 import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-
 import java.io.Serializable;
 import java.io.Serial;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
  * <p>
- *
+ * 基本元素表
  * </p>
  *
  * @author nyaaar
- * @since 2022-08-22
+ * @since 2022-09-16
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -37,6 +33,18 @@ public class Element extends Model<Element> {
 
     @TableField("TYPE")
     private String type;
+
+    /**
+     * (0-否;1-是)
+     */
+    @TableField("SHARED_FLAG")
+    private Integer sharedFlag;
+
+    /**
+     * 上传用户
+     */
+    @TableField("UPLOADER")
+    private String uploader;
 
     @TableField(value = "CREATED_TIME", fill = FieldFill.INSERT)
     private Date createdTime;

@@ -1,5 +1,6 @@
 package cn.nyaaar.partridgemngservice.controller;
 
+import cn.nyaaar.partridgemngservice.common.annotation.LogAnnotation;
 import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.ElementDto;
@@ -32,6 +33,7 @@ public class ElementController {
 
     @Operation(summary = "element基本信息", description = "通过主键id获取element基本信息")
     @GetMapping(value = "/element")
+    @LogAnnotation
     public R<ElementDto> getElementById(@RequestParam Integer elementId) {
         Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, elementId));
         BusinessExceptionEnum.ELEMENT_NOT_FOUND.assertNotNull(element);

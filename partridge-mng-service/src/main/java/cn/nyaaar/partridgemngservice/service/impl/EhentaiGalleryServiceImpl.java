@@ -3,6 +3,7 @@ package cn.nyaaar.partridgemngservice.service.impl;
 import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
 import cn.nyaaar.partridgemngservice.mapper.EhentaiGalleryMapper;
 import cn.nyaaar.partridgemngservice.service.EhentaiGalleryService;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -61,5 +62,10 @@ public class EhentaiGalleryServiceImpl extends ServiceImpl<EhentaiGalleryMapper,
     public EhentaiGallery findById(Long id){
     
         return baseMapper.selectById(id);
+    }
+
+    @Override
+    public Page<EhentaiGallery> pageWithTag(Page<EhentaiGallery> page, Wrapper<EhentaiGallery> wrapper, List<Integer> tagIds) {
+        return baseMapper.pageWithTag(page, wrapper, tagIds);
     }
 }

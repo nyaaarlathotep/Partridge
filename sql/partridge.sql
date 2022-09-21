@@ -11,7 +11,7 @@
  Target Server Version : 80027
  File Encoding         : 65001
 
- Date: 07/09/2022 19:24:45
+ Date: 19/09/2022 23:11:51
 */
 
 SET NAMES utf8mb4;
@@ -39,7 +39,7 @@ CREATE TABLE `author` (
   `CREATED_TIME` datetime DEFAULT NULL,
   `UPDATED_TIME` datetime DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for ehentai_gallery
@@ -52,7 +52,7 @@ CREATE TABLE `ehentai_gallery` (
   `TITLE_JPN` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `CATEGORY` int DEFAULT NULL COMMENT 'gallery分类',
   `UPLOADER` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '上传者',
-  `RATING` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '评分',
+  `RATING` double DEFAULT NULL COMMENT '评分',
   `RATING_COUNT` int DEFAULT NULL COMMENT '评分人数',
   `PAGES` int DEFAULT NULL COMMENT '总页数',
   `PREVIEW_PAGE` int DEFAULT NULL COMMENT '预览画廊对应页',
@@ -103,7 +103,7 @@ CREATE TABLE `ele_file` (
   `CREATED_TIME` datetime DEFAULT NULL,
   `UPDATED_TIME` datetime DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=332 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=405 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for ele_org_re
@@ -126,7 +126,7 @@ CREATE TABLE `ele_tag_re` (
   `ELE_ID` bigint NOT NULL,
   `TAG_ID` int NOT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2326 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=2536 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for element
@@ -135,21 +135,23 @@ DROP TABLE IF EXISTS `element`;
 CREATE TABLE `element` (
   `ID` bigint NOT NULL AUTO_INCREMENT,
   `TYPE` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `SHARED_FLAG` tinyint DEFAULT NULL COMMENT '(0-否;1-是)',
+  `UPLOADER` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '上传用户',
   `CREATED_TIME` datetime DEFAULT NULL,
   `UPDATED_TIME` datetime DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=334 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=539 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='基本元素表';
 
 -- ----------------------------
 -- Table structure for jav
 -- ----------------------------
 DROP TABLE IF EXISTS `jav`;
 CREATE TABLE `jav` (
-  `ELE_ID` int NOT NULL,
+  `ELE_ID` bigint NOT NULL,
   `CODE` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '識別碼',
   `TITLE` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `PUBLISH_DATE` datetime DEFAULT NULL COMMENT '發行日期',
-  `LENGTH` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '長度',
+  `LENGTH` int DEFAULT NULL COMMENT '長度',
   `DIRECTOR` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `SERIES` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `CREATED_TIME` datetime DEFAULT NULL,
@@ -167,13 +169,30 @@ CREATE TABLE `organization` (
   `CREATED_TIME` datetime DEFAULT NULL,
   `UPDATED_TIME` datetime DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
--- Table structure for tag
+-- Table structure for pr_user
 -- ----------------------------
-DROP TABLE IF EXISTS `tag`;
-CREATE TABLE `tag` (
+DROP TABLE IF EXISTS `pr_user`;
+CREATE TABLE `pr_user` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `EMAIL` varchar(255) DEFAULT NULL,
+  `USER_NAME` varchar(255) DEFAULT NULL,
+  `PASSWORD` varchar(255) DEFAULT NULL,
+  `VALIDATED` tinyint DEFAULT NULL COMMENT '(0-否;1-是) 是否为有效账户',
+  `LAST_LOGIN_TIME` datetime DEFAULT NULL COMMENT '上次登陆时间',
+  `LAST_LOGIN_IP` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '上次登陆ip',
+  `CREATED_TIME` datetime DEFAULT NULL,
+  `UPDATED_TIME` datetime DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户表';
+
+-- ----------------------------
+-- Table structure for tag_info
+-- ----------------------------
+DROP TABLE IF EXISTS `tag_info`;
+CREATE TABLE `tag_info` (
   `ID` int NOT NULL AUTO_INCREMENT,
   `NAME` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `GROUP_NAME` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
@@ -181,6 +200,6 @@ CREATE TABLE `tag` (
   `CREATED_TIME` datetime DEFAULT NULL,
   `UPDATED_TIME` datetime DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1677 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=1681 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -5,11 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 
-/**
- * @Description: 路径工具类
- * @author: yangyang3
- * @date: 2021/9/2
- */
 public class PathUtil {
 
     public static String simpleConcatUrl(String... urls) {

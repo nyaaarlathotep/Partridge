@@ -6,6 +6,7 @@ import cn.nyaaar.partridgemngservice.mapper.EleFileMapper;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryPage;
 import cn.nyaaar.partridgemngservice.service.EleFileService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
+import cn.nyaaar.partridgemngservice.util.PathUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -14,6 +15,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import cn.nyaaar.partridgemngservice.model.QueryData;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Objects;
 
@@ -82,5 +87,18 @@ public class EleFileServiceImpl extends ServiceImpl<EleFileMapper, EleFile> impl
                         FileTypeEnum.getTypeBySuffix(eleFile.getName()),
                         FileTypeEnum.unknown
                 ).getSuffix());
+    }
+
+    @Override
+    public void saveBytesToFile(byte[] bytes, String destDic, String fileName, boolean reDownload) throws IOException {
+
+        Path dic = Path.of(destDic);
+        if (Files.notExists(dic)) {
+            Files.createDirectories(dic);
+        }
+        Path filePath = Path.of(PathUtil.simpleConcatUrl(destDic, fileName));
+        if (reDownload || Files.notExists(filePath)) {
+            Files.write(filePath, bytes, StandardOpenOption.CREATE);
+        }
     }
 }

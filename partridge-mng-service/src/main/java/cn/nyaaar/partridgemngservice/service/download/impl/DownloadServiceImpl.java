@@ -1,8 +1,8 @@
 package cn.nyaaar.partridgemngservice.service.download.impl;
 
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
+import cn.nyaaar.partridgemngservice.service.EleFileService;
 import cn.nyaaar.partridgemngservice.service.download.DownloadService;
-import cn.nyaaar.partridgemngservice.service.file.FileHandleService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.requestBuilder.EhRequestBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -25,12 +25,12 @@ public class DownloadServiceImpl implements DownloadService {
 
     private final ThreadPoolTaskExecutor downloadExecutor;
 
-    private final FileHandleService fileHandleService;
+    private final EleFileService eleFileService;
 
-    public DownloadServiceImpl(OkHttpClient okHttpClient, ThreadPoolTaskExecutor downloadExecutor, FileHandleService fileHandleService) {
+    public DownloadServiceImpl(OkHttpClient okHttpClient, ThreadPoolTaskExecutor downloadExecutor, EleFileService eleFileService) {
         this.okHttpClient = okHttpClient;
         this.downloadExecutor = downloadExecutor;
-        this.fileHandleService = fileHandleService;
+        this.eleFileService = eleFileService;
     }
 
     @Override
@@ -49,11 +49,16 @@ public class DownloadServiceImpl implements DownloadService {
                 }
 
                 @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                    byte[] bytes = Objects.requireNonNull(response.body()).bytes();
-                    fileHandleService.saveBytesToFile(bytes, destDic, fileName, false);
-                    if (successHandle != null) {
-                        successHandle.run();
+                public void onResponse(@NotNull Call call, @NotNull Response response) {
+                    try {
+                        byte[] bytes = Objects.requireNonNull(response.body()).bytes();
+                        eleFileService.saveBytesToFile(bytes, destDic, fileName, false);
+                        if (successHandle != null) {
+                            successHandle.run();
+                        }
+                    } catch (IOException e) {
+                        log.error("read response or save error, url:{}", url, e);
+                        failHandle.run();
                     }
                 }
             });

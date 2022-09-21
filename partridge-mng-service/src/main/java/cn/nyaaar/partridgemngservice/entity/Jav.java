@@ -2,12 +2,16 @@ package cn.nyaaar.partridgemngservice.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+
 import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.io.Serializable;
 import java.io.Serial;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -28,7 +32,7 @@ public class Jav extends Model<Jav> {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "ELE_ID", type = IdType.AUTO)
+    @TableId(value = "ELE_ID", type = IdType.ASSIGN_ID)
     private Long eleId;
 
     /**
@@ -50,7 +54,7 @@ public class Jav extends Model<Jav> {
      * 長度
      */
     @TableField("LENGTH")
-    private String length;
+    private Integer length;
 
     @TableField("DIRECTOR")
     private String director;

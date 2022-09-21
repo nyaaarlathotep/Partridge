@@ -9,22 +9,21 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import cn.nyaaar.partridgemngservice.model.QueryData;
-
 import java.util.List;
 
 /**
  * <p>
- * 服务实现类
+ * 基本元素表 服务实现类
  * </p>
  *
  * @author nyaaar
- * @since 2022-08-22
+ * @since 2022-09-16
  */
 @Service
 public class ElementServiceImpl extends ServiceImpl<ElementMapper, Element> implements ElementService {
 
     @Override
-    public QueryData<Element> findListByPage(Element where, Integer page, Integer pageCount) {
+    public QueryData<Element> findListByPage(Element where, Integer page, Integer pageCount){
         IPage<Element> wherePage = new Page<>(page, pageCount);
 
         IPage<Element> iPage = baseMapper.selectPage(wherePage, Wrappers.query(where));
@@ -33,33 +32,34 @@ public class ElementServiceImpl extends ServiceImpl<ElementMapper, Element> impl
     }
 
     @Override
-    public List<Element> findList(Element where) {
+    public List<Element> findList(Element where){
 
-        return baseMapper.selectList(Wrappers.query(where));
+        return baseMapper.selectList( Wrappers.query(where));
     }
 
 
-    @Override
-    public Integer add(Element element) {
 
+    @Override
+    public Integer add(Element element){
+ 
         return baseMapper.insert(element);
     }
 
     @Override
-    public Integer delete(Integer id) {
-
+    public Integer delete(Integer id){
+    
         return baseMapper.deleteById(id);
     }
 
     @Override
-    public Integer updateData(Element element) {
-
+    public Integer updateData(Element element){
+    
         return baseMapper.updateById(element);
     }
 
     @Override
-    public Element findById(Integer id) {
-
+    public Element findById(Integer id){
+    
         return baseMapper.selectById(id);
     }
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.nyaaar.partridgemngservice.mapper.PrUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.nyaaar.partridgemngservice.entity.PrUser">
+        <id column="ID" property="id" />
+        <result column="EMAIL" property="email" />
+        <result column="USER_NAME" property="userName" />
+        <result column="PASSWORD" property="password" />
+        <result column="VALIDATED" property="validated" />
+        <result column="LAST_LOGIN_TIME" property="lastLoginTime" />
+        <result column="LAST_LOGIN_IP" property="lastLoginIp" />
+        <result column="CREATED_TIME" property="createdTime" />
+        <result column="UPDATED_TIME" property="updatedTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ID, EMAIL, USER_NAME, PASSWORD, VALIDATED, LAST_LOGIN_TIME, LAST_LOGIN_IP, CREATED_TIME, UPDATED_TIME
+    </sql>
+
+</mapper>

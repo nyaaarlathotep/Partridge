@@ -29,7 +29,7 @@ public class JavBasicInfo {
     private Date publishDate;
 
     @Schema(title = "長度")
-    private String length;
+    private Integer length;
 
     @Schema(title = "导演")
     private String director;

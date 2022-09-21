@@ -2,6 +2,7 @@ package cn.nyaaar.partridgemngservice.service.jav;
 
 import cn.nyaaar.partridgemngservice.model.jav.JavBasicInfo;
 import cn.nyaaar.partridgemngservice.model.ListResp;
+import cn.nyaaar.partridgemngservice.model.jav.JavQuery;
 
 public interface JavMngService {
 
@@ -16,10 +17,10 @@ public interface JavMngService {
     /**
      * jav.name like JavBasicInfo
      *
-     * @param name jav name
-     * @return JavBasicInfo
+     * @param javQuery javQuery
+     * @return JavBasicInfos
      */
-    ListResp<JavBasicInfo> getJavList(String name, int pageIndex);
+    ListResp<JavBasicInfo> getJavList(JavQuery javQuery, int pageIndex);
 
     /**
      * 浏览Jav，返回一个 jav 的 ListResp
