@@ -1,11 +1,9 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/antchfx/htmlquery"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"javCrawl/internal/dal/dao"
@@ -20,15 +18,11 @@ import (
 
 // TODO transactional support
 // TODO or maybe multi thread
-var db *sqlx.DB
 var queries *query.Query
-var (
-	NotFound = errors.New("sql: no rows in result set")
-)
 
 const urlPrefix = "https://www.javbus.com/"
 const YYYYMMDD = "2006-01-02"
-const javDir = "/media/nyaaar/bigbro/stream/movies"
+const javDir = "/media/disk1/Linux/test"
 const (
 	Jav     string = "1"
 	eHentai string = "2"
@@ -39,20 +33,20 @@ var spaceReg = regexp.MustCompile("\\s+")
 func main() {
 	bT := time.Now()
 
-	elementQ := queries.Element
-	newElement := &dao.Element{
-		TYPE:       Jav,
-		SHAREDFLAG: 1,
-		UPLOADER:   "",
-	}
-	err := elementQ.Create(newElement)
-	if err != nil {
-		return
-	}
-	log.Printf("%+v", newElement)
+	//elementQ := queries.Element
+	//newElement := &dao.Element{
+	//	TYPE:       Jav,
+	//	SHAREDFLAG: 1,
+	//	UPLOADER:   "",
+	//}
+	//err := elementQ.Create(newElement)
+	//if err != nil {
+	//	return
+	//}
+	//log.Printf("%+v", newElement)
 
-	//count := scanJavDir(javDir)
-	//log.Printf("update or insert jav num: %v", count)
+	count := scanJavDir(javDir)
+	log.Printf("update or insert jav num: %v", count)
 	eT := time.Since(bT)
 	log.Printf("run time: %v", eT)
 }
@@ -68,7 +62,7 @@ func scanJavDir(scanDir string) int {
 		count++
 		eleId := updateOrInsertJav(jav)
 		log.Printf("eleId: %d", eleId)
-		insertEleFile(codeFPathMap[code], int64(eleId))
+		insertEleFile(codeFPathMap[code], eleId)
 	}
 	return count
 }
@@ -109,117 +103,83 @@ func getEleFileType(name string) string {
 }
 
 func updateOrInsertJav(jav *jav) int64 {
-	insertOrgReSql := "INSERT INTO ele_org_re(ELE_ID,ORG_ID,RE_TYPE) VALUES(?,?,?)"
-	insertOrganSql := "INSERT INTO organization(name, CREATED_TIME, UPDATED_TIME) VALUES(?,?,?)"
-	selectOrganSql := "select ID from organization where NAME=?"
-	insertActorSql := "INSERT INTO actor(name, CREATED_TIME, UPDATED_TIME) VALUES(?,?,?)"
-	insertTagSql := "INSERT INTO tag_info(name, CREATED_TIME, UPDATED_TIME) VALUES(?,?,?)"
-	selectActorSql := "SELECT ID from actor where NAME=?"
-	insertActorReSql := "INSERT INTO ele_actor_re(ELE_ID,ACTOR_ID) VALUES(?,?)"
-	selectTagSql := "SELECT ID from tag_info where NAME=?"
-	insertTagReSql := "INSERT INTO ele_tag_re(ELE_ID,TAG_ID) VALUES(?,?)"
-	insertEleSql := "INSERT INTO element(TYPE, CREATED_TIME, UPDATED_TIME) VALUES(" + Jav + ", ?, ?)"
-	insertJavSql := "CREATED_TIME, UPDATED_TIME) VALUES(?,?,?,?,?,?,?, ?, ?)" + "INSERT INTO jav(ELE_ID, CODE, TITLE, PUBLISH_DATE, LENGTH, DIRECTOR, SERIES, "
-	selectJavSql := "SELECT ELE_ID AS ID from jav where TITLE=?"
-	var eleId = new(dbId)
-	err := db.Get(eleId, selectJavSql, jav.title)
 	javQ := queries.Jav
-	//eleQ := queries.Element
 	oldJavs, err := javQ.Where(javQ.TITLE.Eq(jav.title)).Find()
-	if err == nil {
+	if err != nil {
 		log.Fatal("db exec failed, ", err)
 	}
 	if len(oldJavs) != 0 {
 		return oldJavs[0].ELEID
 	}
 
-	if err != nil && errors.As(err, &NotFound) {
-		eleRes, err := db.Exec(insertEleSql, time.Now(), time.Now())
-		if err != nil {
-			log.Fatal("db exec failed, ", err)
+	tags := make([]dao.TagInfo, 0)
+	for _, javTag := range jav.tags {
+		tagQ := queries.TagInfo
+		searchTag, _ := tagQ.Where(tagQ.NAME.Eq(javTag)).Find()
+		if len(searchTag) == 0 {
+			tags = append(tags, dao.TagInfo{
+				NAME:      javTag,
+				GROUPNAME: "",
+				SOURCE:    Jav,
+			})
+		} else {
+			tags = append(tags, *searchTag[0])
 		}
-		newEleId, err := eleRes.LastInsertId()
-		eleId.Id = int(newEleId)
-		if err != nil {
-			log.Fatal("db exec failed, ", err)
-		}
-		_, err = db.Exec(insertJavSql, newEleId, jav.code, jav.title, jav.publishDate, jav.length, jav.director, jav.series, time.Now(), time.Now())
-		if err != nil {
-			log.Fatal("db exec failed, ", err)
-		}
+	}
 
-		if len(jav.publisher) != 0 {
-			var publisherId int64
-			getOrInsertGetId(&publisherId, selectOrganSql, jav.publisher, insertOrganSql)
-			insertOrgRe(insertOrgReSql, newEleId, publisherId, "publish")
+	actors := make([]dao.Actor, 0)
+	for _, actor := range jav.actors {
+		actorQ := queries.Actor
+		searchRes, _ := actorQ.Where(actorQ.NAME.Eq(actor)).Find()
+		if len(searchRes) == 0 {
+			actors = append(actors, dao.Actor{
+				NAME: actor,
+			})
+		} else {
+			actors = append(actors, *searchRes[0])
 		}
+	}
 
-		if len(jav.producer) != 0 {
-			var producerId int64
-			getOrInsertGetId(&producerId, selectOrganSql, jav.producer, insertOrganSql)
-			insertOrgRe(insertOrgReSql, newEleId, producerId, "produce")
-		}
-		if len(jav.actors) != 0 {
-			for _, actor := range jav.actors {
-				var actorId int64
-				getOrInsertGetId(&actorId, selectActorSql, actor, insertActorSql)
-				insertDoubleRe(insertActorReSql, int(newEleId), int(actorId))
-			}
-
-		}
-		if len(jav.tags) != 0 {
-			for _, tag_info := range jav.tags {
-				var tagId int64
-				getOrInsertGetId(&tagId, selectTagSql, tag_info, insertTagSql)
-				insertDoubleRe(insertTagReSql, int(newEleId), int(tagId))
-			}
-		}
-	} else if err != nil {
-		log.Fatal("cannot find jav and error, why?", err)
+	organs := make([]dao.Organization, 0)
+	organQ := queries.Organization
+	searchPro, _ := organQ.Where(organQ.NAME.Eq(jav.producer)).Find()
+	if len(searchPro) == 0 {
+		organs = append(organs, dao.Organization{
+			NAME: jav.producer,
+		})
 	} else {
-		// TODO: update
-		log.Printf("update id: %v\n", -1)
+		organs = append(organs, *searchPro[0])
 	}
-	log.Printf("eleId: %v", eleId)
+	searchPro, _ = organQ.Where(organQ.NAME.Eq(jav.publisher)).Find()
+	if len(searchPro) == 0 {
+		organs = append(organs, dao.Organization{
+			NAME: jav.publisher,
+		})
+	} else {
+		organs = append(organs, *searchPro[0])
+	}
 
-	return int64(eleId.Id)
-}
-
-func insertDoubleRe(insertSql string, idOne int, idTwo int) {
-	_, err := db.Exec(insertSql, idOne, idTwo)
+	newEle := &dao.Element{
+		TYPE:       Jav,
+		SHAREDFLAG: 0,
+		UPLOADER:   "root",
+		EleFile: []dao.EleFile{{
+			NAME:            "test",
+			TYPE:            ".mp4",
+			PATH:            "test/test.mp4",
+			PAGENUM:         0,
+			ISAVAILABLEFLAG: 1,
+		}},
+		Actor:        actors,
+		Author:       nil,
+		Organization: organs,
+		TagInfo:      tags,
+	}
+	err = queries.Element.Create(newEle)
 	if err != nil {
 		log.Fatal("db exec failed, ", err)
 	}
-}
-
-func insertOrgRe(insertOrgRe string, eleId int64, organId int64, typeName string) {
-	_, err := db.Exec(insertOrgRe, eleId, organId, typeName)
-	if err != nil {
-		log.Fatal("db exec failed, ", err)
-	}
-}
-
-func getOrInsertGetId(dbId *int64, selectSql string, name string, insertSql string) {
-	var getId int64
-	err := db.Get(&getId, selectSql, name)
-	if err != nil && errors.As(err, &NotFound) {
-		log.Printf("%v not found, turn to insert...", name)
-		insertRes, err := db.Exec(insertSql, name, time.Now(), time.Now())
-		if err != nil {
-			log.Fatal("db exec failed, ", err)
-		}
-		pbId, err := insertRes.LastInsertId()
-		if err != nil {
-			log.Fatal("db exec failed, ", err)
-		}
-		log.Printf("insert success! id: %v", pbId)
-		*dbId = pbId
-		return
-	} else if err != nil {
-		log.Fatal("db exec failed, ", err)
-		return
-	}
-	*dbId = getId
+	return newEle.ID
 }
 
 func getJavCodeInfo(code string) *jav {
@@ -332,8 +292,4 @@ type jav struct {
 	series      string
 	tags        []string
 	actors      []string
-}
-
-type dbId struct {
-	Id int `db:"ID"`
 }
