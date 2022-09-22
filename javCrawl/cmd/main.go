@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -30,11 +31,47 @@ const (
 var number = regexp.MustCompile(`\d+`)
 
 func main() {
-	bT := time.Now()
-	count := scanJavDir(javDir)
-	log.Printf("update or insert jav num: %v", count)
-	eT := time.Since(bT)
-	log.Printf("run time: %v", eT)
+	r := gin.Default()
+	err := r.SetTrustedProxies([]string{"127.0.0.1"})
+	if err != nil {
+		log.Fatalf("trustProxy error:%v", err)
+		return
+	}
+	r.GET("/ping", func(c *gin.Context) {
+		log.Printf("RemoteIP: %v", c.RemoteIP())
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+	r.POST("/scanJav", func(c *gin.Context) {
+		var form scanDirForm
+		if c.ShouldBind(&form) == nil {
+			log.Printf("%v", form)
+			var duration time.Duration
+			var count int
+			if len(form.Dir) != 0 {
+				bT := time.Now()
+				count = scanJavDir(javDir)
+				log.Printf("update or insert jav num: %v", count)
+				eT := time.Since(bT)
+				log.Printf("run time: %v", eT)
+				duration = eT
+			}
+			c.JSON(200, gin.H{
+				"message":  "SUCCESS",
+				"duration": fmt.Sprintf("%v", duration),
+				"count":    count,
+			})
+		} else {
+			c.JSON(400, gin.H{
+				"message": "form error",
+			})
+		}
+	})
+	err = r.Run(":8090")
+	if err != nil {
+		return
+	}
 }
 
 func scanJavDir(scanDir string) int {
@@ -216,4 +253,8 @@ func init() {
 	}
 	queries = query.Use(ormDb)
 	log.Println("open mysql succeed")
+}
+
+type scanDirForm struct {
+	Dir string `form:"dir" binding:"required"`
 }
