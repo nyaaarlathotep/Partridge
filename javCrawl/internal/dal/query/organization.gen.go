@@ -29,6 +29,7 @@ func newOrganization(db *gorm.DB) organization {
 	_organization.ALL = field.NewAsterisk(tableName)
 	_organization.ID = field.NewInt32(tableName, "ID")
 	_organization.NAME = field.NewString(tableName, "NAME")
+	_organization.TYPE = field.NewString(tableName, "TYPE")
 	_organization.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
 	_organization.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
 
@@ -43,6 +44,7 @@ type organization struct {
 	ALL       field.Asterisk
 	ID        field.Int32
 	NAME      field.String
+	TYPE      field.String // 发行商，制作商
 	CreatedAt field.Time
 	UpdatedAt field.Time
 
@@ -63,6 +65,7 @@ func (o *organization) updateTableName(table string) *organization {
 	o.ALL = field.NewAsterisk(table)
 	o.ID = field.NewInt32(table, "ID")
 	o.NAME = field.NewString(table, "NAME")
+	o.TYPE = field.NewString(table, "TYPE")
 	o.CreatedAt = field.NewTime(table, "CREATED_TIME")
 	o.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
@@ -81,9 +84,10 @@ func (o *organization) GetFieldByName(fieldName string) (field.OrderExpr, bool) 
 }
 
 func (o *organization) fillFieldMap() {
-	o.fieldMap = make(map[string]field.Expr, 4)
+	o.fieldMap = make(map[string]field.Expr, 5)
 	o.fieldMap["ID"] = o.ID
 	o.fieldMap["NAME"] = o.NAME
+	o.fieldMap["TYPE"] = o.TYPE
 	o.fieldMap["CREATED_TIME"] = o.CreatedAt
 	o.fieldMap["UPDATED_TIME"] = o.UpdatedAt
 }

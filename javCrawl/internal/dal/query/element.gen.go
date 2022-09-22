@@ -45,19 +45,19 @@ func newElement(db *gorm.DB) element {
 		RelationField: field.NewRelation("Actor", "dao.Actor"),
 	}
 
-	_element.Author = elementHasManyAuthor{
+	_element.Author = elementManyToManyAuthor{
 		db: db.Session(&gorm.Session{}),
 
 		RelationField: field.NewRelation("Author", "dao.Author"),
 	}
 
-	_element.Organization = elementHasManyOrganization{
+	_element.Organization = elementManyToManyOrganization{
 		db: db.Session(&gorm.Session{}),
 
 		RelationField: field.NewRelation("Organization", "dao.Organization"),
 	}
 
-	_element.TagInfo = elementHasManyTagInfo{
+	_element.TagInfo = elementManyToManyTagInfo{
 		db: db.Session(&gorm.Session{}),
 
 		RelationField: field.NewRelation("TagInfo", "dao.TagInfo"),
@@ -82,11 +82,11 @@ type element struct {
 
 	Actor elementManyToManyActor
 
-	Author elementHasManyAuthor
+	Author elementManyToManyAuthor
 
-	Organization elementHasManyOrganization
+	Organization elementManyToManyOrganization
 
-	TagInfo elementHasManyTagInfo
+	TagInfo elementManyToManyTagInfo
 
 	fieldMap map[string]field.Expr
 }
@@ -272,13 +272,13 @@ func (a elementManyToManyActorTx) Count() int64 {
 	return a.tx.Count()
 }
 
-type elementHasManyAuthor struct {
+type elementManyToManyAuthor struct {
 	db *gorm.DB
 
 	field.RelationField
 }
 
-func (a elementHasManyAuthor) Where(conds ...field.Expr) *elementHasManyAuthor {
+func (a elementManyToManyAuthor) Where(conds ...field.Expr) *elementManyToManyAuthor {
 	if len(conds) == 0 {
 		return &a
 	}
@@ -291,22 +291,22 @@ func (a elementHasManyAuthor) Where(conds ...field.Expr) *elementHasManyAuthor {
 	return &a
 }
 
-func (a elementHasManyAuthor) WithContext(ctx context.Context) *elementHasManyAuthor {
+func (a elementManyToManyAuthor) WithContext(ctx context.Context) *elementManyToManyAuthor {
 	a.db = a.db.WithContext(ctx)
 	return &a
 }
 
-func (a elementHasManyAuthor) Model(m *dao.Element) *elementHasManyAuthorTx {
-	return &elementHasManyAuthorTx{a.db.Model(m).Association(a.Name())}
+func (a elementManyToManyAuthor) Model(m *dao.Element) *elementManyToManyAuthorTx {
+	return &elementManyToManyAuthorTx{a.db.Model(m).Association(a.Name())}
 }
 
-type elementHasManyAuthorTx struct{ tx *gorm.Association }
+type elementManyToManyAuthorTx struct{ tx *gorm.Association }
 
-func (a elementHasManyAuthorTx) Find() (result []*dao.Author, err error) {
+func (a elementManyToManyAuthorTx) Find() (result []*dao.Author, err error) {
 	return result, a.tx.Find(&result)
 }
 
-func (a elementHasManyAuthorTx) Append(values ...*dao.Author) (err error) {
+func (a elementManyToManyAuthorTx) Append(values ...*dao.Author) (err error) {
 	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
@@ -314,7 +314,7 @@ func (a elementHasManyAuthorTx) Append(values ...*dao.Author) (err error) {
 	return a.tx.Append(targetValues...)
 }
 
-func (a elementHasManyAuthorTx) Replace(values ...*dao.Author) (err error) {
+func (a elementManyToManyAuthorTx) Replace(values ...*dao.Author) (err error) {
 	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
@@ -322,7 +322,7 @@ func (a elementHasManyAuthorTx) Replace(values ...*dao.Author) (err error) {
 	return a.tx.Replace(targetValues...)
 }
 
-func (a elementHasManyAuthorTx) Delete(values ...*dao.Author) (err error) {
+func (a elementManyToManyAuthorTx) Delete(values ...*dao.Author) (err error) {
 	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
@@ -330,21 +330,21 @@ func (a elementHasManyAuthorTx) Delete(values ...*dao.Author) (err error) {
 	return a.tx.Delete(targetValues...)
 }
 
-func (a elementHasManyAuthorTx) Clear() error {
+func (a elementManyToManyAuthorTx) Clear() error {
 	return a.tx.Clear()
 }
 
-func (a elementHasManyAuthorTx) Count() int64 {
+func (a elementManyToManyAuthorTx) Count() int64 {
 	return a.tx.Count()
 }
 
-type elementHasManyOrganization struct {
+type elementManyToManyOrganization struct {
 	db *gorm.DB
 
 	field.RelationField
 }
 
-func (a elementHasManyOrganization) Where(conds ...field.Expr) *elementHasManyOrganization {
+func (a elementManyToManyOrganization) Where(conds ...field.Expr) *elementManyToManyOrganization {
 	if len(conds) == 0 {
 		return &a
 	}
@@ -357,22 +357,22 @@ func (a elementHasManyOrganization) Where(conds ...field.Expr) *elementHasManyOr
 	return &a
 }
 
-func (a elementHasManyOrganization) WithContext(ctx context.Context) *elementHasManyOrganization {
+func (a elementManyToManyOrganization) WithContext(ctx context.Context) *elementManyToManyOrganization {
 	a.db = a.db.WithContext(ctx)
 	return &a
 }
 
-func (a elementHasManyOrganization) Model(m *dao.Element) *elementHasManyOrganizationTx {
-	return &elementHasManyOrganizationTx{a.db.Model(m).Association(a.Name())}
+func (a elementManyToManyOrganization) Model(m *dao.Element) *elementManyToManyOrganizationTx {
+	return &elementManyToManyOrganizationTx{a.db.Model(m).Association(a.Name())}
 }
 
-type elementHasManyOrganizationTx struct{ tx *gorm.Association }
+type elementManyToManyOrganizationTx struct{ tx *gorm.Association }
 
-func (a elementHasManyOrganizationTx) Find() (result []*dao.Organization, err error) {
+func (a elementManyToManyOrganizationTx) Find() (result []*dao.Organization, err error) {
 	return result, a.tx.Find(&result)
 }
 
-func (a elementHasManyOrganizationTx) Append(values ...*dao.Organization) (err error) {
+func (a elementManyToManyOrganizationTx) Append(values ...*dao.Organization) (err error) {
 	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
@@ -380,7 +380,7 @@ func (a elementHasManyOrganizationTx) Append(values ...*dao.Organization) (err e
 	return a.tx.Append(targetValues...)
 }
 
-func (a elementHasManyOrganizationTx) Replace(values ...*dao.Organization) (err error) {
+func (a elementManyToManyOrganizationTx) Replace(values ...*dao.Organization) (err error) {
 	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
@@ -388,7 +388,7 @@ func (a elementHasManyOrganizationTx) Replace(values ...*dao.Organization) (err 
 	return a.tx.Replace(targetValues...)
 }
 
-func (a elementHasManyOrganizationTx) Delete(values ...*dao.Organization) (err error) {
+func (a elementManyToManyOrganizationTx) Delete(values ...*dao.Organization) (err error) {
 	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
@@ -396,21 +396,21 @@ func (a elementHasManyOrganizationTx) Delete(values ...*dao.Organization) (err e
 	return a.tx.Delete(targetValues...)
 }
 
-func (a elementHasManyOrganizationTx) Clear() error {
+func (a elementManyToManyOrganizationTx) Clear() error {
 	return a.tx.Clear()
 }
 
-func (a elementHasManyOrganizationTx) Count() int64 {
+func (a elementManyToManyOrganizationTx) Count() int64 {
 	return a.tx.Count()
 }
 
-type elementHasManyTagInfo struct {
+type elementManyToManyTagInfo struct {
 	db *gorm.DB
 
 	field.RelationField
 }
 
-func (a elementHasManyTagInfo) Where(conds ...field.Expr) *elementHasManyTagInfo {
+func (a elementManyToManyTagInfo) Where(conds ...field.Expr) *elementManyToManyTagInfo {
 	if len(conds) == 0 {
 		return &a
 	}
@@ -423,22 +423,22 @@ func (a elementHasManyTagInfo) Where(conds ...field.Expr) *elementHasManyTagInfo
 	return &a
 }
 
-func (a elementHasManyTagInfo) WithContext(ctx context.Context) *elementHasManyTagInfo {
+func (a elementManyToManyTagInfo) WithContext(ctx context.Context) *elementManyToManyTagInfo {
 	a.db = a.db.WithContext(ctx)
 	return &a
 }
 
-func (a elementHasManyTagInfo) Model(m *dao.Element) *elementHasManyTagInfoTx {
-	return &elementHasManyTagInfoTx{a.db.Model(m).Association(a.Name())}
+func (a elementManyToManyTagInfo) Model(m *dao.Element) *elementManyToManyTagInfoTx {
+	return &elementManyToManyTagInfoTx{a.db.Model(m).Association(a.Name())}
 }
 
-type elementHasManyTagInfoTx struct{ tx *gorm.Association }
+type elementManyToManyTagInfoTx struct{ tx *gorm.Association }
 
-func (a elementHasManyTagInfoTx) Find() (result []*dao.TagInfo, err error) {
+func (a elementManyToManyTagInfoTx) Find() (result []*dao.TagInfo, err error) {
 	return result, a.tx.Find(&result)
 }
 
-func (a elementHasManyTagInfoTx) Append(values ...*dao.TagInfo) (err error) {
+func (a elementManyToManyTagInfoTx) Append(values ...*dao.TagInfo) (err error) {
 	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
@@ -446,7 +446,7 @@ func (a elementHasManyTagInfoTx) Append(values ...*dao.TagInfo) (err error) {
 	return a.tx.Append(targetValues...)
 }
 
-func (a elementHasManyTagInfoTx) Replace(values ...*dao.TagInfo) (err error) {
+func (a elementManyToManyTagInfoTx) Replace(values ...*dao.TagInfo) (err error) {
 	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
@@ -454,7 +454,7 @@ func (a elementHasManyTagInfoTx) Replace(values ...*dao.TagInfo) (err error) {
 	return a.tx.Replace(targetValues...)
 }
 
-func (a elementHasManyTagInfoTx) Delete(values ...*dao.TagInfo) (err error) {
+func (a elementManyToManyTagInfoTx) Delete(values ...*dao.TagInfo) (err error) {
 	targetValues := make([]interface{}, len(values))
 	for i, v := range values {
 		targetValues[i] = v
@@ -462,11 +462,11 @@ func (a elementHasManyTagInfoTx) Delete(values ...*dao.TagInfo) (err error) {
 	return a.tx.Delete(targetValues...)
 }
 
-func (a elementHasManyTagInfoTx) Clear() error {
+func (a elementManyToManyTagInfoTx) Clear() error {
 	return a.tx.Clear()
 }
 
-func (a elementHasManyTagInfoTx) Count() int64 {
+func (a elementManyToManyTagInfoTx) Count() int64 {
 	return a.tx.Count()
 }
 

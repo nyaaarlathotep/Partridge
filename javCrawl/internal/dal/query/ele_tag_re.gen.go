@@ -30,6 +30,8 @@ func newEleTagRe(db *gorm.DB) eleTagRe {
 	_eleTagRe.ID = field.NewInt32(tableName, "ID")
 	_eleTagRe.ELEID = field.NewInt64(tableName, "ELE_ID")
 	_eleTagRe.TAGID = field.NewInt32(tableName, "TAG_ID")
+	_eleTagRe.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
+	_eleTagRe.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
 
 	_eleTagRe.fillFieldMap()
 
@@ -39,10 +41,12 @@ func newEleTagRe(db *gorm.DB) eleTagRe {
 type eleTagRe struct {
 	eleTagReDo
 
-	ALL   field.Asterisk
-	ID    field.Int32
-	ELEID field.Int64
-	TAGID field.Int32
+	ALL       field.Asterisk
+	ID        field.Int32
+	ELEID     field.Int64
+	TAGID     field.Int32
+	CreatedAt field.Time
+	UpdatedAt field.Time
 
 	fieldMap map[string]field.Expr
 }
@@ -62,6 +66,8 @@ func (e *eleTagRe) updateTableName(table string) *eleTagRe {
 	e.ID = field.NewInt32(table, "ID")
 	e.ELEID = field.NewInt64(table, "ELE_ID")
 	e.TAGID = field.NewInt32(table, "TAG_ID")
+	e.CreatedAt = field.NewTime(table, "CREATED_TIME")
+	e.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
 	e.fillFieldMap()
 
@@ -78,10 +84,12 @@ func (e *eleTagRe) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (e *eleTagRe) fillFieldMap() {
-	e.fieldMap = make(map[string]field.Expr, 3)
+	e.fieldMap = make(map[string]field.Expr, 5)
 	e.fieldMap["ID"] = e.ID
 	e.fieldMap["ELE_ID"] = e.ELEID
 	e.fieldMap["TAG_ID"] = e.TAGID
+	e.fieldMap["CREATED_TIME"] = e.CreatedAt
+	e.fieldMap["UPDATED_TIME"] = e.UpdatedAt
 }
 
 func (e eleTagRe) clone(db *gorm.DB) eleTagRe {

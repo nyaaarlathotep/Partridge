@@ -4,13 +4,19 @@
 
 package dao
 
+import (
+	"time"
+)
+
 const TableNameEleAuthorRe = "ele_author_re"
 
 // EleAuthorRe mapped from table <ele_author_re>
 type EleAuthorRe struct {
-	ID       int32 `gorm:"column:ID;type:int;primaryKey;autoIncrement:true" json:"ID"`
-	ELEID    int64 `gorm:"column:ELE_ID;type:bigint;not null" json:"ELE_ID"`
-	AUTHORID int32 `gorm:"column:AUTHOR_ID;type:int;not null" json:"AUTHOR_ID"`
+	ID        int32     `gorm:"column:ID;type:int;primaryKey;autoIncrement:true" json:"ID"`
+	ELEID     int64     `gorm:"column:ELE_ID;type:bigint;not null" json:"ELE_ID"`
+	AUTHORID  int32     `gorm:"column:AUTHOR_ID;type:int;not null" json:"AUTHOR_ID"`
+	CreatedAt time.Time `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`
+	UpdatedAt time.Time `gorm:"column:UPDATED_TIME;type:datetime" json:"UPDATED_TIME"`
 }
 
 // TableName EleAuthorRe's table name

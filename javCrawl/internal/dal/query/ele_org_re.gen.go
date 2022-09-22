@@ -30,7 +30,8 @@ func newEleOrgRe(db *gorm.DB) eleOrgRe {
 	_eleOrgRe.ID = field.NewInt32(tableName, "ID")
 	_eleOrgRe.ELEID = field.NewInt64(tableName, "ELE_ID")
 	_eleOrgRe.ORGID = field.NewInt32(tableName, "ORG_ID")
-	_eleOrgRe.RETYPE = field.NewString(tableName, "RE_TYPE")
+	_eleOrgRe.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
+	_eleOrgRe.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
 
 	_eleOrgRe.fillFieldMap()
 
@@ -40,11 +41,12 @@ func newEleOrgRe(db *gorm.DB) eleOrgRe {
 type eleOrgRe struct {
 	eleOrgReDo
 
-	ALL    field.Asterisk
-	ID     field.Int32
-	ELEID  field.Int64
-	ORGID  field.Int32
-	RETYPE field.String
+	ALL       field.Asterisk
+	ID        field.Int32
+	ELEID     field.Int64
+	ORGID     field.Int32
+	CreatedAt field.Time
+	UpdatedAt field.Time
 
 	fieldMap map[string]field.Expr
 }
@@ -64,7 +66,8 @@ func (e *eleOrgRe) updateTableName(table string) *eleOrgRe {
 	e.ID = field.NewInt32(table, "ID")
 	e.ELEID = field.NewInt64(table, "ELE_ID")
 	e.ORGID = field.NewInt32(table, "ORG_ID")
-	e.RETYPE = field.NewString(table, "RE_TYPE")
+	e.CreatedAt = field.NewTime(table, "CREATED_TIME")
+	e.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
 	e.fillFieldMap()
 
@@ -81,11 +84,12 @@ func (e *eleOrgRe) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (e *eleOrgRe) fillFieldMap() {
-	e.fieldMap = make(map[string]field.Expr, 4)
+	e.fieldMap = make(map[string]field.Expr, 5)
 	e.fieldMap["ID"] = e.ID
 	e.fieldMap["ELE_ID"] = e.ELEID
 	e.fieldMap["ORG_ID"] = e.ORGID
-	e.fieldMap["RE_TYPE"] = e.RETYPE
+	e.fieldMap["CREATED_TIME"] = e.CreatedAt
+	e.fieldMap["UPDATED_TIME"] = e.UpdatedAt
 }
 
 func (e eleOrgRe) clone(db *gorm.DB) eleOrgRe {

@@ -21,9 +21,13 @@ func JavDic(dir string, codeFPathMap *map[string]string) {
 	}
 	smallCodeFPathMap := make(map[string]string)
 	for _, file := range files {
+		var builder strings.Builder
+		builder.WriteString(dir)
+		builder.WriteRune(os.PathSeparator)
+		builder.WriteString(file.Name())
+		completePath := builder.String()
 		if file.IsDir() {
-			fileDir := dir + string(os.PathSeparator) + file.Name()
-			JavDic(fileDir, codeFPathMap)
+			JavDic(completePath, codeFPathMap)
 		}
 		matches := movieReg.FindAllString(file.Name(), -1)
 		if len(matches) == 0 {
@@ -31,7 +35,7 @@ func JavDic(dir string, codeFPathMap *map[string]string) {
 			continue
 		}
 		code := getAndFormatCode(matches, file.Name())
-		smallCodeFPathMap[code] = dir + string(os.PathSeparator) + file.Name()
+		smallCodeFPathMap[code] = completePath
 	}
 	if len(smallCodeFPathMap) < 1 {
 		log.Printf("match error! file path:%s", dir)
