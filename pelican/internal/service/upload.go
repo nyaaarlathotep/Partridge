@@ -13,45 +13,45 @@ import (
 
 const BOUNDARY string = "; boundary="
 
-func UploadFile(c *gin.Context) {
+func UploadFile(c *gin.Context) error {
 	var contentLength int64
 	contentLength = c.Request.ContentLength
 	if contentLength <= 0 || contentLength > 1024*1024*1024*2 {
 		log.Printf("content_length error\n")
-		return
+		return fmt.Errorf("content_length error")
 	}
 	contentType_, hasKey := c.Request.Header["Content-Type"]
 	if !hasKey {
 		log.Printf("Content-Type error\n")
-		return
+		return fmt.Errorf("Content-Type error")
 	}
 	if len(contentType_) != 1 {
 		log.Printf("Content-Type count error\n")
-		return
+		return fmt.Errorf("Content-Type count error")
 	}
 	contentType := contentType_[0]
 	loc := strings.Index(contentType, BOUNDARY)
 	if -1 == loc {
 		log.Printf("Content-Type error, no boundary\n")
-		return
+		return fmt.Errorf("Content-Type error, no boundary")
 	}
 	boundary := []byte(contentType[(loc + len(BOUNDARY)):])
 	log.Printf("[%s]\n\n", boundary)
-	//
 	readData := make([]byte, 1024*12)
 	var readTotal = 0
 	for {
 		fileHeader, fileData, err := ParseFromHead(readData, readTotal, append(boundary, []byte("\r\n")...), c.Request.Body)
 		if err != nil {
 			log.Printf("%v", err)
-			return
+			return fmt.Errorf("%v", err)
+
 		}
 		log.Printf("file :%s\n", fileHeader.FileName)
 		//
 		f, err := os.Create(fileHeader.FileName)
 		if err != nil {
 			log.Printf("create file fail:%v\n", err)
-			return
+			return fmt.Errorf("create file fail: %v", err)
 		}
 		f.Write(fileData)
 		fileData = nil
@@ -61,7 +61,7 @@ func UploadFile(c *gin.Context) {
 		f.Close()
 		if err != nil {
 			log.Printf("%v\n", err)
-			return
+			return fmt.Errorf("%v", err)
 		}
 		if reachEnd {
 			break
@@ -71,10 +71,7 @@ func UploadFile(c *gin.Context) {
 			continue
 		}
 	}
-	//
-	c.JSON(200, gin.H{
-		"message": "SUCCESS",
-	})
+	return nil
 }
 
 // ParseFileHeader / Analyze the header of the descriptor file information
@@ -86,8 +83,8 @@ func ParseFileHeader(h []byte) (FileHeader, bool) {
 	outHeader.ContentLength = -1
 	const (
 		ContentDisposition = "Content-Disposition: "
-		NAME               = "name=\""
-		FILENAME           = "filename=\""
+		Name               = "name=\""
+		FileName           = "filename=\""
 		ContentType        = "Content-Type: "
 		ContentLength      = "Content-Length: "
 	)
@@ -96,12 +93,12 @@ func ParseFileHeader(h []byte) (FileHeader, bool) {
 			l := len(ContentDisposition)
 			arr1 := bytes.Split(item[l:], []byte("; "))
 			outHeader.ContentDisposition = string(arr1[0])
-			if bytes.HasPrefix(arr1[1], []byte(NAME)) {
-				outHeader.Name = string(arr1[1][len(NAME) : len(arr1[1])-1])
+			if bytes.HasPrefix(arr1[1], []byte(Name)) {
+				outHeader.Name = string(arr1[1][len(Name) : len(arr1[1])-1])
 			}
 			l = len(arr1[2])
-			if bytes.HasPrefix(arr1[2], []byte(FILENAME)) && arr1[2][l-1] == 0x22 {
-				outHeader.FileName = string(arr1[2][len(FILENAME) : l-1])
+			if bytes.HasPrefix(arr1[2], []byte(FileName)) && arr1[2][l-1] == 0x22 {
+				outHeader.FileName = string(arr1[2][len(FileName) : l-1])
 			}
 		} else if bytes.HasPrefix(item, []byte(ContentType)) {
 			l := len(ContentType)

@@ -70,7 +70,16 @@ func startServer() {
 		}
 	})
 	r.POST("/upload", func(c *gin.Context) {
-		service.UploadFile(c)
+		err = service.UploadFile(c)
+		if err != nil {
+			c.JSON(400, gin.H{
+				"message": fmt.Errorf(err.Error()),
+			})
+		} else {
+			c.JSON(200, gin.H{
+				"message": "SUCCESS",
+			})
+		}
 	})
 
 	err = r.Run(":8090")
