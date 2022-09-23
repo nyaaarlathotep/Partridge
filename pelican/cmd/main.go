@@ -10,6 +10,7 @@ import (
 	"javCrawl/internal/dal/query"
 	"javCrawl/internal/request"
 	"javCrawl/internal/scan"
+	"javCrawl/internal/service"
 	"javCrawl/internal/util"
 	"log"
 	"os"
@@ -21,26 +22,13 @@ import (
 // TODO or maybe multi thread
 var queries *query.Query
 
-const javDir = "/mnt/d/temp"
 const (
 	Jav     string = "1"
 	eHentai string = "2"
 )
 
 func main() {
-	updateOrInsertEle(&request.JavInfo{
-		Title:       "ttwer",
-		Code:        "llsl-2324",
-		PublishDate: time.Now(),
-		Length:      "163分钟",
-		Director:    "dir2",
-		Producer:    "prod1",
-		Publisher:   "pub1",
-		Series:      "series3",
-		Tags:        []string{"t3g1", "taq3"},
-		Actors:      []string{"acfor1", "actor3"},
-	}, "test/tellsl_2324.mp4", true)
-	//startServer()
+	startServer()
 }
 
 func startServer() {
@@ -64,7 +52,7 @@ func startServer() {
 			var count int
 			if len(form.Dir) != 0 {
 				bT := time.Now()
-				count = scanJavDir(javDir)
+				count = scanJavDir(form.Dir)
 				log.Printf("update or insert jav num: %v", count)
 				eT := time.Since(bT)
 				log.Printf("run time: %v", eT)
@@ -81,6 +69,10 @@ func startServer() {
 			})
 		}
 	})
+	r.POST("/upload", func(c *gin.Context) {
+		service.UploadFile(c)
+	})
+
 	err = r.Run(":8090")
 }
 
