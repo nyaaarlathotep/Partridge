@@ -2,15 +2,11 @@ package scan
 
 import (
 	"io/ioutil"
+	"javCrawl/internal/util"
 	"log"
 	"os"
-	"regexp"
 	"strings"
 )
-
-var movieReg = regexp.MustCompile(".*[a-zA-Z]{3,5}[-_]?[0-9]{3}.*(avi|mp4)$")
-var codeReg = regexp.MustCompile("[a-zA-Z]{3,5}[-_]?[0-9]{3}")
-var bigLetter = regexp.MustCompile("[A-Z]+")
 
 func JavDic(dir string, codeFPathMap *map[string]string) {
 	log.Printf("start to scan %v...", dir)
@@ -29,12 +25,11 @@ func JavDic(dir string, codeFPathMap *map[string]string) {
 		if file.IsDir() {
 			JavDic(completePath, codeFPathMap)
 		}
-		matches := movieReg.FindAllString(file.Name(), -1)
-		if len(matches) == 0 {
+		if !util.HasJavRegex(file.Name()) {
 			log.Printf("no match for name: %v", file.Name())
 			continue
 		}
-		code := getAndFormatCode(matches, file.Name())
+		code := util.FormatJavCode(file.Name())
 		smallCodeFPathMap[code] = completePath
 	}
 	if len(smallCodeFPathMap) < 1 {
@@ -43,15 +38,4 @@ func JavDic(dir string, codeFPathMap *map[string]string) {
 	for code := range smallCodeFPathMap {
 		(*codeFPathMap)[code] = smallCodeFPathMap[code]
 	}
-}
-
-func getAndFormatCode(matches []string, fileName string) string {
-	matches = codeReg.FindAllString(fileName, -1)
-	code := matches[len(matches)-1]
-	code = strings.ToUpper(code)
-	if !strings.ContainsRune(code, '-') {
-		index := bigLetter.FindAllStringIndex(code, 1)
-		code = code[0:index[0][1]] + "-" + code[index[0][1]:]
-	}
-	return code
 }

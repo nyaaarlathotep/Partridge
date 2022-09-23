@@ -10,10 +10,9 @@ import (
 	"javCrawl/internal/dal/query"
 	"javCrawl/internal/request"
 	"javCrawl/internal/scan"
+	"javCrawl/internal/util"
 	"log"
 	"os"
-	"regexp"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -28,21 +27,19 @@ const (
 	eHentai string = "2"
 )
 
-var number = regexp.MustCompile(`\d+`)
-
 func main() {
 	updateOrInsertEle(&request.JavInfo{
-		Title:       "tt",
-		Code:        "llll-2324",
+		Title:       "ttwer",
+		Code:        "llsl-2324",
 		PublishDate: time.Now(),
-		Length:      "123分钟",
-		Director:    "dir",
-		Producer:    "prod",
-		Publisher:   "pub",
-		Series:      "serise",
-		Tags:        []string{"tag1", "tag3"},
-		Actors:      []string{"actor1", "actor3"},
-	}, "test/te234.mp4", true)
+		Length:      "163分钟",
+		Director:    "dir2",
+		Producer:    "prod1",
+		Publisher:   "pub1",
+		Series:      "series3",
+		Tags:        []string{"t3g1", "taq3"},
+		Actors:      []string{"acfor1", "actor3"},
+	}, "test/tellsl_2324.mp4", true)
 	//startServer()
 }
 
@@ -134,7 +131,7 @@ func updateOrInsertEle(jav *request.JavInfo, path string, update bool) int64 {
 		Organization: organs,
 		TagInfo:      tags,
 	}
-	err, length := getJavLength(jav.Length)
+	err, length := util.GetNumFromString(jav.Length)
 	if err != nil {
 		log.Printf("parse jav length error: %v", err)
 		length = 0
@@ -143,11 +140,11 @@ func updateOrInsertEle(jav *request.JavInfo, path string, update bool) int64 {
 		CODE:        jav.Code,
 		TITLE:       jav.Title,
 		PUBLISHDATE: jav.PublishDate,
-		LENGTH:      length,
+		LENGTH:      int32(length),
 		DIRECTOR:    jav.Director,
 		SERIES:      jav.Series,
 	}
-	oldJavs, err := javQ.Where(javQ.TITLE.Eq(jav.Title)).Find()
+	oldJavs, err := javQ.Where(javQ.CODE.Eq(jav.Code)).Find()
 	if err != nil {
 		log.Printf("db exec failed, %v", err)
 	}
@@ -177,18 +174,6 @@ func updateOrInsertEle(jav *request.JavInfo, path string, update bool) int64 {
 	}
 
 	return newEle.ID
-}
-
-func getJavLength(stringLength string) (error, int32) {
-	lengths := number.FindAllString(stringLength, -1)
-	if len(lengths) != 1 {
-		return fmt.Errorf("find multi number"), 0
-	}
-	length, err := strconv.ParseInt(lengths[0], 10, 32)
-	if err != nil {
-		return err, 0
-	}
-	return nil, int32(length)
 }
 
 func getEleFile(path string) *dao.EleFile {
