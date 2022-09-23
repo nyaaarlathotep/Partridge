@@ -31,6 +31,22 @@ const (
 var number = regexp.MustCompile(`\d+`)
 
 func main() {
+	updateOrInsertEle(&request.JavInfo{
+		Title:       "tt",
+		Code:        "llll-2324",
+		PublishDate: time.Now(),
+		Length:      "123分钟",
+		Director:    "dir",
+		Producer:    "prod",
+		Publisher:   "pub",
+		Series:      "serise",
+		Tags:        []string{"tag1", "tag3"},
+		Actors:      []string{"actor1", "actor3"},
+	}, "test/te234.mp4", true)
+	//startServer()
+}
+
+func startServer() {
 	r := gin.Default()
 	err := r.SetTrustedProxies([]string{"127.0.0.1"})
 	if err != nil {
@@ -69,9 +85,6 @@ func main() {
 		}
 	})
 	err = r.Run(":8090")
-	if err != nil {
-		return
-	}
 }
 
 func scanJavDir(scanDir string) int {
@@ -83,7 +96,7 @@ func scanJavDir(scanDir string) int {
 		jav := request.GetJavInfo(code)
 		log.Printf("%+v", *jav)
 		count++
-		updateOrInsertEle(jav, codeFPathMap[code])
+		updateOrInsertEle(jav, codeFPathMap[code], false)
 	}
 	return count
 }
@@ -100,20 +113,16 @@ func getEleFileType(name string) string {
 	return eleFileType
 }
 
-func updateOrInsertEle(jav *request.JavInfo, path string) int64 {
+func updateOrInsertEle(jav *request.JavInfo, path string, update bool) int64 {
 	javQ := queries.Jav
-	oldJavs, err := javQ.Where(javQ.TITLE.Eq(jav.Title)).Find()
-	if err != nil {
-		log.Fatalf("db exec failed, %v", err)
-	}
-	if len(oldJavs) != 0 {
-		return oldJavs[0].ELEID
-	}
+	eleQ := queries.Element
+
+	var newJav *dao.Jav
 
 	tags := getTags(jav)
 	actors := getActors(jav)
 	organs := getOrgans(jav)
-	eleFile := getEleFile(path, err)
+	eleFile := getEleFile(path)
 
 	newEle := &dao.Element{
 		TYPE:         Jav,
@@ -125,33 +134,52 @@ func updateOrInsertEle(jav *request.JavInfo, path string) int64 {
 		Organization: organs,
 		TagInfo:      tags,
 	}
-	err, length := getJavLength(jav.Length, err, newEle)
+	err, length := getJavLength(jav.Length)
 	if err != nil {
 		log.Printf("parse jav length error: %v", err)
 		length = 0
 	}
-
-	err = javQ.Create(&dao.Jav{
-		ELEID:       newEle.ID,
+	newJav = &dao.Jav{
 		CODE:        jav.Code,
 		TITLE:       jav.Title,
 		PUBLISHDATE: jav.PublishDate,
 		LENGTH:      length,
 		DIRECTOR:    jav.Director,
 		SERIES:      jav.Series,
-	})
+	}
+	oldJavs, err := javQ.Where(javQ.TITLE.Eq(jav.Title)).Find()
 	if err != nil {
-		log.Fatalf("create jav error: %v", err)
+		log.Printf("db exec failed, %v", err)
+	}
+	if len(oldJavs) == 0 {
+		log.Printf("create: [%v]", jav.Code)
+		err = eleQ.Create(newEle)
+		if err != nil {
+			log.Fatalf("create ele error: %v", err)
+		}
+		newJav.ELEID = newEle.ID
+		err = javQ.Create(newJav)
+		if err != nil {
+			log.Fatalf("create jav error: %v", err)
+		}
+	} else if update {
+		log.Printf("update: [%v]", jav.Code)
+		newJav.ELEID = oldJavs[0].ELEID
+		newEle.ID = oldJavs[0].ELEID
+		err = eleQ.Save(newEle)
+		if err != nil {
+			log.Fatalf("save ele error: %v", err)
+		}
+		err = javQ.Save(newJav)
+		if err != nil {
+			log.Fatalf("save jav error: %v", err)
+		}
 	}
 
 	return newEle.ID
 }
 
-func getJavLength(stringLength string, err error, newEle *dao.Element) (error, int32) {
-	err = queries.Element.Create(newEle)
-	if err != nil {
-		return err, 0
-	}
+func getJavLength(stringLength string) (error, int32) {
 	lengths := number.FindAllString(stringLength, -1)
 	if len(lengths) != 1 {
 		return fmt.Errorf("find multi number"), 0
@@ -163,27 +191,16 @@ func getJavLength(stringLength string, err error, newEle *dao.Element) (error, i
 	return nil, int32(length)
 }
 
-func getEleFile(path string, err error) *dao.EleFile {
-	eleFileQ := queries.EleFile
+func getEleFile(path string) *dao.EleFile {
 	name := path[strings.LastIndex(path, string(os.PathSeparator))+1:]
 	eleFileType := getEleFileType(name)
-	log.Printf("file name: %v", name)
-	oldEleFiles, err := eleFileQ.Where(eleFileQ.PATH.Eq(path)).Find()
-	if err != nil {
-		log.Printf("eleFile search db error:%v", err)
+	log.Printf("file name: [%v]", name)
+	return &dao.EleFile{
+		NAME:            name,
+		TYPE:            eleFileType,
+		PATH:            path,
+		ISAVAILABLEFLAG: 1,
 	}
-	var eleFile *dao.EleFile
-	if len(oldEleFiles) == 0 {
-		eleFile = &dao.EleFile{
-			NAME:            name,
-			TYPE:            eleFileType,
-			PATH:            path,
-			ISAVAILABLEFLAG: 1,
-		}
-	} else {
-		eleFile = oldEleFiles[0]
-	}
-	return eleFile
 }
 
 func getOrgans(jav *request.JavInfo) []dao.Organization {
