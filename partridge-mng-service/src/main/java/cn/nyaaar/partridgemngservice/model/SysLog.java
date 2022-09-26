@@ -11,22 +11,22 @@ public class SysLog implements Serializable {
 
     private String id;
 
-    @Schema(name = "操作")
+    @Schema(title = "操作")
     private String operation;
 
-    @Schema(name = "调用方法")
+    @Schema(title = "调用方法")
     private String method;
 
-    @Schema(name = "参数")
+    @Schema(title = "参数")
     private String params;
 
-    @Schema(name = "调用时长")
+    @Schema(title = "调用时长")
     private Long during;
 
-    @Schema(name = "IP")
+    @Schema(title = "IP")
     private String ip;
 
-    @Schema(name = "返回结果")
+    @Schema(title = "返回结果")
     private String result;
 
 }

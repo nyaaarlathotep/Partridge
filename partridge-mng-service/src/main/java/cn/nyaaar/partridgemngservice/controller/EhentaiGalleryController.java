@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Collection;
 
 /**
@@ -66,10 +67,12 @@ public class EhentaiGalleryController {
 
         return new R<>(ehService.getGalleryList(pageIndex));
     }
-    @Operation(summary = "gallery 基本信息列表", description = "获取保存在数据库的 gallery 基本信息列表")
+
+    @Operation(summary = "gallery 下载队列", description = "获取保存在数据库的 gallery 基本信息列表")
     @GetMapping(value = "/download/queue")
     @LogAnnotation
     public R<Collection<DownloadingGallery>> getDownloadQueue() {
+        // TODO user, dto
 
         return new R<>(ehService.getDownloadingQueue().values());
     }
@@ -85,8 +88,8 @@ public class EhentaiGalleryController {
     @Operation(summary = "下载 gallery", description = "通过 gid 与 gtoken 异步下载对应 gallery")
     @PostMapping(value = "/download")
     @LogAnnotation
-    public R<String> downloadGallery(@RequestBody @Validated(EhDownload.class) EhCommonReq ehCommonReq) {
-        ehService.downloadGallery(ehCommonReq.getGid(), ehCommonReq.getGtoken());
+    public R<String> downloadGallery(@RequestBody @Validated(EhDownload.class) EhCommonReq ehCommonReq, Principal principal) {
+        ehService.downloadGallery(ehCommonReq.getGid(), ehCommonReq.getGtoken(), principal.getName());
         return new R<>();
     }
 

@@ -11,14 +11,13 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
-
 /**
  * <p>
- * Mapper 接口
+ * ehentai 画廊 Mapper 接口
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-02
+ * @since 2022-09-26
  */
 public interface EhentaiGalleryMapper extends BaseMapper<EhentaiGallery> {
 

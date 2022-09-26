@@ -5,18 +5,23 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @Schema(name = "RegisterDto")
-public class RegistrationRequest {
+public class RegistrationReq {
 
-    @Schema(name = "邮箱")
+    @Schema(title = "邮箱")
+    @NotNull(message = "请指定邮箱")
     private String email;
 
-    @Schema(name = "用户名")
+    @Schema(title = "用户名")
+    @NotNull(message = "请指定用户名")
     private String userName;
 
-    @Schema(name = "密码")
+    @Schema(title = "密码")
+    @NotNull(message = "请指定密码")
     private String password;
 }

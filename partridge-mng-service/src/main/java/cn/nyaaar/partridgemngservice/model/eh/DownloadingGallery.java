@@ -38,6 +38,8 @@ public class DownloadingGallery {
     @Schema(title = "画廊页数")
     private int pages;
 
+    private String folderPath;
+
     @Schema(title = "画廊下载最后期限")
     private Date deadline = DateUtil.date().offset(DateField.MINUTE, Settings.getDownloadQueueExpireTime());
 

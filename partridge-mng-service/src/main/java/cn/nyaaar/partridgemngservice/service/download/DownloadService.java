@@ -7,7 +7,7 @@ package cn.nyaaar.partridgemngservice.service.download;
  */
 public interface DownloadService {
 
-    void downloadUrlToDest(String url, String dest, String fileName, Runnable successHandle, Runnable failHandle);
+    void downloadUrlToDest(String url, String dest, String fileName, Runnable successHandle, Runnable failHandle, boolean reDownload);
 
     String downloadUrlToBase64(String url);
 }

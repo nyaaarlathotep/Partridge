@@ -24,17 +24,17 @@ import java.util.Objects;
 
 /**
  * <p>
- * 服务实现类
+ *  服务实现类
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-02
+ * @since 2022-09-26
  */
 @Service
 public class EleFileServiceImpl extends ServiceImpl<EleFileMapper, EleFile> implements EleFileService {
 
     @Override
-    public QueryData<EleFile> findListByPage(EleFile where, Integer page, Integer pageCount) {
+    public QueryData<EleFile> findListByPage(EleFile where, Integer page, Integer pageCount){
         IPage<EleFile> wherePage = new Page<>(page, pageCount);
 
         IPage<EleFile> iPage = baseMapper.selectPage(wherePage, Wrappers.query(where));
@@ -43,33 +43,34 @@ public class EleFileServiceImpl extends ServiceImpl<EleFileMapper, EleFile> impl
     }
 
     @Override
-    public List<EleFile> findList(EleFile where) {
+    public List<EleFile> findList(EleFile where){
 
-        return baseMapper.selectList(Wrappers.query(where));
+        return baseMapper.selectList( Wrappers.query(where));
     }
 
 
-    @Override
-    public Integer add(EleFile eleFile) {
 
+    @Override
+    public Integer add(EleFile eleFile){
+ 
         return baseMapper.insert(eleFile);
     }
 
     @Override
-    public Integer delete(Integer id) {
-
+    public Integer delete(Integer id){
+    
         return baseMapper.deleteById(id);
     }
 
     @Override
-    public Integer updateData(EleFile eleFile) {
-
+    public Integer updateData(EleFile eleFile){
+    
         return baseMapper.updateById(eleFile);
     }
 
     @Override
-    public EleFile findById(Integer id) {
-
+    public EleFile findById(Integer id){
+    
         return baseMapper.selectById(id);
     }
 

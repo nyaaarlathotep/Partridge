@@ -3,18 +3,22 @@ package cn.nyaaar.partridgemngservice.service.ehService.ehBasic;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.nyaaar.partridgemngservice.common.constants.EhUrl;
-import cn.nyaaar.partridgemngservice.common.constants.Settings;
+import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
 import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
 import cn.nyaaar.partridgemngservice.entity.EleFile;
+import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.eh.DownloadingGallery;
 import cn.nyaaar.partridgemngservice.model.eh.GalleryPage;
 import cn.nyaaar.partridgemngservice.service.EhentaiGalleryService;
 import cn.nyaaar.partridgemngservice.service.EleFileService;
+import cn.nyaaar.partridgemngservice.service.ElementService;
 import cn.nyaaar.partridgemngservice.service.download.DownloadService;
+import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.PathUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.NonNull;
@@ -35,6 +39,7 @@ public class EhDownload {
     private final DownloadService downloadService;
     private final EleFileService eleFileService;
     private final EhentaiGalleryService ehentaiGalleryService;
+    private final ElementService elementService;
     private final ThreadPoolTaskExecutor downloadQueueExecutor;
 
     private static final int ehentaiPreviewSize = 40;
@@ -44,11 +49,13 @@ public class EhDownload {
                       DownloadService downloadService,
                       EleFileService eleFileService,
                       EhentaiGalleryService ehentaiGalleryService,
+                      ElementService elementService, 
                       ThreadPoolTaskExecutor downloadQueueExecutor) {
         this.ehEngine = ehEngine;
         this.downloadService = downloadService;
         this.eleFileService = eleFileService;
         this.ehentaiGalleryService = ehentaiGalleryService;
+        this.elementService = elementService;
         this.downloadQueueExecutor = downloadQueueExecutor;
     }
 
@@ -63,14 +70,28 @@ public class EhDownload {
                 .setGtoken(ehentaiGallery.getToken())
                 .setPages(ehentaiGallery.getPages())
                 .setEleId(ehentaiGallery.getEleId())
-                .setTitle(ehentaiGallery.getTitle());
+                .setTitle(ehentaiGallery.getTitle())
+                .setFolderPath(PathUtil.getEhFolderPath(String.valueOf(ehentaiGallery.getGid()), ehentaiGallery.getTitle()));
         downloadingGalleryQueue.put(ehentaiGallery.getGid(), downloadingGallery);
         downloadQueueExecutor.submit(() -> {
+            log.info("[{}]gallery download complete!", ehentaiGallery.getGid());
             List<String> galleryTokens = ehEngine.getPTokens(ehentaiGallery.getGid(), ehentaiGallery.getToken());
             for (int i = 0; i < galleryTokens.size(); i++) {
-                downloadGalleryPageAsync(galleryTokens.get(i), i, downloadingGallery);
+                if (!getPageDownloaded(ehentaiGallery.getEleId(), i + 1)) {
+                    downloadGalleryPageAsync(galleryTokens.get(i), i, downloadingGallery, false);
+                }
             }
         });
+    }
+
+    private boolean getPageDownloaded(Long eleId, int pageIndex) {
+        EleFile eleFile = eleFileService.getOne(
+                Wrappers.lambdaQuery(EleFile.class)
+                        .eq(EleFile::getEleId, eleId)
+                        .eq(EleFile::getPageNum, pageIndex)
+                        .eq(EleFile::getAvailableFlag, PrConstant.VALIDATED)
+        );
+        return eleFile != null;
     }
 
     private GalleryPage downloadGalleryPageSync(String pToken, int index, long gid, String gtoken) {
@@ -93,17 +114,17 @@ public class EhDownload {
         } else {
             log.warn("[{}]gallery page download failed...index:{}, fail count:{}, try again...", gid, index, failCount + 1);
             downloadingGallery.getDownloadFailPageIndex().put(index, failCount + 1);
-            downloadGalleryPageAsync(pToken, index, downloadingGallery);
+            downloadGalleryPageAsync(pToken, index, downloadingGallery, true);
         }
     }
 
     private void downloadGalleryPageAsync(String pToken, int index,
-                                          DownloadingGallery downloadingGallery) {
+                                          DownloadingGallery downloadingGallery, boolean reDownload) {
         long gid = downloadingGallery.getGid();
         long eleId = downloadingGallery.getEleId();
         String gtoken = downloadingGallery.getGtoken();
         int pageIndex = index + 1;
-        String folder = getFolderPath(Settings.getDownloadRootPath(), String.valueOf(gid), downloadingGallery.getTitle());
+        String folder = downloadingGallery.getFolderPath();
 
         String pageUrl = EhUrl.getPageUrl(gid, index, pToken);
         String pagePicUrl = ehEngine.getGalleryPage(pageUrl, gid, gtoken).imageUrl;
@@ -114,7 +135,7 @@ public class EhDownload {
                 folder,
                 eleFile.getName(),
                 () -> handlePageDownloadSuccess(eleFile, downloadingGallery),
-                () -> handlePageDownloadFail(pToken, index, downloadingGallery));
+                () -> handlePageDownloadFail(pToken, index, downloadingGallery), reDownload);
     }
 
     @NotNull
@@ -124,13 +145,16 @@ public class EhDownload {
         eleFile.setName(pageIndex + fileTypeEnum.getSuffix());
         eleFile.setPath(PathUtil.simpleConcatUrl(folder, eleFile.getName()));
         eleFile.setPageNum(pageIndex);
-        eleFile.setIsAvailableFlag(1);
+        eleFile.setAvailableFlag(PrConstant.VALIDATED);
         eleFile.setType(fileTypeEnum.getCode());
         return eleFile;
     }
 
     private void handlePageDownloadSuccess(EleFile eleFile, DownloadingGallery downloadingGallery) {
         eleFileService.saveOrUpdate(eleFile);
+        elementService.update(Wrappers.lambdaUpdate(Element.class)
+                .set(Element::getFilePath, downloadingGallery.getFolderPath())
+                .eq(Element::getId, downloadingGallery.getEleId()));
         handlePageDownloadComplete(downloadingGallery);
     }
 
@@ -139,30 +163,28 @@ public class EhDownload {
         Integer completeNum = downloadingGallery.getDownloadCompleteNum().addAndGet(1);
         if (completeNum.equals(downloadingGallery.getPages())) {
             downloadingGalleryQueue.remove(gid);
-
-            ehentaiGalleryService.update(new LambdaUpdateWrapper<EhentaiGallery>()
+            elementService.update(Wrappers.lambdaUpdate(Element.class)
+                    .set(Element::getFilePath, downloadingGallery.getFolderPath())
+                    .set(Element::getFileSize, FileUtil.getFolderSize(downloadingGallery.getFolderPath()))
+                    .eq(Element::getId, downloadingGallery.getEleId()));
+            // TODO update user download limit
+            ehentaiGalleryService.update(Wrappers.lambdaUpdate(EhentaiGallery.class)
                     .eq(EhentaiGallery::getGid, gid)
-                    .set(EhentaiGallery::getDownloadFlag, 1));
+                    .set(EhentaiGallery::getDownloadFlag, PrConstant.DOWNLOADED));
             log.info("[{}]gallery download complete!", gid);
         }
     }
 
     public void downloadGalleryThumb(long gid, String thumbUrl, Long eleId, String title) {
-        String folder = getFolderPath(Settings.getDownloadRootPath(), String.valueOf(gid), title);
+        String folder = PathUtil.getEhFolderPath(String.valueOf(gid), title);
         FileTypeEnum fileTypeEnum = FileTypeEnum.getTypeBySuffix(thumbUrl);
         EleFile eleFile = createEleFile(eleId, 0, folder, fileTypeEnum);
         downloadService.downloadUrlToDest(thumbUrl,
                 folder,
                 eleFile.getName(),
                 null,
-                null);
+                null, true);
         eleFileService.add(eleFile);
-    }
-
-    @NotNull
-    private static String getFolderPath(String DownloadRootPath, String gid, String title) {
-        return PathUtil.simpleConcatUrl(DownloadRootPath,
-                gid + "-" + title);
     }
 
     @NotNull
@@ -195,6 +217,9 @@ public class EhDownload {
         if (!deadGalleries.isEmpty()) {
             for (Long gid : deadGalleries) {
                 downloadingGalleryQueue.remove(gid);
+                ehentaiGalleryService.update(Wrappers.lambdaUpdate(EhentaiGallery.class)
+                        .set(EhentaiGallery::getDownloadFlag, PrConstant.UN_DOWNLOADED)
+                        .eq(EhentaiGallery::getGid, gid));
             }
         }
         return downloadingGalleryQueue;

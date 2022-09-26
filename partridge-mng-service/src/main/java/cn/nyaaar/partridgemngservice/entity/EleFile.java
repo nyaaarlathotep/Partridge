@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-02
+ * @since 2022-09-26
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -52,8 +52,8 @@ public class EleFile extends Model<EleFile> {
     /**
      * 启用标志(0-禁用;1-启用)
      */
-    @TableField("IS_AVAILABLE_FLAG")
-    private Integer isAvailableFlag;
+    @TableField("AVAILABLE_FLAG")
+    private Integer availableFlag;
 
     @TableField(value = "CREATED_TIME", fill = FieldFill.INSERT)
     private Date createdTime;

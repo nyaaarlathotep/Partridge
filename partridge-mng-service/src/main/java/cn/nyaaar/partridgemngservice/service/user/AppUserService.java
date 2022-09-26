@@ -1,10 +1,10 @@
 package cn.nyaaar.partridgemngservice.service.user;
 
-import cn.nyaaar.partridgemngservice.model.user.RegistrationRequest;
+import cn.nyaaar.partridgemngservice.model.user.RegistrationReq;
 
 public interface AppUserService {
 
     boolean confirmToken(String token);
 
-    String register(RegistrationRequest request);
+    String register(RegistrationReq request);
 }

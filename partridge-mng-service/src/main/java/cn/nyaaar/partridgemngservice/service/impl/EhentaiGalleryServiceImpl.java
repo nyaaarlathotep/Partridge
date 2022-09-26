@@ -14,11 +14,11 @@ import java.util.List;
 
 /**
  * <p>
- *  服务实现类
+ * ehentai 画廊 服务实现类
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-02
+ * @since 2022-09-26
  */
 @Service
 public class EhentaiGalleryServiceImpl extends ServiceImpl<EhentaiGalleryMapper, EhentaiGallery> implements EhentaiGalleryService {

@@ -48,6 +48,8 @@ public class SecurityConfig {
                 .hasRole(PrivilegeEnum.ROOT.getCode())
                 .anyRequest()
                 .hasAnyRole(PrivilegeEnum.USER.getCode(), PrivilegeEnum.ROOT.getCode())
+//                .anyRequest()
+//                .permitAll()
                 .and()
                 .logout()
                 .permitAll().//允许所有用户

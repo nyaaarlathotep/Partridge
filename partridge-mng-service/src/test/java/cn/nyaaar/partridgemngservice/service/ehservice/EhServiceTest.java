@@ -50,7 +50,7 @@ public class EhServiceTest {
 
     @Test
     public void downloadGalleryTest() {
-        ehService.downloadGallery(2316851, "7a18d746bd");
+        ehService.downloadGallery(2316851, "7a18d746bd", "root");
         ThreadUtil.sleep(30, TimeUnit.SECONDS);
     }
 
@@ -60,7 +60,7 @@ public class EhServiceTest {
         Map<Long, DownloadingGallery> queue = ehService.getDownloadingQueue();
         log.info(JSON.toJSONString(queue));
         log.info("------before start-------");
-        ehService.downloadGallery(2315232, "c4fdf93bea");
+        ehService.downloadGallery(2315232, "c4fdf93bea", "root");
 
         log.info("------after start-------");
         queue = ehService.getDownloadingQueue();

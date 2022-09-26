@@ -34,7 +34,8 @@ public class DownloadServiceImpl implements DownloadService {
     }
 
     @Override
-    public void downloadUrlToDest(@NotNull String url, @NotNull String destDic, @NotNull String fileName, Runnable successHandle, Runnable failHandle) {
+    public void downloadUrlToDest(@NotNull String url, @NotNull String destDic, @NotNull String fileName,
+                                  Runnable successHandle, Runnable failHandle, boolean reDownload) {
         downloadExecutor.submit(() -> {
             Request request = new Request.Builder()
                     .url(url)

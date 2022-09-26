@@ -5,48 +5,47 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.nyaaar.partridgemngservice.model.QueryData;
-
 import java.util.List;
 
 /**
  * <p>
- * 服务类
+ * ehentai 画廊 服务类
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-02
+ * @since 2022-09-26
  */
 public interface EhentaiGalleryService extends IService<EhentaiGallery> {
 
     /**
-     * 查询分页数据
+     * 查询ehentai 画廊分页数据
      *
      * @param where     查询条件
      * @param page      页码
      * @param pageCount 每页条数
      * @return QueryData
      */
-    QueryData<EhentaiGallery> findListByPage(EhentaiGallery where, Integer page, Integer pageCount);
+    QueryData<EhentaiGallery> findListByPage(EhentaiGallery where,Integer page, Integer pageCount);
 
     /**
-     * 查询所有数据
-     *
-     * @param where 查询条件
-     * @return List
-     */
+    * 查询ehentai 画廊所有数据
+    *
+    * @param where     查询条件
+    * @return List
+    */
     List<EhentaiGallery> findList(EhentaiGallery where);
 
 
     /**
-     * 添加
+     * 添加ehentai 画廊
      *
-     * @param ehentaiGallery ehentaiGallery
+     * @param ehentaiGallery ehentai 画廊
      * @return 影响条数
      */
     Integer add(EhentaiGallery ehentaiGallery);
 
     /**
-     * 删除
+     * 删除ehentai 画廊
      *
      * @param id 主键
      * @return 影响条数
@@ -54,9 +53,9 @@ public interface EhentaiGalleryService extends IService<EhentaiGallery> {
     Integer delete(Integer id);
 
     /**
-     * 修改
+     * 修改ehentai 画廊
      *
-     * @param ehentaiGallery ehentaiGallery
+     * @param ehentaiGallery ehentai 画廊
      * @return 影响条数
      */
     Integer updateData(EhentaiGallery ehentaiGallery);

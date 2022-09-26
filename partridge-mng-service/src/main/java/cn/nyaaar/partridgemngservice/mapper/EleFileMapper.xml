@@ -10,14 +10,14 @@
         <result column="TYPE" property="type" />
         <result column="PATH" property="path" />
         <result column="PAGE_NUM" property="pageNum" />
-        <result column="IS_AVAILABLE_FLAG" property="isAvailableFlag" />
+        <result column="AVAILABLE_FLAG" property="availableFlag" />
         <result column="CREATED_TIME" property="createdTime" />
         <result column="UPDATED_TIME" property="updatedTime" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        ID, ELE_ID, NAME, TYPE, PATH, PAGE_NUM, IS_AVAILABLE_FLAG, CREATED_TIME, UPDATED_TIME
+        ID, ELE_ID, NAME, TYPE, PATH, PAGE_NUM, AVAILABLE_FLAG, CREATED_TIME, UPDATED_TIME
     </sql>
 
 </mapper>

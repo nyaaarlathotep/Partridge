@@ -15,10 +15,10 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Schema(name = "ElementDto")
 public class ElementDto {
-    @Schema(name = "主键id")
+    @Schema(title = "主键id")
     private Integer id;
 
-    @Schema(name = "element类型")
+    @Schema(title = "element类型")
     private String type;
 
 }

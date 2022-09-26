@@ -6,7 +6,7 @@ import cn.nyaaar.partridgemngservice.common.enums.PrivilegeEnum;
 import cn.nyaaar.partridgemngservice.entity.PrUser;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.exception.ValidationException;
-import cn.nyaaar.partridgemngservice.model.user.RegistrationRequest;
+import cn.nyaaar.partridgemngservice.model.user.RegistrationReq;
 import cn.nyaaar.partridgemngservice.service.PrUserService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -54,7 +54,7 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
     }
 
     @Override
-    public String register(RegistrationRequest request) {
+    public String register(RegistrationReq request) {
         String pattern = "[^@ \\t\\r\\n]+@[^@ \\t\\r\\n]+\\.[^@ \\t\\r\\n]+";
         boolean isValidEmail = Pattern.matches(pattern, request.getEmail());
 
