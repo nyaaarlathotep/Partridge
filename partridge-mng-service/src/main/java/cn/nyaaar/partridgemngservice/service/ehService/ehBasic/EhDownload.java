@@ -62,7 +62,8 @@ public class EhDownload {
                 .setGid(ehentaiGallery.getGid())
                 .setGtoken(ehentaiGallery.getToken())
                 .setPages(ehentaiGallery.getPages())
-                .setEleId(ehentaiGallery.getEleId());
+                .setEleId(ehentaiGallery.getEleId())
+                .setTitle(ehentaiGallery.getTitle());
         downloadingGalleryQueue.put(ehentaiGallery.getGid(), downloadingGallery);
         downloadQueueExecutor.submit(() -> {
             List<String> galleryTokens = ehEngine.getPTokens(ehentaiGallery.getGid(), ehentaiGallery.getToken());
@@ -102,7 +103,7 @@ public class EhDownload {
         long eleId = downloadingGallery.getEleId();
         String gtoken = downloadingGallery.getGtoken();
         int pageIndex = index + 1;
-        String folder = PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(), String.valueOf(gid));
+        String folder = getFolderPath(Settings.getDownloadRootPath(), String.valueOf(gid), downloadingGallery.getTitle());
 
         String pageUrl = EhUrl.getPageUrl(gid, index, pToken);
         String pagePicUrl = ehEngine.getGalleryPage(pageUrl, gid, gtoken).imageUrl;
@@ -146,8 +147,8 @@ public class EhDownload {
         }
     }
 
-    public void downloadGalleryThumb(long gid, String thumbUrl, Long eleId) {
-        String folder = PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(), String.valueOf(gid));
+    public void downloadGalleryThumb(long gid, String thumbUrl, Long eleId, String title) {
+        String folder = getFolderPath(Settings.getDownloadRootPath(), String.valueOf(gid), title);
         FileTypeEnum fileTypeEnum = FileTypeEnum.getTypeBySuffix(thumbUrl);
         EleFile eleFile = createEleFile(eleId, 0, folder, fileTypeEnum);
         downloadService.downloadUrlToDest(thumbUrl,
@@ -156,6 +157,12 @@ public class EhDownload {
                 null,
                 null);
         eleFileService.add(eleFile);
+    }
+
+    @NotNull
+    private static String getFolderPath(String DownloadRootPath, String gid, String title) {
+        return PathUtil.simpleConcatUrl(DownloadRootPath,
+                gid + "-" + title);
     }
 
     @NotNull

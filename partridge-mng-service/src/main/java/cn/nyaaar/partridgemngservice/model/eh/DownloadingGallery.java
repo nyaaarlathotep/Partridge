@@ -30,6 +30,9 @@ public class DownloadingGallery {
 
     private String gtoken;
 
+    @Schema(title = "画廊标题")
+    private String title;
+
     private long eleId;
 
     @Schema(title = "画廊页数")

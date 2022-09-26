@@ -223,7 +223,7 @@ public class EhServiceImpl implements EhService {
         Long eleId = getOrInsertEleIdFromGid(gid);
         tagInfoService.saveOrUpdateTagInfoWithRe(galleryDetail.getTags(), eleId);
         if (downloadThumb) {
-            ehDownload.downloadGalleryThumb(gid, galleryDetail.thumb, eleId);
+            ehDownload.downloadGalleryThumb(gid, galleryDetail.thumb, eleId, ehentaiGallery.getTitle());
         }
         ehentaiGallery.setEleId(eleId);
         ehentaiGalleryService.saveOrUpdate(ehentaiGallery);
