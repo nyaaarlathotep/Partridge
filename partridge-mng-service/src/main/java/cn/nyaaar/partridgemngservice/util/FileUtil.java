@@ -260,8 +260,8 @@ public class FileUtil {
         return hs;
     }
 
-    public static String getFolderSize(String folderPath) {
-        return formatFileSize(FileUtil.size(new File(folderPath)));
+    public static long getFolderSize(String folderPath) {
+        return FileUtil.size(new File(folderPath));
     }
 
     /**
@@ -277,7 +277,7 @@ public class FileUtil {
         }
         DecimalFormat df = new DecimalFormat("#.00");
         if (fileLength < 1024) {
-            fileSizeString = df.format((double) fileLength) + "B";
+            fileSizeString = df.format((double) fileLength) + " B";
         } else if (fileLength < 1048576) {
             fileSizeString = df.format((double) fileLength / 1024) + " KB";
         } else if (fileLength < 1073741824) {
@@ -287,6 +287,22 @@ public class FileUtil {
         }
         return fileSizeString;
 
+    }
+
+    public static double formatSizeToBytes(String size) throws Exception {
+        if (size.contains(" B")) {
+            return Double.parseDouble(size.substring(0, size.length() - 2));
+        }
+        double l = Double.parseDouble(size.substring(0, size.length() - 3));
+        if (size.contains(" KB")) {
+            return l * 1024;
+        } else if (size.contains(" MB")) {
+            return l * 1048576;
+        } else if (size.contains(" GB")) {
+            return l * 1073741824;
+        } else {
+            throw new Exception("error file size");
+        }
     }
 
     /**
@@ -315,5 +331,31 @@ public class FileUtil {
         } else {
             return file.length();
         }
+    }
+
+    public static String legalizeDirName(String originName) {
+        originName = originName.trim();
+        originName = originName.replace("<", "_");
+        originName = originName.replace(">", "_");
+        originName = originName.replace("|", "_");
+        originName = originName.replace(":", "_");
+        originName = originName.replace("*", "_");
+        originName = originName.replace("?", "_");
+        originName = originName.replace(";", "_");
+        while (originName.startsWith(".") || originName.startsWith("!") || originName.startsWith("#") ||
+                originName.startsWith("$") || originName.startsWith("%") || originName.startsWith("^") || originName.startsWith("&")) {
+            originName = originName.substring(1);
+        }
+        while (originName.endsWith(".") || originName.endsWith("!") || originName.endsWith("#") ||
+                originName.endsWith("$") || originName.endsWith("%") || originName.endsWith("^") || originName.endsWith("&")) {
+            originName = originName.substring(0, originName.length() - 1);
+        }
+        return originName;
+    }
+
+    public static String legalizeFileName(String originName) {
+        originName = originName.replace("/", "");
+        originName = originName.replace("\\", "");
+        return legalizeDirName(originName);
     }
 }

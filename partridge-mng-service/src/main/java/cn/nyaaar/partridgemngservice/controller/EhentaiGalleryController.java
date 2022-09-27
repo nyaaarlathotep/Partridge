@@ -8,13 +8,13 @@ import cn.nyaaar.partridgemngservice.model.validate.EhDownload;
 import cn.nyaaar.partridgemngservice.model.validate.EhPreview;
 import cn.nyaaar.partridgemngservice.model.validate.EhView;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
+import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.Collection;
 
 /**
@@ -88,8 +88,9 @@ public class EhentaiGalleryController {
     @Operation(summary = "下载 gallery", description = "通过 gid 与 gtoken 异步下载对应 gallery")
     @PostMapping(value = "/download")
     @LogAnnotation
-    public R<String> downloadGallery(@RequestBody @Validated(EhDownload.class) EhCommonReq ehCommonReq, Principal principal) {
-        ehService.downloadGallery(ehCommonReq.getGid(), ehCommonReq.getGtoken(), principal.getName());
+    public R<String> downloadGallery(@RequestBody @Validated(EhDownload.class) EhCommonReq ehCommonReq) {
+        log.info("userName: {}", ThreadLocalUtil.getCurrentUser());
+        ehService.downloadGallery(ehCommonReq.getGid(), ehCommonReq.getGtoken());
         return new R<>();
     }
 

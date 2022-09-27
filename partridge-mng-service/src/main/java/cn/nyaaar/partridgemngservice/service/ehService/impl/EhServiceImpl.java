@@ -80,7 +80,7 @@ public class EhServiceImpl implements EhService {
     }
 
     @Override
-    public void downloadGallery(long gid, String gtoken, String userName) {
+    public void downloadGallery(long gid, String gtoken) {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken, true);
         ehDownload.downloadGalleryAsync(ehentaiGallery);
     }

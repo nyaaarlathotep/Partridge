@@ -24,7 +24,7 @@ import java.util.Objects;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author nyaaar
@@ -34,7 +34,7 @@ import java.util.Objects;
 public class EleFileServiceImpl extends ServiceImpl<EleFileMapper, EleFile> implements EleFileService {
 
     @Override
-    public QueryData<EleFile> findListByPage(EleFile where, Integer page, Integer pageCount){
+    public QueryData<EleFile> findListByPage(EleFile where, Integer page, Integer pageCount) {
         IPage<EleFile> wherePage = new Page<>(page, pageCount);
 
         IPage<EleFile> iPage = baseMapper.selectPage(wherePage, Wrappers.query(where));
@@ -43,34 +43,33 @@ public class EleFileServiceImpl extends ServiceImpl<EleFileMapper, EleFile> impl
     }
 
     @Override
-    public List<EleFile> findList(EleFile where){
+    public List<EleFile> findList(EleFile where) {
 
-        return baseMapper.selectList( Wrappers.query(where));
+        return baseMapper.selectList(Wrappers.query(where));
     }
 
 
-
     @Override
-    public Integer add(EleFile eleFile){
- 
+    public Integer add(EleFile eleFile) {
+
         return baseMapper.insert(eleFile);
     }
 
     @Override
-    public Integer delete(Integer id){
-    
+    public Integer delete(Integer id) {
+
         return baseMapper.deleteById(id);
     }
 
     @Override
-    public Integer updateData(EleFile eleFile){
-    
+    public Integer updateData(EleFile eleFile) {
+
         return baseMapper.updateById(eleFile);
     }
 
     @Override
-    public EleFile findById(Integer id){
-    
+    public EleFile findById(Integer id) {
+
         return baseMapper.selectById(id);
     }
 
@@ -93,11 +92,12 @@ public class EleFileServiceImpl extends ServiceImpl<EleFileMapper, EleFile> impl
     @Override
     public void saveBytesToFile(byte[] bytes, String destDic, String fileName, boolean reDownload) throws IOException {
 
+        destDic = FileUtil.legalizeDirName(destDic);
         Path dic = Path.of(destDic);
         if (Files.notExists(dic)) {
             Files.createDirectories(dic);
         }
-        Path filePath = Path.of(PathUtil.simpleConcatUrl(destDic, fileName));
+        Path filePath = Path.of(PathUtil.simpleConcatUrl(destDic, FileUtil.legalizeFileName(fileName)));
         if (reDownload || Files.notExists(filePath)) {
             Files.write(filePath, bytes, StandardOpenOption.CREATE);
         }

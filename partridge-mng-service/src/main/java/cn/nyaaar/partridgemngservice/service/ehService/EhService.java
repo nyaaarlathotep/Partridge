@@ -35,9 +35,8 @@ public interface EhService {
      *
      * @param gid      画廊id
      * @param gtoken   gtoken
-     * @param userName userName
      */
-    void downloadGallery(long gid, String gtoken, String userName);
+    void downloadGallery(long gid, String gtoken);
 
     /**
      * 下载画廊的指定页数
