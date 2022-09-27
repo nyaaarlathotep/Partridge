@@ -71,13 +71,13 @@ public class GlobalExceptionHandler implements Ordered {
     @ExceptionHandler(Exception.class)
     public BaseResponse exceptionHandler(HttpServletRequest req, Exception e) {
         log.error("发生未知异常 ", e);
-        return new BaseResponse(CommonResponseEnum.SERVER_ERROR.getCode(), "服务器异常");
+        return new BaseResponse(CommonResponseEnum.SERVER_ERROR.getCode(), "服务器异常，请联系管理员");
     }
 
     @ExceptionHandler(Throwable.class)
     public BaseResponse exceptionHandler(HttpServletRequest req, Throwable e) {
         log.error("发生未知异常 ", e);
-        return new BaseResponse(CommonResponseEnum.SERVER_ERROR.getCode(), "服务器异常");
+        return new BaseResponse(CommonResponseEnum.SERVER_ERROR.getCode(), "服务器异常，请联系管理员");
     }
 
 }

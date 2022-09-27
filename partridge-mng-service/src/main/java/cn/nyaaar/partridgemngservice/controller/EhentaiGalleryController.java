@@ -8,7 +8,6 @@ import cn.nyaaar.partridgemngservice.model.validate.EhDownload;
 import cn.nyaaar.partridgemngservice.model.validate.EhPreview;
 import cn.nyaaar.partridgemngservice.model.validate.EhView;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
-import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -89,7 +88,6 @@ public class EhentaiGalleryController {
     @PostMapping(value = "/download")
     @LogAnnotation
     public R<String> downloadGallery(@RequestBody @Validated(EhDownload.class) EhCommonReq ehCommonReq) {
-        log.info("userName: {}", ThreadLocalUtil.getCurrentUser());
         ehService.downloadGallery(ehCommonReq.getGid(), ehCommonReq.getGtoken());
         return new R<>();
     }

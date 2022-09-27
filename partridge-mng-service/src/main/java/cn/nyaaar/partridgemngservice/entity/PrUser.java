@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-17
+ * @since 2022-09-27
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -53,16 +53,22 @@ public class PrUser extends Model<PrUser> {
     private Date lastLoginTime;
 
     /**
-     * 上次登陆ip
+     * 用户空间配额
      */
-    @TableField("LAST_LOGIN_IP")
-    private String lastLoginIp;
+    @TableField("SPACE_QUOTA")
+    private Long spaceQuota;
 
     @TableField(value = "CREATED_TIME", fill = FieldFill.INSERT)
     private Date createdTime;
 
     @TableField(value = "UPDATED_TIME", fill = FieldFill.INSERT_UPDATE)
     private Date updatedTime;
+
+    /**
+     * 上次登陆ip
+     */
+    @TableField("LAST_LOGIN_IP")
+    private String lastLoginIp;
 
 
     @Override

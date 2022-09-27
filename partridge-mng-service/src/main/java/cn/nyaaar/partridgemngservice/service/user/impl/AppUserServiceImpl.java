@@ -50,6 +50,7 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
         } else {
             privilegeEnum = PrivilegeEnum.USER;
         }
+        // TODO user login record
         return User.withUsername(prUser.getUserName()).password(prUser.getPassword()).roles(privilegeEnum.getCode()).build();
     }
 
@@ -66,12 +67,14 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
 //        emailSender.send(
 //                request.getEmail(),
 //                buildEmail(request.getFirstName(), link) );
+        // TODO invite code and user level
         String encoderPassword = passwordEncoder.encode(request.getPassword());
         PrUser prUser = new PrUser()
                 .setUserName(request.getUserName())
                 .setPassword(encoderPassword)
                 .setEmail(request.getEmail())
                 .setValidated(PrConstant.VALIDATED)
+                .setSpaceQuota(100 * 1073741824L)
                 .setLastLoginTime(DateUtil.date());
         System.out.println("使用security加密后的密码为：" + encoderPassword);
         prUserService.save(prUser);
@@ -104,4 +107,22 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
         return true;
     }
 
+    @Override
+    public Boolean checkUserSpaceLimit(String userName) {
+        PrUser prUser = prUserService.getOne(Wrappers.lambdaQuery(PrUser.class)
+                .eq(PrUser::getUserName, userName));
+        return prUser.getSpaceQuota() > 0;
+    }
+
+    @Override
+    public void minusUserSpaceLimit(String userName, Long spaceBytes) {
+        if (null == spaceBytes || spaceBytes <= 0) {
+            return;
+        }
+        PrUser prUser = prUserService.getOne(Wrappers.lambdaQuery(PrUser.class)
+                .eq(PrUser::getUserName, userName));
+        prUserService.update(Wrappers.lambdaUpdate(PrUser.class)
+                .set(PrUser::getSpaceQuota, prUser.getSpaceQuota() - spaceBytes)
+                .eq(PrUser::getUserName, userName));
+    }
 }

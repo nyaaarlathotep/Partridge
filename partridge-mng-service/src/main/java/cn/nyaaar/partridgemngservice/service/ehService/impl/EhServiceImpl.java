@@ -13,8 +13,10 @@ import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
 import cn.nyaaar.partridgemngservice.service.ehService.ehBasic.EhDownload;
 import cn.nyaaar.partridgemngservice.service.ehService.ehBasic.EhEngine;
+import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.StringUtils;
+import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -40,19 +42,22 @@ public class EhServiceImpl implements EhService {
     private final EhentaiGalleryService ehentaiGalleryService;
     private final EleFileService eleFileService;
     private final ElementService elementService;
+    private final AppUserService appUserService;
+
     private final TagInfoService tagInfoService;
 
     public EhServiceImpl(EhEngine ehEngine,
                          EhentaiGalleryService ehentaiGalleryService,
                          EleFileService eleFileService,
                          ElementService elementService,
-                         TagInfoService tagInfoService, EhDownload ehDownload) {
+                         TagInfoService tagInfoService, EhDownload ehDownload, AppUserService appUserService) {
         this.ehEngine = ehEngine;
         this.ehentaiGalleryService = ehentaiGalleryService;
         this.eleFileService = eleFileService;
         this.elementService = elementService;
         this.tagInfoService = tagInfoService;
         this.ehDownload = ehDownload;
+        this.appUserService = appUserService;
     }
 
     @Override
@@ -82,6 +87,7 @@ public class EhServiceImpl implements EhService {
     @Override
     public void downloadGallery(long gid, String gtoken) {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken, true);
+        BusinessExceptionEnum.SPACE_INSUFFICIENT.assertIsTrue(appUserService.checkUserSpaceLimit(ThreadLocalUtil.getCurrentUser()));
         ehDownload.downloadGalleryAsync(ehentaiGallery);
     }
 

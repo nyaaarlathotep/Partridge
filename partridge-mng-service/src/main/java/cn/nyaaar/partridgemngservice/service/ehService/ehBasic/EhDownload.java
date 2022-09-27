@@ -15,9 +15,10 @@ import cn.nyaaar.partridgemngservice.service.EhentaiGalleryService;
 import cn.nyaaar.partridgemngservice.service.EleFileService;
 import cn.nyaaar.partridgemngservice.service.ElementService;
 import cn.nyaaar.partridgemngservice.service.download.DownloadService;
+import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.PathUtil;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +41,7 @@ public class EhDownload {
     private final EleFileService eleFileService;
     private final EhentaiGalleryService ehentaiGalleryService;
     private final ElementService elementService;
+    private final AppUserService appUserService;
     private final ThreadPoolTaskExecutor downloadQueueExecutor;
 
     private static final int ehentaiPreviewSize = 40;
@@ -49,13 +51,15 @@ public class EhDownload {
                       DownloadService downloadService,
                       EleFileService eleFileService,
                       EhentaiGalleryService ehentaiGalleryService,
-                      ElementService elementService, 
+                      ElementService elementService,
+                      AppUserService appUserService,
                       ThreadPoolTaskExecutor downloadQueueExecutor) {
         this.ehEngine = ehEngine;
         this.downloadService = downloadService;
         this.eleFileService = eleFileService;
         this.ehentaiGalleryService = ehentaiGalleryService;
         this.elementService = elementService;
+        this.appUserService = appUserService;
         this.downloadQueueExecutor = downloadQueueExecutor;
     }
 
@@ -65,12 +69,14 @@ public class EhDownload {
         BusinessExceptionEnum.NOT_EXISTS.assertNotNull(ehentaiGallery.getPages(), "pages");
         BusinessExceptionEnum.NOT_EXISTS.assertNotNull(ehentaiGallery.getEleId(), "eleId");
 
+        String userName = ThreadLocalUtil.getCurrentUser();
         DownloadingGallery downloadingGallery = new DownloadingGallery()
                 .setGid(ehentaiGallery.getGid())
                 .setGtoken(ehentaiGallery.getToken())
                 .setPages(ehentaiGallery.getPages())
                 .setEleId(ehentaiGallery.getEleId())
                 .setTitle(ehentaiGallery.getTitle())
+                .setUserName(userName)
                 .setFolderPath(PathUtil.getEhFolderPath(String.valueOf(ehentaiGallery.getGid()), ehentaiGallery.getTitle()));
         downloadingGalleryQueue.put(ehentaiGallery.getGid(), downloadingGallery);
         downloadQueueExecutor.submit(() -> {
@@ -162,12 +168,13 @@ public class EhDownload {
         long gid = downloadingGallery.getGid();
         Integer completeNum = downloadingGallery.getDownloadCompleteNum().addAndGet(1);
         if (completeNum.equals(downloadingGallery.getPages())) {
+            Long elementBytes = FileUtil.getFolderSize(downloadingGallery.getFolderPath());
             downloadingGalleryQueue.remove(gid);
             elementService.update(Wrappers.lambdaUpdate(Element.class)
                     .set(Element::getFilePath, downloadingGallery.getFolderPath())
-                    .set(Element::getFileSize, FileUtil.getFolderSize(downloadingGallery.getFolderPath()))
+                    .set(Element::getFileSize, elementBytes)
                     .eq(Element::getId, downloadingGallery.getEleId()));
-            // TODO update user download limit
+            appUserService.minusUserSpaceLimit(ThreadLocalUtil.getCurrentUser(), elementBytes);
             ehentaiGalleryService.update(Wrappers.lambdaUpdate(EhentaiGallery.class)
                     .eq(EhentaiGallery::getGid, gid)
                     .set(EhentaiGallery::getDownloadFlag, PrConstant.DOWNLOADED));
