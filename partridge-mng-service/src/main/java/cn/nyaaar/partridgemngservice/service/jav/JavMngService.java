@@ -1,8 +1,10 @@
 package cn.nyaaar.partridgemngservice.service.jav;
 
+import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.model.jav.JavBasicInfo;
 import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.jav.JavQuery;
+import cn.nyaaar.partridgemngservice.model.jav.JavUploadReq;
 
 public interface JavMngService {
 
@@ -29,4 +31,6 @@ public interface JavMngService {
      * @return ListResp<JavBasicInfo>
      */
     ListResp<JavBasicInfo> getJavList(int pageIndex);
+
+    CheckResp uploadJav(JavUploadReq javUploadReq);
 }

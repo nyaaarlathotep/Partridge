@@ -1,6 +1,5 @@
 package cn.nyaaar.partridgemngservice.model.file;
 
-import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.model.validate.FileCheck;
 import cn.nyaaar.partridgemngservice.model.validate.FileUpload;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,7 +32,7 @@ public class FileReq {
 
     @Schema(title = "文件大小，单位为 Byte")
     @NotNull(groups = {FileCheck.class}, message = "请上传文件大小")
-    private Long fileBytes;
+    private Long fileSize;
 
     @Schema(title = "文件分片序号")
     @NotNull(groups = {FileUpload.class}, message = "请上传文件分片序号")
@@ -43,7 +42,7 @@ public class FileReq {
     @NotNull(groups = {FileUpload.class}, message = "请上传文件分片 md5")
     private String shardMd5;
 
-    @Schema(title = "来源")
-    @NotNull(groups = {FileCheck.class, FileUpload.class}, message = "请上传文件来源")
-    private SourceEnum sourceEnum;
+    @Schema(title = "对应 EleFile 的 Id")
+    @NotNull(groups = {FileCheck.class, FileUpload.class}, message = "请上传对应 EleFile 的 Id")
+    private Integer EleFileId;
 }

@@ -4,7 +4,9 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.nyaaar.partridgemngservice.common.constants.EhUrl;
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
+import cn.nyaaar.partridgemngservice.common.constants.Settings;
 import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
+import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
 import cn.nyaaar.partridgemngservice.entity.EleFile;
 import cn.nyaaar.partridgemngservice.entity.Element;
@@ -77,7 +79,11 @@ public class EhDownload {
                 .setEleId(ehentaiGallery.getEleId())
                 .setTitle(ehentaiGallery.getTitle())
                 .setUserName(userName)
-                .setFolderPath(PathUtil.getEhFolderPath(String.valueOf(ehentaiGallery.getGid()), ehentaiGallery.getTitle()));
+                .setFolderPath(getEhFolderPath(
+                        ThreadLocalUtil.getCurrentUser(),
+                        ehentaiGallery.getEleId(),
+                        String.valueOf(ehentaiGallery.getGid()),
+                        ehentaiGallery.getTitle()));
         downloadingGalleryQueue.put(ehentaiGallery.getGid(), downloadingGallery);
         downloadQueueExecutor.submit(() -> {
             log.info("[{}]gallery download complete!", ehentaiGallery.getGid());
@@ -183,7 +189,11 @@ public class EhDownload {
     }
 
     public void downloadGalleryThumb(long gid, String thumbUrl, Long eleId, String title) {
-        String folder = PathUtil.getEhFolderPath(String.valueOf(gid), title);
+        String folder = getEhFolderPath(
+                ThreadLocalUtil.getCurrentUser(),
+                eleId,
+                String.valueOf(gid),
+                title);
         FileTypeEnum fileTypeEnum = FileTypeEnum.getTypeBySuffix(thumbUrl);
         EleFile eleFile = createEleFile(eleId, 0, folder, fileTypeEnum);
         downloadService.downloadUrlToDest(thumbUrl,
@@ -230,5 +240,10 @@ public class EhDownload {
             }
         }
         return downloadingGalleryQueue;
+    }
+    @NotNull
+    public static String getEhFolderPath(String userName, Long eleId, String gid, String title) {
+        return PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(),
+                userName, SourceEnum.Ehentai.getCode(), String.valueOf(eleId), gid + "-" + title);
     }
 }

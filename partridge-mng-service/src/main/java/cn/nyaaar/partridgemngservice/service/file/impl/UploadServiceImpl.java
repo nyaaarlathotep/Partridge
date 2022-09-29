@@ -3,10 +3,13 @@ package cn.nyaaar.partridgemngservice.service.file.impl;
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
 import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
-import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
+import cn.nyaaar.partridgemngservice.entity.EleFile;
+import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.entity.FileUploadInfo;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.file.CheckResp;
+import cn.nyaaar.partridgemngservice.service.EleFileService;
+import cn.nyaaar.partridgemngservice.service.ElementService;
 import cn.nyaaar.partridgemngservice.service.FileUploadInfoService;
 import cn.nyaaar.partridgemngservice.service.file.UploadService;
 import cn.nyaaar.partridgemngservice.util.PathUtil;
@@ -34,14 +37,20 @@ import java.util.stream.Stream;
 public class UploadServiceImpl implements UploadService {
 
     private final FileUploadInfoService fileUploadInfoService;
+    private final ElementService elementService;
+    private final EleFileService eleFileService;
 
-    public UploadServiceImpl(FileUploadInfoService fileUploadInfoService) {
+    public UploadServiceImpl(FileUploadInfoService fileUploadInfoService, ElementService elementService, EleFileService eleFileService) {
         this.fileUploadInfoService = fileUploadInfoService;
+        this.elementService = elementService;
+        this.eleFileService = eleFileService;
     }
 
 
-    public CheckResp check(String fileName, String fileMd5, Long fileSize, SourceEnum sourceEnum) throws IOException {
-        File filePath = new File(PathUtil.getDownloadDir(ThreadLocalUtil.getCurrentUser(), sourceEnum), fileMd5);
+    public CheckResp check(String fileName, String fileMd5, Long fileSize, Integer eleFileId) throws IOException {
+        EleFile eleFile = eleFileService.findById(eleFileId);
+        Element element = elementService.getById(eleFile.getEleId());
+        File filePath = new File(getDownloadDir(ThreadLocalUtil.getCurrentUser(), element), fileMd5);
         File currentFile = new File(filePath, fileName);
         if (currentFile.exists()) {
             return new CheckResp();
@@ -81,18 +90,20 @@ public class UploadServiceImpl implements UploadService {
         // 得到缺失的文件片号
         chunks.removeAll(chunkNames);
         if (chunks.isEmpty()) {
-            merge(fileUploadInfo, sourceEnum);
+            merge(fileUploadInfo, eleFileId);
         }
         return new CheckResp()
                 .setMissingShardIndex(chunks)
                 .setShardSize(fileUploadInfo.getShardSize());
     }
 
-    public void upload(Integer shardIndex, String fileMd5, String shardMd5, byte[] shardBytes, SourceEnum sourceEnum) throws IOException {
+    public void upload(Integer shardIndex, String fileMd5, String shardMd5, byte[] shardBytes, Integer eleFileId) throws IOException {
         log.info("{} 分片:[{}]上传开始", fileMd5, shardIndex);
         BusinessExceptionEnum.VERIFY_MD5_ERR.assertIsTrue(shardMd5.equals(DigestUtils.md5DigestAsHex(shardBytes)));
 
-        File filePath = new File(PathUtil.getDownloadDirChild(ThreadLocalUtil.getCurrentUser(), sourceEnum, fileMd5), String.valueOf(shardIndex));
+        EleFile eleFile = eleFileService.findById(eleFileId);
+        Element element = elementService.getById(eleFile.getEleId());
+        File filePath = new File(getDownloadDirChild(ThreadLocalUtil.getCurrentUser(), element, fileMd5), String.valueOf(shardIndex));
         try (FileOutputStream fileOutputStream = new FileOutputStream(filePath)) {
             StreamUtils.copy(shardBytes, fileOutputStream);
         } catch (Exception e) {
@@ -105,14 +116,17 @@ public class UploadServiceImpl implements UploadService {
         fileUploadInfo.setShardNum(fileUploadInfo.getShardNum() + 1);
         fileUploadInfoService.updateById(fileUploadInfo);
         if (fileUploadInfo.getShardNum().equals(fileUploadInfo.getShardTotal())) {
-            merge(fileUploadInfo, sourceEnum);
+            merge(fileUploadInfo, eleFileId);
         }
         log.info("{} 分片:[{}]上传成功", fileMd5, shardIndex);
     }
 
-    private void merge(FileUploadInfo fileUploadInfo, SourceEnum sourceEnum) throws IOException {
+    private void merge(FileUploadInfo fileUploadInfo, Integer eleFileId) throws IOException {
         log.info("{} 合并开始", fileUploadInfo.getFileKey());
-        File filePath = new File(PathUtil.getDownloadDir(ThreadLocalUtil.getCurrentUser(), sourceEnum), fileUploadInfo.getFileKey());
+
+        EleFile eleFile = eleFileService.findById(eleFileId);
+        Element element = elementService.getById(eleFile.getEleId());
+        File filePath = new File(getDownloadDir(ThreadLocalUtil.getCurrentUser(), element), fileUploadInfo.getFileKey());
         File currentFile = new File(filePath, fileUploadInfo.getName());
         if (currentFile.exists()) {
             return;
@@ -126,8 +140,7 @@ public class UploadServiceImpl implements UploadService {
         }
         try (BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(currentFile))) {
             for (Path shardFile : shardFiles) {
-                byte[] chunkFileBytes = Files.readAllBytes(shardFile);
-                bufferedOutputStream.write(chunkFileBytes);
+                bufferedOutputStream.write(Files.readAllBytes(shardFile));
             }
         }
         for (Path shardFile : shardFiles) {
@@ -136,5 +149,17 @@ public class UploadServiceImpl implements UploadService {
         fileUploadInfo.setUploadFlag(PrConstant.UPLOADED);
         fileUploadInfoService.updateById(fileUploadInfo);
         log.info("{} 合并成功", fileUploadInfo.getFileKey());
+    }
+
+    private static String getDownloadDir(String userName, Element element) {
+        return PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(),
+                userName, element.getType(), String.valueOf(element.getId()));
+    }
+
+    private static String getDownloadDirChild(String userName, Element element, String... names) {
+        String[] dirs = new String[names.length + 1];
+        dirs[0] = getDownloadDir(userName, element);
+        System.arraycopy(names, 0, dirs, 1, names.length);
+        return PathUtil.simpleConcatUrl(dirs);
     }
 }

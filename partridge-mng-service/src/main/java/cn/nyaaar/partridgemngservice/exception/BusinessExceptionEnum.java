@@ -27,6 +27,7 @@ public enum BusinessExceptionEnum implements BusinessExceptionAssert {
     TIME_FORMAT_ERROR(100016, "时间格式异常{0}"),
     ENCRYPTION_ERROR(1000017, "发送数据错误，无法加密"),
 
+    FILE_IO_ERROR(100018, "文件 I/O 异常，请联系管理员"),
     // 特殊业务异常
 
     SPACE_INSUFFICIENT(200005, "用户空间配额不足"),

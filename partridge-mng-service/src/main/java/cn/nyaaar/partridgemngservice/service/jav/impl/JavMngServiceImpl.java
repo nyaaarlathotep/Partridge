@@ -1,15 +1,22 @@
 package cn.nyaaar.partridgemngservice.service.jav.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
 import cn.nyaaar.partridgemngservice.common.enums.EleOrgReTypeEnum;
+import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
+import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.TagDto;
+import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.model.jav.JavBasicInfo;
 import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.jav.JavQuery;
+import cn.nyaaar.partridgemngservice.model.jav.JavUploadReq;
 import cn.nyaaar.partridgemngservice.service.*;
+import cn.nyaaar.partridgemngservice.service.file.UploadService;
 import cn.nyaaar.partridgemngservice.service.jav.JavMngService;
+import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -17,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,19 +43,25 @@ public class JavMngServiceImpl implements JavMngService {
     private final EleOrgReService eleOrgReService;
 
     private final TagInfoService tagInfoService;
+    private final ElementService elementService;
+    private final EleFileService eleFileService;
+    private final UploadService uploadService;
 
     public JavMngServiceImpl(JavService javService,
                              OrganizationService organizationService,
                              ActorService actorService,
                              EleActorReService eleActorReService,
                              EleOrgReService eleOrgReService,
-                             TagInfoService tagInfoService) {
+                             TagInfoService tagInfoService, ElementService elementService, EleFileService eleFileService, UploadService uploadService) {
         this.javService = javService;
         this.organizationService = organizationService;
         this.actorService = actorService;
         this.eleActorReService = eleActorReService;
         this.eleOrgReService = eleOrgReService;
         this.tagInfoService = tagInfoService;
+        this.elementService = elementService;
+        this.eleFileService = eleFileService;
+        this.uploadService = uploadService;
     }
 
     @Override
@@ -64,6 +78,38 @@ public class JavMngServiceImpl implements JavMngService {
         LambdaQueryWrapper<Jav> lambdaQueryWrapper = getJavLambdaQueryWrapper(javQuery);
         queryPage(javQuery, page, lambdaQueryWrapper);
         return getJInfoListResp(page);
+    }
+
+    @Override
+    public ListResp<JavBasicInfo> getJavList(int pageIndex) {
+        Page<Jav> page = new Page<>(pageIndex, 10);
+        javService.page(page, Wrappers.lambdaQuery(Jav.class).orderByDesc(Jav::getEleId));
+        return getJInfoListResp(page);
+    }
+
+    @Override
+    public CheckResp uploadJav(JavUploadReq javUploadReq) {
+        Element element = new Element()
+                .setType(SourceEnum.Jav.getCode())
+                .setUploader(ThreadLocalUtil.getCurrentUser())
+                .setAvailableFlag(PrConstant.VALIDATED)
+                .setSharedFlag(PrConstant.NO);
+        elementService.save(element);
+        // TODO rpc call pelican to crawl javInfo
+        EleFile eleFile = new EleFile()
+                .setEleId(element.getId())
+                .setType(FileTypeEnum.getTypeBySuffix(javUploadReq.getFileName()).getSuffix())
+                .setAvailableFlag(PrConstant.VALIDATED)
+                .setName(javUploadReq.getFileName());
+        eleFileService.save(eleFile);
+        CheckResp checkResp = null;
+        try {
+            checkResp = uploadService.check(javUploadReq.getFileName(), javUploadReq.getFileMd5(),
+                    javUploadReq.getFileSize(), eleFile.getId());
+        } catch (IOException e) {
+            BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
+        }
+        return checkResp;
     }
 
     private void queryPage(JavQuery javQuery, Page<Jav> page, LambdaQueryWrapper<Jav> lambdaQueryWrapper) {
@@ -133,13 +179,6 @@ public class JavMngServiceImpl implements JavMngService {
         return lambdaQueryWrapper;
     }
 
-
-    @Override
-    public ListResp<JavBasicInfo> getJavList(int pageIndex) {
-        Page<Jav> page = new Page<>(pageIndex, 10);
-        javService.page(page, Wrappers.lambdaQuery(Jav.class).orderByDesc(Jav::getEleId));
-        return getJInfoListResp(page);
-    }
 
     @NotNull
     private ListResp<JavBasicInfo> getJInfoListResp(Page<Jav> page) {

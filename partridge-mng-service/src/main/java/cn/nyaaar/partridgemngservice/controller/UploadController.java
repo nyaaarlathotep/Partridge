@@ -42,12 +42,11 @@ public class UploadController {
     @LogAnnotation
     public R<CheckResp> check(@RequestBody @Validated(FileCheck.class) FileReq fileReq) {
         try {
-            return new R<>(uploadService.check(fileReq.getFileName(), fileReq.getFileMd5(), fileReq.getFileBytes(), fileReq.getSourceEnum()));
+            return new R<>(uploadService.check(fileReq.getFileName(), fileReq.getFileMd5(), fileReq.getFileSize(), fileReq.getEleFileId()));
         } catch (IOException e) {
             log.error("file check error, ", e);
-            BusinessExceptionEnum.SYSTEM_ERROR_CUSTOM.assertFail("文件操作异常，请联系管理员");
+            BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
         }
-
         return new R<>();
     }
 
@@ -57,10 +56,10 @@ public class UploadController {
     public R<String> upload(@RequestBody @Validated(FileUpload.class) FileReq fileReq, String shardBase64) {
         try {
             uploadService.upload(fileReq.getShardIndex(), fileReq.getFileMd5(), fileReq.getShardMd5(),
-                    Base64.getDecoder().decode(shardBase64), fileReq.getSourceEnum());
+                    Base64.getDecoder().decode(shardBase64), fileReq.getEleFileId());
         } catch (IOException e) {
             log.error("file check error, ", e);
-            BusinessExceptionEnum.SYSTEM_ERROR_CUSTOM.assertFail("文件操作异常，请联系管理员");
+            BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
         }
         return new R<>();
     }

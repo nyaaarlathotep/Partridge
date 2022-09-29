@@ -1,10 +1,7 @@
 package cn.nyaaar.partridgemngservice.util;
 
-import cn.nyaaar.partridgemngservice.common.constants.Settings;
-import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
@@ -40,19 +37,5 @@ public class PathUtil {
         return finalUrl.toString();
     }
 
-    @NotNull
-    public static String getEhFolderPath(String gid, String title) {
-        return PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(),
-                gid + "-" + title);
-    }
-
-    public static String getDownloadDir(String userName, SourceEnum sourceEnum) {
-        return simpleConcatUrl(Settings.getDownloadRootPath(),
-                userName, sourceEnum.getCode());
-    }
-
-    public static String getDownloadDirChild(String userName, SourceEnum sourceEnum, String fileName) {
-        return simpleConcatUrl(getDownloadDir(userName, sourceEnum), fileName);
-    }
 
 }

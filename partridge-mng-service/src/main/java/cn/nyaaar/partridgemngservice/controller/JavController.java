@@ -1,14 +1,18 @@
 package cn.nyaaar.partridgemngservice.controller;
 
 import cn.nyaaar.partridgemngservice.common.annotation.LogAnnotation;
+import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.model.jav.JavBasicInfo;
 import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.jav.JavQuery;
+import cn.nyaaar.partridgemngservice.model.jav.JavUploadReq;
 import cn.nyaaar.partridgemngservice.model.response.R;
+import cn.nyaaar.partridgemngservice.model.validate.FileCheck;
 import cn.nyaaar.partridgemngservice.service.jav.JavMngService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "jav", description = "jav 相关 Controller")
@@ -44,6 +48,14 @@ public class JavController {
     public R<ListResp<JavBasicInfo>> getJavBasicInfoList(@PathVariable Integer pageIndex) {
 
         return new R<>(javMngService.getJavList(pageIndex));
+    }
+
+    @Operation(summary = "upload jav", description = "上传 Jav")
+    @GetMapping(value = "/upload")
+    @LogAnnotation
+    public R<CheckResp> uploadJav(@RequestBody @Validated(FileCheck.class) JavUploadReq javUploadReq) {
+
+        return new R<>(javMngService.uploadJav(javUploadReq));
     }
 
 }
