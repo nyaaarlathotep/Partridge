@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.nyaaar.partridgemngservice.mapper.FileUploadInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.nyaaar.partridgemngservice.entity.FileUploadInfo">
+        <id column="ID" property="id" />
+        <result column="PATH" property="path" />
+        <result column="NAME" property="name" />
+        <result column="SUFFIX" property="suffix" />
+        <result column="SIZE" property="size" />
+        <result column="SHARD_NUM" property="shardNum" />
+        <result column="SHARD_SIZE" property="shardSize" />
+        <result column="SHARD_TOTAL" property="shardTotal" />
+        <result column="FILE_KEY" property="fileKey" />
+        <result column="UPLOAD_FLAG" property="uploadFlag" />
+        <result column="CREATED_TIME" property="createdTime" />
+        <result column="UPDATED_TIME" property="updatedTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ID, PATH, NAME, SUFFIX, SIZE, SHARD_NUM, SHARD_SIZE, SHARD_TOTAL, FILE_KEY, UPLOAD_FLAG, CREATED_TIME, UPDATED_TIME
+    </sql>
+
+</mapper>
