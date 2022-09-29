@@ -121,19 +121,17 @@ public class UploadServiceImpl implements UploadService {
         try (Stream<Path> paths = Files.walk(filePath.toPath())) {
             shardFiles = paths
                     .filter(Files::isRegularFile)
-                    .sorted().toList();
-        }
-        byte[] fileBytes;
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            for (Path shardFile : shardFiles) {
-                byte[] chunkFileBytes = Files.readAllBytes(shardFile);
-                byteArrayOutputStream.write(chunkFileBytes);
-                Files.delete(shardFile);
-            }
-            fileBytes = byteArrayOutputStream.toByteArray();
+                    .sorted()
+                    .toList();
         }
         try (BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(currentFile))) {
-            StreamUtils.copy(fileBytes, bufferedOutputStream);
+            for (Path shardFile : shardFiles) {
+                byte[] chunkFileBytes = Files.readAllBytes(shardFile);
+                bufferedOutputStream.write(chunkFileBytes);
+            }
+        }
+        for (Path shardFile : shardFiles) {
+            Files.delete(shardFile);
         }
         fileUploadInfo.setUploadFlag(PrConstant.UPLOADED);
         fileUploadInfoService.updateById(fileUploadInfo);
