@@ -1,8 +1,8 @@
-package cn.nyaaar.partridgemngservice.service.download.impl;
+package cn.nyaaar.partridgemngservice.service.file.impl;
 
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.service.EleFileService;
-import cn.nyaaar.partridgemngservice.service.download.DownloadService;
+import cn.nyaaar.partridgemngservice.service.file.DownloadService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.requestBuilder.EhRequestBuilder;
 import lombok.extern.slf4j.Slf4j;

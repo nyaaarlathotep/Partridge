@@ -263,6 +263,9 @@ public class Settings {
     private static final int DEFAULT_DOWNLOAD_QUEUE_EXPIRE_TIME = 30;
     private static final String DOWNLOAD_QUEUE_EXPIRE_TIME = "download_queue_expire_time";
     //    private static Context sContext;
+    private static final Integer DEFAULT_SHARD_SIZE = 5242880;
+    // please don't overflow int size...
+    private static final String SHARD_SIZE = "chuck_size";
     private static Map<String, Object> sSettingsPre = new HashMap<>();
     private static EhConfig sEhConfig;
 
@@ -1178,8 +1181,12 @@ public class Settings {
     public static int getPageSize() {
         return getInt(PAGE_SIZE, DEFAULT_PAGE_SIZE);
     }
-    
-    public static int getDownloadQueueExpireTime(){
-        return getInt(DOWNLOAD_QUEUE_EXPIRE_TIME,DEFAULT_DOWNLOAD_QUEUE_EXPIRE_TIME);
+
+    public static int getDownloadQueueExpireTime() {
+        return getInt(DOWNLOAD_QUEUE_EXPIRE_TIME, DEFAULT_DOWNLOAD_QUEUE_EXPIRE_TIME);
+    }
+
+    public static Integer getShardSize() {
+        return getInt(SHARD_SIZE, DEFAULT_SHARD_SIZE);
     }
 }

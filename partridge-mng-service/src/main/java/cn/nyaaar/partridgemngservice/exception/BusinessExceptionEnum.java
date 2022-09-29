@@ -18,7 +18,7 @@ public enum BusinessExceptionEnum implements BusinessExceptionAssert {
     JSON_PARSE_ERR(100007, "JSON转换错误"),
     DECRYPTION_ERR(100008, "请求数据错误，无法解密"),
     BAD_REQUEST(100009, "请求异常"),
-    VERIFY_SIGN_ERR(100010, "验签失败"),
+    VERIFY_MD5_ERR(100010, "md5校验失败"),
     FIELD_ERROR_CUSTOM(100011, "{0}"),
     SYSTEM_ERROR_CUSTOM(100012, "{0}"),
     HTTP_REQUEST_FAILED(100013, "网络异常，请检查您的网络情况"),

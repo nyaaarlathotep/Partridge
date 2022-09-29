@@ -2,6 +2,8 @@ package cn.nyaaar.partridgemngservice.util;
 
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.setting.Setting;
+import cn.nyaaar.partridgemngservice.common.constants.Settings;
 
 import java.io.*;
 import java.security.MessageDigest;

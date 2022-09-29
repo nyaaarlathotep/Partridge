@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.service.download;
+package cn.nyaaar.partridgemngservice.service.file;
 
 
 /**
