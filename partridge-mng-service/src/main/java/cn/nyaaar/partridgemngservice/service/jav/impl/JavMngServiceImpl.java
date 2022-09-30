@@ -2,6 +2,7 @@ package cn.nyaaar.partridgemngservice.service.jav.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
+import cn.nyaaar.partridgemngservice.common.constants.Settings;
 import cn.nyaaar.partridgemngservice.common.enums.EleOrgReTypeEnum;
 import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
@@ -16,6 +17,7 @@ import cn.nyaaar.partridgemngservice.model.jav.JavUploadReq;
 import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.file.UploadService;
 import cn.nyaaar.partridgemngservice.service.jav.JavMngService;
+import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -46,13 +48,15 @@ public class JavMngServiceImpl implements JavMngService {
     private final ElementService elementService;
     private final EleFileService eleFileService;
     private final UploadService uploadService;
+    private final FileUploadInfoService fileUploadInfoService;
+    private final AppUserService appUserService;
 
     public JavMngServiceImpl(JavService javService,
                              OrganizationService organizationService,
                              ActorService actorService,
                              EleActorReService eleActorReService,
                              EleOrgReService eleOrgReService,
-                             TagInfoService tagInfoService, ElementService elementService, EleFileService eleFileService, UploadService uploadService) {
+                             TagInfoService tagInfoService, ElementService elementService, EleFileService eleFileService, UploadService uploadService, FileUploadInfoService fileUploadInfoService, AppUserService appUserService) {
         this.javService = javService;
         this.organizationService = organizationService;
         this.actorService = actorService;
@@ -62,6 +66,8 @@ public class JavMngServiceImpl implements JavMngService {
         this.elementService = elementService;
         this.eleFileService = eleFileService;
         this.uploadService = uploadService;
+        this.fileUploadInfoService = fileUploadInfoService;
+        this.appUserService = appUserService;
     }
 
     @Override
@@ -89,9 +95,11 @@ public class JavMngServiceImpl implements JavMngService {
 
     @Override
     public CheckResp uploadJav(JavUploadReq javUploadReq) {
+        checkQuota();
         Element element = new Element()
                 .setType(SourceEnum.Jav.getCode())
                 .setUploader(ThreadLocalUtil.getCurrentUser())
+                .setFileSize(0L)
                 .setAvailableFlag(PrConstant.VALIDATED)
                 .setSharedFlag(PrConstant.NO);
         elementService.save(element);
@@ -105,12 +113,56 @@ public class JavMngServiceImpl implements JavMngService {
         CheckResp checkResp = null;
         try {
             checkResp = uploadService.check(javUploadReq.getFileName(), javUploadReq.getFileMd5(),
-                    javUploadReq.getFileSize(), eleFile.getId());
+                    javUploadReq.getFileSize(), eleFile.getId(), javUploadReq.getUploaderPath());
         } catch (IOException e) {
             log.error("check error, ", e);
             BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
         }
         return checkResp;
+    }
+
+    private void checkQuota() {
+        String userName = ThreadLocalUtil.getCurrentUser();
+        List<FileUploadInfo> uploadingFiles = elementService
+                .list(Wrappers.lambdaQuery(Element.class)
+                        .eq(Element::getUploader, userName))
+                .stream()
+                .map(element -> eleFileService.getOne(Wrappers.lambdaQuery(EleFile.class)
+                        .eq(EleFile::getEleId, element.getId()))).filter(Objects::nonNull)
+                .map(eleFile -> fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
+                        .eq(FileUploadInfo::getEleFileId, eleFile.getId())
+                        .eq(FileUploadInfo::getUploadFlag, PrConstant.UPLOADING))).filter(Objects::nonNull)
+                .toList();
+        if (uploadingFiles.size() >= Settings.getJavUploadingMax()) {
+            BusinessExceptionEnum.USER_CUSTOM.assertFail("已存在 " + uploadingFiles.size() + " 个正在上传的文件，请先上传完成。");
+        }
+        BusinessExceptionEnum.SPACE_INSUFFICIENT.assertIsTrue(appUserService.checkUserSpaceLimit(ThreadLocalUtil.getCurrentUser()));
+    }
+
+    @Override
+    public List<CheckResp> getUploadingJavs() {
+        String userName = ThreadLocalUtil.getCurrentUser();
+        return elementService
+                .list(Wrappers.lambdaQuery(Element.class)
+                        .eq(Element::getUploader, userName)
+                        .eq(Element::getAvailableFlag, PrConstant.VALIDATED))
+                .stream()
+                .map(element -> eleFileService.getOne(Wrappers.lambdaQuery(EleFile.class)
+                        .eq(EleFile::getEleId, element.getId())
+                        .eq(EleFile::getAvailableFlag, PrConstant.VALIDATED))).filter(Objects::nonNull)
+                .map(eleFile -> fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
+                        .eq(FileUploadInfo::getEleFileId, eleFile.getId())
+                        .eq(FileUploadInfo::getUploadFlag, PrConstant.UPLOADING))).filter(Objects::nonNull)
+                .map(fileUploadInfo -> {
+                    try {
+                        return uploadService.check(fileUploadInfo.getEleFileId());
+                    } catch (IOException e) {
+                        log.error("file check error, ", e);
+                        BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
+                    }
+                    return null;
+                }).filter(Objects::nonNull)
+                .toList();
     }
 
     private void queryPage(JavQuery javQuery, Page<Jav> page, LambdaQueryWrapper<Jav> lambdaQueryWrapper) {

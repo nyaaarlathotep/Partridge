@@ -6,8 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.util.Collections;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * 检查文件上传 Resp
@@ -22,8 +22,18 @@ import java.util.TreeSet;
 public class CheckResp {
 
     @Schema(title = "缺失分片序号")
-    Set<Integer> missingShardIndex = new TreeSet<>();
+    private Set<Integer> missingShardIndex = Collections.emptySet();
 
     @Schema(title = "分片大小，单位为 Byte")
-    Integer shardSize;
+    private Integer shardSize;
+
+    @Schema(title = "对应文件大小，单位为 Byte")
+    private Long size;
+
+    @Schema(title = "对应文件在上传者文件系统的路径")
+    private String uploaderPath;
+
+    @Schema(title = "对应 eleFile id")
+    private Integer eleFileId;
+
 }

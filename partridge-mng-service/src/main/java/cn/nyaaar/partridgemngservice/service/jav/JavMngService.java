@@ -6,6 +6,8 @@ import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.jav.JavQuery;
 import cn.nyaaar.partridgemngservice.model.jav.JavUploadReq;
 
+import java.util.List;
+
 public interface JavMngService {
 
     /**
@@ -32,5 +34,18 @@ public interface JavMngService {
      */
     ListResp<JavBasicInfo> getJavList(int pageIndex);
 
+    /**
+     * 上传 Jav 的提前准备
+     *
+     * @param javUploadReq javUploadReq
+     * @return CheckResp
+     */
     CheckResp uploadJav(JavUploadReq javUploadReq);
+
+    /**
+     * 获取当前用户正在上传，未上传完成的 Jav
+     *
+     * @return List<CheckResp>
+     */
+    List<CheckResp> getUploadingJavs();
 }

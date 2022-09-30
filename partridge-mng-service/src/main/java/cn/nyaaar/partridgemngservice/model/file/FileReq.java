@@ -38,6 +38,14 @@ public class FileReq {
     @NotNull(groups = {FileUpload.class}, message = "请上传文件分片序号")
     private Integer shardIndex;
 
+    @Schema(title = "文件 Base64")
+    @NotNull(groups = {FileUpload.class}, message = "请上传文件Base64")
+    private String shardBase64;
+
+    @Schema(title = "文件上传者文件系统路径")
+    @NotNull(groups = {FileUpload.class}, message = "请上传文件Base64")
+    private String uploaderPath;
+
     @Schema(title = "文件分片 md5")
     @NotNull(groups = {FileUpload.class}, message = "请上传文件分片 md5")
     private String shardMd5;

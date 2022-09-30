@@ -47,6 +47,12 @@ public class FileUploadInfo extends Model<FileUploadInfo> {
     private String path;
 
     /**
+     * 文件在上传者文件系统的路径
+     */
+    @TableField("UPLOADER_PATH")
+    private String uploaderPath;
+
+    /**
      * 文件名
      */
     @TableField("NAME")

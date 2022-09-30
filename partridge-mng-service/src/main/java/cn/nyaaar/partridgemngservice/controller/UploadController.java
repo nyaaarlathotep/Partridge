@@ -5,7 +5,6 @@ import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.model.file.FileReq;
 import cn.nyaaar.partridgemngservice.model.response.R;
-import cn.nyaaar.partridgemngservice.model.validate.FileCheck;
 import cn.nyaaar.partridgemngservice.model.validate.FileUpload;
 import cn.nyaaar.partridgemngservice.service.file.UploadService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,9 +39,9 @@ public class UploadController {
     @Operation(summary = "检查文件", description = "检查文件分片是否全部上传完成")
     @PostMapping(value = "/check")
     @LogAnnotation
-    public R<CheckResp> check(@RequestBody @Validated(FileCheck.class) FileReq fileReq) {
+    public R<CheckResp> check(@RequestBody Integer eleId) {
         try {
-            return new R<>(uploadService.check(fileReq.getFileName(), fileReq.getFileMd5(), fileReq.getFileSize(), fileReq.getEleFileId()));
+            return new R<>(uploadService.check(eleId));
         } catch (IOException e) {
             log.error("file check error, ", e);
             BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
@@ -53,12 +52,26 @@ public class UploadController {
     @Operation(summary = "上传文件分片", description = "上传文件分片")
     @PostMapping(value = "/upload")
     @LogAnnotation
-    public R<String> upload(@RequestBody @Validated(FileUpload.class) FileReq fileReq, String shardBase64) {
+    public R<String> upload(@RequestBody @Validated(FileUpload.class) FileReq fileReq) {
         try {
             uploadService.upload(fileReq.getShardIndex(), fileReq.getFileMd5(), fileReq.getShardMd5(),
-                    Base64.getDecoder().decode(shardBase64), fileReq.getEleFileId());
+                    Base64.getDecoder().decode(fileReq.getShardBase64()));
         } catch (IOException e) {
-            log.error("file check error, ", e);
+            log.error("file upload error, ", e);
+            BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
+        }
+        return new R<>();
+    }
+
+
+    @Operation(summary = "上传文件分片", description = "上传文件分片")
+    @PostMapping(value = "/delete")
+    @LogAnnotation
+    public R<String> delete(@RequestBody Integer eleId) {
+        try {
+            uploadService.delete(eleId);
+        } catch (IOException e) {
+            log.error("file upload error, ", e);
             BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
         }
         return new R<>();

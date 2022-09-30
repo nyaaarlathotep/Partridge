@@ -13,14 +13,24 @@ public interface UploadService {
     /**
      * 检查文件是否分片是否上传完成，如果完成，则进行合并。
      *
-     * @param fileName  fileName
-     * @param fileMd5   fileMd5
-     * @param fileSize  fileSize
+     * @param fileName     fileName
+     * @param fileMd5      fileMd5
+     * @param fileSize     fileSize
+     * @param eleFileId    eleFileId
+     * @param uploaderPath uploaderPath
+     * @return 缺失分片序号
+     * @throws IOException 文件操作异常
+     */
+    CheckResp check(String fileName, String fileMd5, Long fileSize, Integer eleFileId, String uploaderPath) throws IOException;
+
+    /**
+     * 检查文件是否分片是否上传完成，如果完成，则进行合并，只能在后面几次调用
+     *
      * @param eleFileId eleFileId
      * @return 缺失分片序号
      * @throws IOException 文件操作异常
      */
-    CheckResp check(String fileName, String fileMd5, Long fileSize, Integer eleFileId) throws IOException;
+    CheckResp check(Integer eleFileId) throws IOException;
 
     /**
      * 上传文件分片
@@ -29,9 +39,15 @@ public interface UploadService {
      * @param fileMd5    fileMd5
      * @param shardMd5   shardMd5
      * @param shardBytes shardBytes
-     * @param eleFileId  eleFileId
      * @throws IOException 文件操作异常
      */
-    void upload(Integer shardIndex, String fileMd5, String shardMd5, byte[] shardBytes, Integer eleFileId) throws IOException;
+    void upload(Integer shardIndex, String fileMd5, String shardMd5, byte[] shardBytes) throws IOException;
+
+    /**
+     * 删除文件与相关分片
+     *
+     * @param eleId eleId
+     */
+    void delete(Integer eleId) throws IOException;
 
 }

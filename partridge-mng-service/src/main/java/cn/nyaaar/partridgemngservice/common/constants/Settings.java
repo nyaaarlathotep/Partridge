@@ -266,7 +266,10 @@ public class Settings {
     private static final Integer DEFAULT_SHARD_SIZE = 5242880;
     // please don't overflow int size...
     private static final String SHARD_SIZE = "chuck_size";
-    private static Map<String, Object> sSettingsPre = new HashMap<>();
+
+    private static final int DEFAULT_UPLOADING_JAV_MAX = 3;
+    private static final String UPLOADING_JAV_MAX = "uploading_jav_max";
+    private static final Map<String, Object> sSettingsPre = new HashMap<>();
     private static EhConfig sEhConfig;
 
 //    public static void initialize(Context context) {
@@ -1188,5 +1191,9 @@ public class Settings {
 
     public static Integer getShardSize() {
         return getInt(SHARD_SIZE, DEFAULT_SHARD_SIZE);
+    }
+
+    public static Integer getJavUploadingMax() {
+        return getInt(UPLOADING_JAV_MAX, DEFAULT_UPLOADING_JAV_MAX);
     }
 }

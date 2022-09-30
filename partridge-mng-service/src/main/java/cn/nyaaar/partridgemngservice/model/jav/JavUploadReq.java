@@ -21,6 +21,6 @@ import javax.validation.constraints.NotNull;
 public class JavUploadReq extends FileReq {
    
     @Schema(title = "jav code")
-    @NotNull(groups = {FileCheck.class,}, message = "请上传对应的 jav code")
+    @NotNull(groups = {FileCheck.class}, message = "请上传对应的 jav code")
     private String code;
 }

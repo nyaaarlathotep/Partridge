@@ -2,8 +2,6 @@ package cn.nyaaar.partridgemngservice.util;
 
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.setting.Setting;
-import cn.nyaaar.partridgemngservice.common.constants.Settings;
 
 import java.io.*;
 import java.security.MessageDigest;
@@ -359,5 +357,9 @@ public class FileUtil {
         originName = originName.replace("/", "");
         originName = originName.replace("\\", "");
         return legalizeDirName(originName);
+    }
+
+    public static String getFileDir(String filePath) {
+        return filePath.substring(0, filePath.lastIndexOf(File.separator));
     }
 }

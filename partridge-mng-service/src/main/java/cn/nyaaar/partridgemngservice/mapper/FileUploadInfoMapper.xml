@@ -7,6 +7,7 @@
         <id column="ID" property="id" />
         <result column="ELE_FILE_ID" property="eleFileId" />
         <result column="PATH" property="path" />
+        <result column="UPLOADER_PATH" property="uploaderPath" />
         <result column="NAME" property="name" />
         <result column="SUFFIX" property="suffix" />
         <result column="SIZE" property="size" />
@@ -21,7 +22,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        ID, ELE_FILE_ID, PATH, NAME, SUFFIX, SIZE, SHARD_NUM, SHARD_SIZE, SHARD_TOTAL, FILE_KEY, UPLOAD_FLAG, CREATED_TIME, UPDATED_TIME
+        ID, ELE_FILE_ID, PATH, UPLOADER_PATH, NAME, SUFFIX, SIZE, SHARD_NUM, SHARD_SIZE, SHARD_TOTAL, FILE_KEY, UPLOAD_FLAG, CREATED_TIME, UPDATED_TIME
     </sql>
 
 </mapper>

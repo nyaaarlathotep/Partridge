@@ -12,11 +12,14 @@ import cn.nyaaar.partridgemngservice.service.EleFileService;
 import cn.nyaaar.partridgemngservice.service.ElementService;
 import cn.nyaaar.partridgemngservice.service.FileUploadInfoService;
 import cn.nyaaar.partridgemngservice.service.file.UploadService;
+import cn.nyaaar.partridgemngservice.service.user.AppUserService;
+import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.PathUtil;
 import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 import java.io.*;
@@ -38,24 +41,30 @@ public class UploadServiceImpl implements UploadService {
     private final FileUploadInfoService fileUploadInfoService;
     private final ElementService elementService;
     private final EleFileService eleFileService;
+    private final AppUserService appUserService;
 
-    public UploadServiceImpl(FileUploadInfoService fileUploadInfoService, ElementService elementService, EleFileService eleFileService) {
+    public UploadServiceImpl(FileUploadInfoService fileUploadInfoService,
+                             ElementService elementService,
+                             EleFileService eleFileService,
+                             AppUserService appUserService) {
         this.fileUploadInfoService = fileUploadInfoService;
         this.elementService = elementService;
         this.eleFileService = eleFileService;
+        this.appUserService = appUserService;
     }
 
 
-    public CheckResp check(String fileName, String fileMd5, Long fileSize, Integer eleFileId) throws IOException {
+    @Transactional(rollbackFor = Exception.class)
+    public CheckResp check(String fileName, String fileMd5, Long fileSize, Integer eleFileId, String uploaderPath) throws IOException {
         EleFile eleFile = eleFileService.findById(eleFileId);
         Element element = elementService.getById(eleFile.getEleId());
-        File filePath = new File(getDownloadDir(ThreadLocalUtil.getCurrentUser(), element), fileMd5);
-        File currentFile = new File(filePath, fileName);
+        File fileDir = new File(getDownloadDir(ThreadLocalUtil.getCurrentUser(), element), fileMd5);
+        File currentFile = new File(fileDir, fileName);
         if (currentFile.exists()) {
             return new CheckResp();
         }
-        if (!filePath.exists()) {
-            Files.createDirectories(filePath.toPath());
+        if (!fileDir.exists()) {
+            Files.createDirectories(fileDir.toPath());
         }
         FileUploadInfo fileUploadInfo = fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
                 .eq(FileUploadInfo::getFileKey, fileMd5));
@@ -65,23 +74,41 @@ public class UploadServiceImpl implements UploadService {
                     .setFileKey(fileMd5)
                     .setEleFileId(eleFileId)
                     .setPath(currentFile.getAbsolutePath())
+                    .setUploaderPath(uploaderPath)
                     .setName(fileName)
                     .setShardNum(0)
                     .setShardSize(Settings.getShardSize())
                     .setSuffix(FileTypeEnum.getTypeBySuffix(fileName).getSuffix())
                     .setShardTotal(shardTotal)
                     .setSize(fileSize)
-                    .setUploadFlag(PrConstant.NEW_CREATED);
+                    .setUploadFlag(PrConstant.UPLOADING);
             fileUploadInfoService.save(fileUploadInfo);
         }
+        return getCheckResp(fileUploadInfo, fileDir.toPath());
+    }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public CheckResp check(Integer eleFileId) throws IOException {
+        EleFile eleFile = eleFileService.findById(eleFileId);
+        FileUploadInfo fileUploadInfo = fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
+                .eq(FileUploadInfo::getEleFileId, eleFile.getId()));
+        BusinessExceptionEnum.NOT_EXISTS.assertNotNull(fileUploadInfo, "fileUploadInfo");
+        if (new File(fileUploadInfo.getPath()).exists()) {
+            return new CheckResp();
+        }
+        String fileDIr = FileUtil.getFileDir(fileUploadInfo.getPath());
+        return getCheckResp(fileUploadInfo, Path.of(fileDIr));
+    }
+
+    private CheckResp getCheckResp(FileUploadInfo fileUploadInfo, Path fileDir) throws IOException {
         Set<Integer> totalShards = IntStream
                 .range(0, fileUploadInfo.getShardTotal())
                 .boxed()
                 .collect(Collectors.toSet());
 
         Set<Integer> uploadedShards = Collections.emptySet();
-        try (Stream<Path> fileNameStream = Files.walk(filePath.toPath())) {
+        try (Stream<Path> fileNameStream = Files.walk(fileDir)) {
             uploadedShards = fileNameStream
                     .filter(Files::isRegularFile)
                     .map(path -> Integer.parseInt(path.getFileName().toString()))
@@ -101,27 +128,39 @@ public class UploadServiceImpl implements UploadService {
         }
         return new CheckResp()
                 .setMissingShardIndex(totalShards)
-                .setShardSize(fileUploadInfo.getShardSize());
+                .setShardSize(fileUploadInfo.getShardSize())
+                .setEleFileId(fileUploadInfo.getEleFileId())
+                .setUploaderPath(fileUploadInfo.getUploaderPath())
+                .setSize(fileUploadInfo.getSize());
     }
 
-    public void upload(Integer shardIndex, String fileMd5, String shardMd5, byte[] shardBytes, Integer eleFileId) throws IOException {
+    public void upload(Integer shardIndex, String fileMd5, String shardMd5, byte[] shardBytes) throws IOException {
         log.info("{} 分片:[{}]上传开始", fileMd5, shardIndex);
-        BusinessExceptionEnum.VERIFY_MD5_ERR.assertIsTrue(shardMd5.equals(DigestUtils.md5DigestAsHex(shardBytes)));
+        checkShardMd5(shardMd5, shardBytes);
 
-        EleFile eleFile = eleFileService.findById(eleFileId);
+        FileUploadInfo fileUploadInfo = fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
+                .eq(FileUploadInfo::getFileKey, fileMd5));
+
+        BusinessExceptionEnum.NOT_EXISTS.assertNotNull(fileUploadInfo, "fileUploadInfo");
+        EleFile eleFile = eleFileService.findById(fileUploadInfo.getEleFileId());
         Element element = elementService.getById(eleFile.getEleId());
         eleFileService.saveBytesToFile(shardBytes, getDownloadDirChild(ThreadLocalUtil.getCurrentUser(), element, fileMd5),
                 getShardName(shardIndex), true);
-        
-        FileUploadInfo fileUploadInfo = fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
-                .eq(FileUploadInfo::getFileKey, fileMd5));
-        BusinessExceptionEnum.NOT_EXISTS.assertNotNull(fileUploadInfo, "fileUploadInfo");
+        log.info("{} 分片:[{}]上传成功", fileMd5, shardIndex);
         fileUploadInfo.setShardNum(fileUploadInfo.getShardNum() + 1);
         fileUploadInfoService.updateById(fileUploadInfo);
         if (fileUploadInfo.getShardNum().equals(fileUploadInfo.getShardTotal())) {
             merge(fileUploadInfo);
         }
-        log.info("{} 分片:[{}]上传成功", fileMd5, shardIndex);
+    }
+
+    @Override
+    public void delete(Integer eleId) throws IOException {
+        
+    }
+
+    private static void checkShardMd5(String shardMd5, byte[] shardBytes) {
+        BusinessExceptionEnum.VERIFY_MD5_ERR.assertIsTrue(shardMd5.equals(DigestUtils.md5DigestAsHex(shardBytes)));
     }
 
     private static String getShardName(Integer shardIndex) {
@@ -153,9 +192,22 @@ public class UploadServiceImpl implements UploadService {
         for (Path shardFile : shardFiles) {
             Files.delete(shardFile);
         }
-        fileUploadInfo.setUploadFlag(PrConstant.UPLOADED);
-        fileUploadInfoService.updateById(fileUploadInfo);
         log.info("{} 合并成功", fileUploadInfo.getFileKey());
+        mergePostHandle(fileUploadInfo, element, eleFile);
+    }
+
+    private void mergePostHandle(FileUploadInfo fileUploadInfo, Element element, EleFile eleFile) {
+        fileUploadInfoService.update(Wrappers.lambdaUpdate(FileUploadInfo.class)
+                .set(FileUploadInfo::getUploadFlag, PrConstant.UPLOADED)
+                .eq(FileUploadInfo::getId, fileUploadInfo.getId()));
+        eleFileService.update(Wrappers.lambdaUpdate(EleFile.class)
+                .set(EleFile::getPath, fileUploadInfo.getPath())
+                .eq(EleFile::getId, eleFile.getId()));
+        Long elementBytes = FileUtil.getFolderSize(fileUploadInfo.getPath());
+        elementService.update(Wrappers.lambdaUpdate(Element.class)
+                .set(Element::getFileSize, element.getFileSize() + elementBytes)
+                .eq(Element::getId, element.getId()));
+        appUserService.minusUserSpaceLimit(ThreadLocalUtil.getCurrentUser(), elementBytes);
     }
 
     private static String getDownloadDir(String userName, Element element) {

@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "jav", description = "jav 相关 Controller")
 @RestController
 @RequestMapping("/jav")
@@ -51,11 +53,19 @@ public class JavController {
     }
 
     @Operation(summary = "上传 Jav", description = "上传 Jav，返回 check 的结果")
-    @GetMapping(value = "/upload")
+    @PostMapping(value = "/upload")
     @LogAnnotation
     public R<CheckResp> uploadJav(@RequestBody @Validated(FileCheck.class) JavUploadReq javUploadReq) {
 
         return new R<>(javMngService.uploadJav(javUploadReq));
+    }
+
+    @Operation(summary = "获取未上传完成的 Jav", description = "返回 check 的结果列表")
+    @GetMapping(value = "/uploading")
+    @LogAnnotation
+    public R<List<CheckResp>> getUploadingJavs() {
+
+        return new R<>(javMngService.getUploadingJavs());
     }
 
 }

@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-26
+ * @since 2022-09-30
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -41,10 +41,10 @@ public class Element extends Model<Element> {
     private String filePath;
 
     /**
-     * 关联文件总大小
+     * 关联文件总大小，单位为 B
      */
     @TableField("FILE_SIZE")
-    private String fileSize;
+    private Long fileSize;
 
     /**
      * (0-否;1-是)
