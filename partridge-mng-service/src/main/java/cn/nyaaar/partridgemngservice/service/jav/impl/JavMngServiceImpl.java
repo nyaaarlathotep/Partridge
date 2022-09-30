@@ -56,7 +56,12 @@ public class JavMngServiceImpl implements JavMngService {
                              ActorService actorService,
                              EleActorReService eleActorReService,
                              EleOrgReService eleOrgReService,
-                             TagInfoService tagInfoService, ElementService elementService, EleFileService eleFileService, UploadService uploadService, FileUploadInfoService fileUploadInfoService, AppUserService appUserService) {
+                             TagInfoService tagInfoService, 
+                             ElementService elementService, 
+                             EleFileService eleFileService, 
+                             UploadService uploadService, 
+                             FileUploadInfoService fileUploadInfoService, 
+                             AppUserService appUserService) {
         this.javService = javService;
         this.organizationService = organizationService;
         this.actorService = actorService;

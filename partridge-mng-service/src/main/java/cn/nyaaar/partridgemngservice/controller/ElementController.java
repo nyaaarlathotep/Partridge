@@ -6,6 +6,7 @@ import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.ElementDto;
 import cn.nyaaar.partridgemngservice.model.response.R;
 import cn.nyaaar.partridgemngservice.service.ElementService;
+import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,18 +24,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/element")
 @Slf4j
 public class ElementController {
-    // TODO more flag and mng, such as shared, uploader...
+    // TODO abstract upload element file...
 
     private final ElementService elementService;
+    private final ElementMngService elementMngService;
 
-    public ElementController(ElementService elementService) {
+    public ElementController(ElementService elementService,
+                             ElementMngService elementMngService) {
         this.elementService = elementService;
+        this.elementMngService = elementMngService;
     }
 
     @Operation(summary = "element基本信息", description = "通过主键id获取element基本信息")
     @GetMapping(value = "/element")
     @LogAnnotation
-    public R<ElementDto> getElementById(@RequestParam Integer elementId) {
+    public R<ElementDto> getElementById(@RequestParam Long elementId) {
         Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, elementId));
         BusinessExceptionEnum.ELEMENT_NOT_FOUND.assertNotNull(element);
         ElementDto elementDto = new ElementDto()
@@ -43,4 +47,11 @@ public class ElementController {
         return new R<>(elementDto);
     }
 
+    @Operation(summary = "分享 element", description = "通过主键id 分享 element")
+    @GetMapping(value = "/share")
+    @LogAnnotation
+    public R<String> shareElement(@RequestParam Long elementId) {
+        elementMngService.share(elementId);
+        return new R<>();
+    }
 }

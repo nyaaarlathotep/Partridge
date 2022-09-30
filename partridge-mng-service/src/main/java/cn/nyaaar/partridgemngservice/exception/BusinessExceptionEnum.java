@@ -20,7 +20,7 @@ public enum BusinessExceptionEnum implements BusinessExceptionAssert {
     BAD_REQUEST(100009, "请求异常"),
     VERIFY_MD5_ERR(100010, "md5校验失败"),
     FIELD_ERROR_CUSTOM(100011, "{0}"),
-    deleteFileSYSTEM_ERROR_CUSTOM(100012, "{0}"),
+    SYSTEM_ERROR_CUSTOM(100012, "{0}"),
     HTTP_REQUEST_FAILED(100013, "网络异常，请检查您的网络情况"),
     SYSTEM_DATA_ERROR(100014, "{0}"),
     COMMON_BUSINESS_ERROR(100015, "{0}"),

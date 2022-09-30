@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
 @Schema(name = "ElementDto")
 public class ElementDto {
     @Schema(title = "主键id")
-    private Integer id;
+    private Long id;
 
     @Schema(title = "element类型")
     private String type;
