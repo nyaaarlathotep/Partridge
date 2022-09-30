@@ -29,10 +29,18 @@ public interface AppUserService {
     Boolean checkUserSpaceLimit(String userName);
 
     /**
-     * element 下载完成后减去用户配额
+     * 下载或上传完成后减去用户配额
      *
      * @param userName   userName
      * @param spaceBytes bytes
      */
     void minusUserSpaceLimit(String userName, Long spaceBytes);
+
+    /**
+     * 删除完成后增加用户配额
+     *
+     * @param userName   userName
+     * @param spaceBytes bytes
+     */
+    void freeUserSpaceLimit(String userName, Long spaceBytes);
 }

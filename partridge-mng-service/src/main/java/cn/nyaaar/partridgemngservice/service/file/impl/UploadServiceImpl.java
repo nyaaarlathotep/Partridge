@@ -89,7 +89,7 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CheckResp check(Integer eleFileId) throws IOException {
+    public CheckResp check(Integer eleFileId) {
         EleFile eleFile = eleFileService.findById(eleFileId);
         FileUploadInfo fileUploadInfo = fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
                 .eq(FileUploadInfo::getEleFileId, eleFile.getId()));
@@ -98,7 +98,13 @@ public class UploadServiceImpl implements UploadService {
             return new CheckResp();
         }
         String fileDIr = FileUtil.getFileDir(fileUploadInfo.getPath());
-        return getCheckResp(fileUploadInfo, Path.of(fileDIr));
+        try {
+            return getCheckResp(fileUploadInfo, Path.of(fileDIr));
+        } catch (IOException e) {
+            log.error("file check error, ", e);
+            BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
+        }
+        return null;
     }
 
     private CheckResp getCheckResp(FileUploadInfo fileUploadInfo, Path fileDir) throws IOException {
@@ -114,7 +120,7 @@ public class UploadServiceImpl implements UploadService {
                     .map(path -> Integer.parseInt(path.getFileName().toString()))
                     .collect(Collectors.toSet());
         } catch (IOException e) {
-            log.error("[{}]read file shard name fail, ", ThreadLocalUtil.getCurrentUser(), e);
+            log.error("[{}] read file shard name fail, ", ThreadLocalUtil.getCurrentUser(), e);
             BusinessExceptionEnum.SYSTEM_DATA_ERROR.assertFail("读取分片文件出错，请联系管理员");
         }
         if (!fileUploadInfo.getShardNum().equals(uploadedShards.size())) {
@@ -134,8 +140,8 @@ public class UploadServiceImpl implements UploadService {
                 .setSize(fileUploadInfo.getSize());
     }
 
-    public void upload(Integer shardIndex, String fileMd5, String shardMd5, byte[] shardBytes) throws IOException {
-        log.info("{} 分片:[{}]上传开始", fileMd5, shardIndex);
+    public void upload(Integer shardIndex, String fileMd5, String shardMd5, byte[] shardBytes) {
+        log.info("[{}] 分片:[{}]上传开始", fileMd5, shardIndex);
         checkShardMd5(shardMd5, shardBytes);
 
         FileUploadInfo fileUploadInfo = fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
@@ -144,19 +150,47 @@ public class UploadServiceImpl implements UploadService {
         BusinessExceptionEnum.NOT_EXISTS.assertNotNull(fileUploadInfo, "fileUploadInfo");
         EleFile eleFile = eleFileService.findById(fileUploadInfo.getEleFileId());
         Element element = elementService.getById(eleFile.getEleId());
-        eleFileService.saveBytesToFile(shardBytes, getDownloadDirChild(ThreadLocalUtil.getCurrentUser(), element, fileMd5),
-                getShardName(shardIndex), true);
-        log.info("{} 分片:[{}]上传成功", fileMd5, shardIndex);
-        fileUploadInfo.setShardNum(fileUploadInfo.getShardNum() + 1);
-        fileUploadInfoService.updateById(fileUploadInfo);
-        if (fileUploadInfo.getShardNum().equals(fileUploadInfo.getShardTotal())) {
-            merge(fileUploadInfo);
+        try {
+            eleFileService.saveBytesToFile(shardBytes, getDownloadDirChild(ThreadLocalUtil.getCurrentUser(), element, fileMd5),
+                    getShardName(shardIndex), true);
+            log.info("[{}] 分片:[{}]上传成功", fileMd5, shardIndex);
+            fileUploadInfo.setShardNum(fileUploadInfo.getShardNum() + 1);
+            fileUploadInfoService.updateById(fileUploadInfo);
+            if (fileUploadInfo.getShardNum().equals(fileUploadInfo.getShardTotal())) {
+                merge(fileUploadInfo);
+            }
+        } catch (IOException e) {
+            log.error("[{}] 分片:[{}]上传失败", fileMd5, shardIndex, e);
+            BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
+
         }
     }
 
     @Override
-    public void delete(Integer eleId) throws IOException {
-        
+    public void delete(Integer eleId) {
+        try {
+            EleFile eleFile = eleFileService.findById(eleId);
+            BusinessExceptionEnum.ELEMENT_FILE_NOT_FOUND.assertNotNull(eleFile);
+            String dir = FileUtil.getFileDir(eleFile.getPath());
+            Long elementBytes = FileUtil.getFolderSize(dir);
+            File dirFile = new File(dir);
+            log.info("[{}] 删除开始", dir);
+            Integer deleteNum = 0;
+            FileUtil.deleteDir(dirFile, deleteNum);
+            log.info("[{}] 删除成功，共删除文件数量：{}", dir, deleteNum);
+
+            deletePostHandle(eleFile, elementBytes);
+        } catch (IOException e) {
+            log.error("file delete error, ", e);
+            BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
+        }
+    }
+
+    private void deletePostHandle(EleFile eleFile, Long elementBytes) {
+        eleFileService.update(Wrappers.lambdaUpdate(EleFile.class)
+                .set(EleFile::getAvailableFlag, PrConstant.INVALIDATED)
+                .eq(EleFile::getId, eleFile.getId()));
+        appUserService.freeUserSpaceLimit(ThreadLocalUtil.getCurrentUser(), elementBytes);
     }
 
     private static void checkShardMd5(String shardMd5, byte[] shardBytes) {
@@ -168,7 +202,7 @@ public class UploadServiceImpl implements UploadService {
     }
 
     private void merge(FileUploadInfo fileUploadInfo) throws IOException {
-        log.info("{} 合并开始", fileUploadInfo.getFileKey());
+        log.info("[{}] 合并开始", fileUploadInfo.getFileKey());
 
         EleFile eleFile = eleFileService.findById(fileUploadInfo.getEleFileId());
         Element element = elementService.getById(eleFile.getEleId());
@@ -192,7 +226,7 @@ public class UploadServiceImpl implements UploadService {
         for (Path shardFile : shardFiles) {
             Files.delete(shardFile);
         }
-        log.info("{} 合并成功", fileUploadInfo.getFileKey());
+        log.info("[{}] 合并成功", fileUploadInfo.getFileKey());
         mergePostHandle(fileUploadInfo, element, eleFile);
     }
 

@@ -1,7 +1,6 @@
 package cn.nyaaar.partridgemngservice.controller;
 
 import cn.nyaaar.partridgemngservice.common.annotation.LogAnnotation;
-import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.model.file.FileReq;
 import cn.nyaaar.partridgemngservice.model.response.R;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.Base64;
 
 /**
@@ -40,40 +38,24 @@ public class UploadController {
     @PostMapping(value = "/check")
     @LogAnnotation
     public R<CheckResp> check(@RequestBody Integer eleId) {
-        try {
-            return new R<>(uploadService.check(eleId));
-        } catch (IOException e) {
-            log.error("file check error, ", e);
-            BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
-        }
-        return new R<>();
+        return new R<>(uploadService.check(eleId));
     }
 
     @Operation(summary = "上传文件分片", description = "上传文件分片")
     @PostMapping(value = "/upload")
     @LogAnnotation
     public R<String> upload(@RequestBody @Validated(FileUpload.class) FileReq fileReq) {
-        try {
-            uploadService.upload(fileReq.getShardIndex(), fileReq.getFileMd5(), fileReq.getShardMd5(),
-                    Base64.getDecoder().decode(fileReq.getShardBase64()));
-        } catch (IOException e) {
-            log.error("file upload error, ", e);
-            BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
-        }
+        uploadService.upload(fileReq.getShardIndex(), fileReq.getFileMd5(), fileReq.getShardMd5(),
+                Base64.getDecoder().decode(fileReq.getShardBase64()));
         return new R<>();
     }
 
 
-    @Operation(summary = "上传文件分片", description = "上传文件分片")
+    @Operation(summary = "删除文件", description = "删除文件及其关联分片")
     @PostMapping(value = "/delete")
     @LogAnnotation
     public R<String> delete(@RequestBody Integer eleId) {
-        try {
-            uploadService.delete(eleId);
-        } catch (IOException e) {
-            log.error("file upload error, ", e);
-            BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
-        }
+        uploadService.delete(eleId);
         return new R<>();
     }
 }

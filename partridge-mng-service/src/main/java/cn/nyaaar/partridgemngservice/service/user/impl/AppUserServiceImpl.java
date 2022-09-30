@@ -125,4 +125,16 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
                 .set(PrUser::getSpaceQuota, prUser.getSpaceQuota() - spaceBytes)
                 .eq(PrUser::getUserName, userName));
     }
+
+    @Override
+    public void freeUserSpaceLimit(String userName, Long spaceBytes) {
+        if (null == spaceBytes || spaceBytes <= 0) {
+            return;
+        }
+        PrUser prUser = prUserService.getOne(Wrappers.lambdaQuery(PrUser.class)
+                .eq(PrUser::getUserName, userName));
+        prUserService.update(Wrappers.lambdaUpdate(PrUser.class)
+                .set(PrUser::getSpaceQuota, prUser.getSpaceQuota() + spaceBytes)
+                .eq(PrUser::getUserName, userName));
+    }
 }

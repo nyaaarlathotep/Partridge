@@ -360,6 +360,30 @@ public class FileUtil {
     }
 
     public static String getFileDir(String filePath) {
+        if (StringUtils.isEmpty(filePath)) {
+            return "";
+        }
         return filePath.substring(0, filePath.lastIndexOf(File.separator));
+    }
+
+    public static void deleteDir(File dirFile, Integer deleteNum) throws IOException {
+        if (!dirFile.exists()) {
+            return;
+        }
+        File[] files = dirFile.listFiles();
+        if (files == null) {
+            return;
+        }
+        for (File file : files) {
+            if (file.isDirectory()) {
+                deleteDir(file, deleteNum);
+            } else {
+                if (!file.delete()) {
+                    throw new IOException("delete file fail...");
+                } else {
+                    deleteNum++;
+                }
+            }
+        }
     }
 }

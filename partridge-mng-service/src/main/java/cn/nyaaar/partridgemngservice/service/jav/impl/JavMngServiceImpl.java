@@ -153,15 +153,7 @@ public class JavMngServiceImpl implements JavMngService {
                 .map(eleFile -> fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
                         .eq(FileUploadInfo::getEleFileId, eleFile.getId())
                         .eq(FileUploadInfo::getUploadFlag, PrConstant.UPLOADING))).filter(Objects::nonNull)
-                .map(fileUploadInfo -> {
-                    try {
-                        return uploadService.check(fileUploadInfo.getEleFileId());
-                    } catch (IOException e) {
-                        log.error("file check error, ", e);
-                        BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
-                    }
-                    return null;
-                }).filter(Objects::nonNull)
+                .map(fileUploadInfo -> uploadService.check(fileUploadInfo.getEleFileId())).filter(Objects::nonNull)
                 .toList();
     }
 

@@ -28,9 +28,8 @@ public interface UploadService {
      *
      * @param eleFileId eleFileId
      * @return 缺失分片序号
-     * @throws IOException 文件操作异常
      */
-    CheckResp check(Integer eleFileId) throws IOException;
+    CheckResp check(Integer eleFileId);
 
     /**
      * 上传文件分片
@@ -39,15 +38,14 @@ public interface UploadService {
      * @param fileMd5    fileMd5
      * @param shardMd5   shardMd5
      * @param shardBytes shardBytes
-     * @throws IOException 文件操作异常
      */
-    void upload(Integer shardIndex, String fileMd5, String shardMd5, byte[] shardBytes) throws IOException;
+    void upload(Integer shardIndex, String fileMd5, String shardMd5, byte[] shardBytes);
 
     /**
      * 删除文件与相关分片
      *
      * @param eleId eleId
      */
-    void delete(Integer eleId) throws IOException;
+    void delete(Integer eleId);
 
 }

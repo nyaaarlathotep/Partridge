@@ -20,7 +20,7 @@ public enum BusinessExceptionEnum implements BusinessExceptionAssert {
     BAD_REQUEST(100009, "请求异常"),
     VERIFY_MD5_ERR(100010, "md5校验失败"),
     FIELD_ERROR_CUSTOM(100011, "{0}"),
-    SYSTEM_ERROR_CUSTOM(100012, "{0}"),
+    deleteFileSYSTEM_ERROR_CUSTOM(100012, "{0}"),
     HTTP_REQUEST_FAILED(100013, "网络异常，请检查您的网络情况"),
     SYSTEM_DATA_ERROR(100014, "{0}"),
     COMMON_BUSINESS_ERROR(100015, "{0}"),
@@ -38,8 +38,9 @@ public enum BusinessExceptionEnum implements BusinessExceptionAssert {
     END_HERE(200012, "今回はここまで"),
     GALLERY_NOT_AVAILABLE(200013, "{0}"),
     ELEMENT_NOT_FOUND(200014, "没有找到对应元素"),
-    GALLERY_NOT_FOUND(200015, "没有找到对应画廊"),
-    PAGE_NOT_FOUND(200016, "没有找到对应页码"),
+    ELEMENT_FILE_NOT_FOUND(200015, "没有找到对应文件"),
+    GALLERY_NOT_FOUND(200016, "没有找到对应画廊"),
+    PAGE_NOT_FOUND(200017, "没有找到对应页码"),
     ;
 
     final int code;
