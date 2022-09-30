@@ -5,6 +5,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="cn.nyaaar.partridgemngservice.entity.FileUploadInfo">
         <id column="ID" property="id" />
+        <result column="ELE_FILE_ID" property="eleFileId" />
         <result column="PATH" property="path" />
         <result column="NAME" property="name" />
         <result column="SUFFIX" property="suffix" />
@@ -20,7 +21,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        ID, PATH, NAME, SUFFIX, SIZE, SHARD_NUM, SHARD_SIZE, SHARD_TOTAL, FILE_KEY, UPLOAD_FLAG, CREATED_TIME, UPDATED_TIME
+        ID, ELE_FILE_ID, PATH, NAME, SUFFIX, SIZE, SHARD_NUM, SHARD_SIZE, SHARD_TOTAL, FILE_KEY, UPLOAD_FLAG, CREATED_TIME, UPDATED_TIME
     </sql>
 
 </mapper>

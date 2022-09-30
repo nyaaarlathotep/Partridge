@@ -50,7 +50,7 @@ public class JavController {
         return new R<>(javMngService.getJavList(pageIndex));
     }
 
-    @Operation(summary = "upload jav", description = "上传 Jav")
+    @Operation(summary = "上传 Jav", description = "上传 Jav，返回 check 的结果")
     @GetMapping(value = "/upload")
     @LogAnnotation
     public R<CheckResp> uploadJav(@RequestBody @Validated(FileCheck.class) JavUploadReq javUploadReq) {

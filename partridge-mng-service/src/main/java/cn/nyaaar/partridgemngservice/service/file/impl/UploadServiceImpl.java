@@ -18,7 +18,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
-import org.springframework.util.StreamUtils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -64,6 +63,7 @@ public class UploadServiceImpl implements UploadService {
             int shardTotal = (int) Math.ceil(1.0 * fileSize / Settings.getShardSize());
             fileUploadInfo = new FileUploadInfo()
                     .setFileKey(fileMd5)
+                    .setEleFileId(eleFileId)
                     .setPath(currentFile.getAbsolutePath())
                     .setName(fileName)
                     .setShardNum(0)
@@ -75,25 +75,32 @@ public class UploadServiceImpl implements UploadService {
             fileUploadInfoService.save(fileUploadInfo);
         }
 
-        Set<Integer> chunks = IntStream.range(0, fileUploadInfo.getShardTotal()).boxed().collect(Collectors.toSet());
+        Set<Integer> totalShards = IntStream
+                .range(0, fileUploadInfo.getShardTotal())
+                .boxed()
+                .collect(Collectors.toSet());
 
-        Set<Integer> chunkNames = new TreeSet<>();
+        Set<Integer> uploadedShards = Collections.emptySet();
         try (Stream<Path> fileNameStream = Files.walk(filePath.toPath())) {
-            chunkNames = fileNameStream
+            uploadedShards = fileNameStream
                     .filter(Files::isRegularFile)
                     .map(path -> Integer.parseInt(path.getFileName().toString()))
                     .collect(Collectors.toSet());
         } catch (IOException e) {
-            log.error("[{}]read file shards fail, ", ThreadLocalUtil.getCurrentUser(), e);
+            log.error("[{}]read file shard name fail, ", ThreadLocalUtil.getCurrentUser(), e);
             BusinessExceptionEnum.SYSTEM_DATA_ERROR.assertFail("读取分片文件出错，请联系管理员");
         }
+        if (!fileUploadInfo.getShardNum().equals(uploadedShards.size())) {
+            log.error("shardNum mismatch! fileUploadInfo id:{}", fileUploadInfo.getId());
+            fileUploadInfo.setShardNum(uploadedShards.size());
+        }
         // 得到缺失的文件片号
-        chunks.removeAll(chunkNames);
-        if (chunks.isEmpty()) {
-            merge(fileUploadInfo, eleFileId);
+        totalShards.removeAll(uploadedShards);
+        if (totalShards.isEmpty()) {
+            merge(fileUploadInfo);
         }
         return new CheckResp()
-                .setMissingShardIndex(chunks)
+                .setMissingShardIndex(totalShards)
                 .setShardSize(fileUploadInfo.getShardSize());
     }
 
@@ -103,28 +110,28 @@ public class UploadServiceImpl implements UploadService {
 
         EleFile eleFile = eleFileService.findById(eleFileId);
         Element element = elementService.getById(eleFile.getEleId());
-        File filePath = new File(getDownloadDirChild(ThreadLocalUtil.getCurrentUser(), element, fileMd5), String.valueOf(shardIndex));
-        try (FileOutputStream fileOutputStream = new FileOutputStream(filePath)) {
-            StreamUtils.copy(shardBytes, fileOutputStream);
-        } catch (Exception e) {
-            // 分片传输过程中出现问题,删除当前分片文件
-            Files.delete(filePath.toPath());
-            throw e;
-        }
+        eleFileService.saveBytesToFile(shardBytes, getDownloadDirChild(ThreadLocalUtil.getCurrentUser(), element, fileMd5),
+                getShardName(shardIndex), true);
+        
         FileUploadInfo fileUploadInfo = fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
                 .eq(FileUploadInfo::getFileKey, fileMd5));
+        BusinessExceptionEnum.NOT_EXISTS.assertNotNull(fileUploadInfo, "fileUploadInfo");
         fileUploadInfo.setShardNum(fileUploadInfo.getShardNum() + 1);
         fileUploadInfoService.updateById(fileUploadInfo);
         if (fileUploadInfo.getShardNum().equals(fileUploadInfo.getShardTotal())) {
-            merge(fileUploadInfo, eleFileId);
+            merge(fileUploadInfo);
         }
         log.info("{} 分片:[{}]上传成功", fileMd5, shardIndex);
     }
 
-    private void merge(FileUploadInfo fileUploadInfo, Integer eleFileId) throws IOException {
+    private static String getShardName(Integer shardIndex) {
+        return String.valueOf(shardIndex);
+    }
+
+    private void merge(FileUploadInfo fileUploadInfo) throws IOException {
         log.info("{} 合并开始", fileUploadInfo.getFileKey());
 
-        EleFile eleFile = eleFileService.findById(eleFileId);
+        EleFile eleFile = eleFileService.findById(fileUploadInfo.getEleFileId());
         Element element = elementService.getById(eleFile.getEleId());
         File filePath = new File(getDownloadDir(ThreadLocalUtil.getCurrentUser(), element), fileUploadInfo.getFileKey());
         File currentFile = new File(filePath, fileUploadInfo.getName());

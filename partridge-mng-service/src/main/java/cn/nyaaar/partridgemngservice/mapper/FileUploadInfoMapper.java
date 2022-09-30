@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-29
+ * @since 2022-09-30
  */
 public interface FileUploadInfoMapper extends BaseMapper<FileUploadInfo> {
 

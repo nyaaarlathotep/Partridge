@@ -107,6 +107,7 @@ public class JavMngServiceImpl implements JavMngService {
             checkResp = uploadService.check(javUploadReq.getFileName(), javUploadReq.getFileMd5(),
                     javUploadReq.getFileSize(), eleFile.getId());
         } catch (IOException e) {
+            log.error("check error, ", e);
             BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
         }
         return checkResp;

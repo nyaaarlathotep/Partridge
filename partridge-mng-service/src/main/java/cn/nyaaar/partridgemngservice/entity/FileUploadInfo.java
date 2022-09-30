@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-29
+ * @since 2022-09-30
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -33,6 +33,12 @@ public class FileUploadInfo extends Model<FileUploadInfo> {
      */
     @TableId(value = "ID", type = IdType.AUTO)
     private Integer id;
+
+    /**
+     * 对应 ELE_FILE 的 id
+     */
+    @TableField("ELE_FILE_ID")
+    private Integer eleFileId;
 
     /**
      * 绝对路径

@@ -11,7 +11,7 @@ import java.util.List;
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-29
+ * @since 2022-09-30
  */
 public interface FileUploadInfoService extends IService<FileUploadInfo> {
 

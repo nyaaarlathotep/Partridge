@@ -91,7 +91,7 @@ public class EleFileServiceImpl extends ServiceImpl<EleFileMapper, EleFile> impl
 
     @Override
     public void saveBytesToFile(byte[] bytes, String destDic, String fileName, boolean reDownload) throws IOException {
-
+        // TODO legalize name for read
         destDic = FileUtil.legalizeDirName(destDic);
         Path dic = Path.of(destDic);
         if (Files.notExists(dic)) {
