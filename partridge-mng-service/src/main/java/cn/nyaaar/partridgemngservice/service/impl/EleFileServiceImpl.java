@@ -58,7 +58,7 @@ public class EleFileServiceImpl extends ServiceImpl<EleFileMapper, EleFile> impl
     }
 
     @Override
-    public EleFile findById(Integer id){
+    public EleFile findById(Long id){
     
         return baseMapper.selectById(id);
     }

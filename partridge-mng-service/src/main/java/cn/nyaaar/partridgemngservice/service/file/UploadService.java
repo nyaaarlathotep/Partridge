@@ -21,7 +21,7 @@ public interface UploadService {
      * @return 缺失分片序号
      * @throws IOException 文件操作异常
      */
-    CheckResp check(String fileName, String fileMd5, Long fileSize, Integer eleFileId, String uploaderPath) throws IOException;
+    CheckResp check(String fileName, String fileMd5, Long fileSize, Long eleFileId, String uploaderPath) throws IOException;
 
     /**
      * 检查文件是否分片是否上传完成，如果完成，则进行合并，只能在后面几次调用
@@ -29,7 +29,7 @@ public interface UploadService {
      * @param eleFileId eleFileId
      * @return 缺失分片序号
      */
-    CheckResp check(Integer eleFileId);
+    CheckResp check(Long eleFileId);
 
     /**
      * 上传文件分片

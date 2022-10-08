@@ -38,7 +38,7 @@ public class FileUploadInfo extends Model<FileUploadInfo> {
      * 对应 ELE_FILE 的 id
      */
     @TableField("ELE_FILE_ID")
-    private Integer eleFileId;
+    private Long eleFileId;
 
     /**
      * 绝对路径

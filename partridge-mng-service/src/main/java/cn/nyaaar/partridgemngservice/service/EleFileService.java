@@ -64,5 +64,5 @@ public interface EleFileService extends IService<EleFile> {
      * @param id id
      * @return EleFile
      */
-    EleFile findById(Integer id);
+    EleFile findById(Long id);
 }

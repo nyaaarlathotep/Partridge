@@ -34,7 +34,7 @@ public class CheckResp {
     private String uploaderPath;
 
     @Schema(title = "对应 eleFile id")
-    private Integer eleFileId;
+    private Long eleFileId;
 
     @Schema(title = "是否上传完成")
     private Boolean uploaded = false;

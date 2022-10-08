@@ -55,8 +55,8 @@ public class Element extends Model<Element> {
     /**
      * 释放标志(0-否;1-是)，释放后上传者将不能删除元素
      */
-    @TableField("FREED_FLAG")
-    private Integer freedFlag;
+    @TableField("PUBLISHED_FLAG")
+    private Integer publishedFlag;
 
     /**
      * 上传用户

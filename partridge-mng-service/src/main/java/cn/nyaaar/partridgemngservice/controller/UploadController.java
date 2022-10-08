@@ -37,7 +37,7 @@ public class UploadController {
     @Operation(summary = "检查文件", description = "检查文件分片是否全部上传完成")
     @PostMapping(value = "/check")
     @LogAnnotation
-    public R<CheckResp> check(@RequestBody Integer eleId) {
+    public R<CheckResp> check(@RequestBody Long eleId) {
         return new R<>(uploadService.check(eleId));
     }
 

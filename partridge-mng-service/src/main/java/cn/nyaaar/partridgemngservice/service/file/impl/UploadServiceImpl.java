@@ -55,7 +55,7 @@ public class UploadServiceImpl implements UploadService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public CheckResp check(String fileName, String fileMd5, Long fileSize, Integer eleFileId, String uploaderPath) throws IOException {
+    public CheckResp check(String fileName, String fileMd5, Long fileSize, Long eleFileId, String uploaderPath) throws IOException {
         EleFile eleFile = eleFileService.findById(eleFileId);
         Element element = elementService.getById(eleFile.getEleId());
         File fileDir = new File(getDownloadDir(ThreadLocalUtil.getCurrentUser(), element), fileMd5);
@@ -89,7 +89,7 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CheckResp check(Integer eleFileId) {
+    public CheckResp check(Long eleFileId) {
         EleFile eleFile = eleFileService.findById(eleFileId);
         FileUploadInfo fileUploadInfo = fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
                 .eq(FileUploadInfo::getEleFileId, eleFile.getId()));

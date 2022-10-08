@@ -1,6 +1,7 @@
 package cn.nyaaar.partridgemngservice.service.element.impl;
 
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
+import cn.nyaaar.partridgemngservice.entity.EleFile;
 import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.service.EleFileService;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -40,7 +42,7 @@ public class ElementMngServiceImpl implements ElementMngService {
     public void share(Long elementId) {
         Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, elementId));
         BusinessExceptionEnum.ELEMENT_NOT_FOUND.assertNotNull(element);
-
+        checkEleFilesCompleted(elementId);
         elementService.update(Wrappers.lambdaUpdate(Element.class)
                 .set(Element::getSharedFlag, PrConstant.YES)
                 .eq(Element::getId, elementId));
@@ -70,7 +72,7 @@ public class ElementMngServiceImpl implements ElementMngService {
 
     private void checkDeletePermission(Long eleId, Element element) {
         BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(checkWritePermission(eleId));
-        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(Objects.equals(PrConstant.YES, element.getFreedFlag()));
+        BusinessExceptionEnum.PERMISSION_DENY.assertIsFalse(Objects.equals(PrConstant.YES, element.getPublishedFlag()));
     }
 
     @Override
@@ -82,12 +84,21 @@ public class ElementMngServiceImpl implements ElementMngService {
     public void publishElement(Long eleId) {
         Element element = elementService.getById(eleId);
         BusinessExceptionEnum.ELEMENT_FILE_NOT_FOUND.assertNotNull(element);
-//        List<EleFile>
-
+        checkEleFilesCompleted(eleId);
+        appUserService.freeUserSpaceLimit(ThreadLocalUtil.getCurrentUser(), element.getFileSize());
+        elementService.update(Wrappers.lambdaUpdate(Element.class)
+                .set(Element::getPublishedFlag, PrConstant.YES)
+                .eq(Element::getId, eleId));
     }
 
-    private void freeQuota(Long elementBytes) {
-        appUserService.freeUserSpaceLimit(ThreadLocalUtil.getCurrentUser(), elementBytes);
+    private void checkEleFilesCompleted(Long eleId) {
+        List<EleFile> eleFiles = eleFileService.list(Wrappers.lambdaQuery(EleFile.class)
+                .eq(EleFile::getEleId, eleId));
+        for (EleFile eleFile : eleFiles) {
+            if (!Objects.equals(eleFile.getCompletedFlag(), PrConstant.YES)) {
+                BusinessExceptionEnum.COMMON_BUSINESS_ERROR.assertFail("存在文件未上传完成，无法操作");
+            }
+        }
     }
 
     @Override
