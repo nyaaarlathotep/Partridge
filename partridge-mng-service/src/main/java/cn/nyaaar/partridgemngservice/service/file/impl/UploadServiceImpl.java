@@ -94,8 +94,10 @@ public class UploadServiceImpl implements UploadService {
         FileUploadInfo fileUploadInfo = fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
                 .eq(FileUploadInfo::getEleFileId, eleFile.getId()));
         BusinessExceptionEnum.NOT_EXISTS.assertNotNull(fileUploadInfo, "fileUploadInfo");
-        if (new File(fileUploadInfo.getPath()).exists()) {
-            return new CheckResp();
+        if (Objects.equals(fileUploadInfo.getUploadFlag(), PrConstant.UPLOADED)) {
+            return new CheckResp()
+                    .setEleFileId(fileUploadInfo.getEleFileId())
+                    .setUploaded(true);
         }
         String fileDIr = FileUtil.getFileDir(fileUploadInfo.getPath());
         try {
@@ -120,11 +122,14 @@ public class UploadServiceImpl implements UploadService {
                     .map(path -> Integer.parseInt(path.getFileName().toString()))
                     .collect(Collectors.toSet());
         } catch (IOException e) {
-            log.error("[{}] read file shard name fail, ", ThreadLocalUtil.getCurrentUser(), e);
+            log.error("[{}] read file shard name fail, ", fileUploadInfo.getFileKey(), e);
             BusinessExceptionEnum.SYSTEM_DATA_ERROR.assertFail("读取分片文件出错，请联系管理员");
         }
         if (!fileUploadInfo.getShardNum().equals(uploadedShards.size())) {
-            log.error("shardNum mismatch! fileUploadInfo id:{}", fileUploadInfo.getId());
+            log.error("[{}] shardNum mismatch!", fileUploadInfo.getFileKey());
+            fileUploadInfoService.update(Wrappers.lambdaUpdate(FileUploadInfo.class)
+                    .set(FileUploadInfo::getShardNum, uploadedShards.size())
+                    .eq(FileUploadInfo::getId, fileUploadInfo.getId()));
             fileUploadInfo.setShardNum(uploadedShards.size());
         }
         // 得到缺失的文件片号
@@ -172,21 +177,19 @@ public class UploadServiceImpl implements UploadService {
             EleFile eleFile = eleFileService.findById(eleId);
             BusinessExceptionEnum.ELEMENT_FILE_NOT_FOUND.assertNotNull(eleFile);
             String dir = FileUtil.getFileDir(eleFile.getPath());
-            Long elementBytes = FileUtil.getFolderSize(dir);
             File dirFile = new File(dir);
             log.info("[{}] 删除开始", dir);
             Integer deleteNum = 0;
             FileUtil.deleteDir(dirFile, deleteNum);
             log.info("[{}] 删除成功，共删除文件数量：{}", dir, deleteNum);
 
-            deletePostHandle(eleFile, elementBytes);
         } catch (IOException e) {
             log.error("file delete error, ", e);
             BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
         }
     }
 
-    private void deletePostHandle(EleFile eleFile, Long elementBytes) {
+    private void freeQuota(EleFile eleFile, Long elementBytes) {
         eleFileService.update(Wrappers.lambdaUpdate(EleFile.class)
                 .set(EleFile::getAvailableFlag, PrConstant.INVALIDATED)
                 .eq(EleFile::getId, eleFile.getId()));

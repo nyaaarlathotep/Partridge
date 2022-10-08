@@ -50,7 +50,9 @@ public class EhServiceImpl implements EhService {
                          EhentaiGalleryService ehentaiGalleryService,
                          EleFileService eleFileService,
                          ElementService elementService,
-                         TagInfoService tagInfoService, EhDownload ehDownload, AppUserService appUserService) {
+                         TagInfoService tagInfoService,
+                         EhDownload ehDownload,
+                         AppUserService appUserService) {
         this.ehEngine = ehEngine;
         this.ehentaiGalleryService = ehentaiGalleryService;
         this.eleFileService = eleFileService;
