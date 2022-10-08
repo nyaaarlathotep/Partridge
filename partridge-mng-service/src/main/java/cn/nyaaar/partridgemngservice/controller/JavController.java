@@ -45,13 +45,6 @@ public class JavController {
         return new R<>(javMngService.getJavList(javQuery, pageIndex));
     }
 
-    @Operation(summary = "jav 基本信息列表", description = "获取保存在数据库的 jav 基本信息列表")
-    @GetMapping(value = "/list/{pageIndex}")
-    @LogAnnotation
-    public R<ListResp<JavBasicInfo>> getJavBasicInfoList(@PathVariable Integer pageIndex) {
-
-        return new R<>(javMngService.getJavList(pageIndex));
-    }
 
     @Operation(summary = "上传 Jav", description = "上传 Jav，返回 check 的结果")
     @PostMapping(value = "/upload")

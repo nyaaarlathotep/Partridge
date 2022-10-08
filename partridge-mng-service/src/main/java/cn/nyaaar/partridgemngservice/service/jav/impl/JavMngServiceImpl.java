@@ -93,13 +93,6 @@ public class JavMngServiceImpl implements JavMngService {
     }
 
     @Override
-    public ListResp<JavBasicInfo> getJavList(int pageIndex) {
-        Page<Jav> page = new Page<>(pageIndex, 10);
-        javService.page(page, Wrappers.lambdaQuery(Jav.class).orderByDesc(Jav::getEleId));
-        return getJInfoListResp(page);
-    }
-
-    @Override
     public CheckResp uploadJav(JavUploadReq javUploadReq) {
         checkQuota();
         Element element = new Element()
@@ -227,6 +220,7 @@ public class JavMngServiceImpl implements JavMngService {
         if (javQuery.getSeries() != null) {
             lambdaQueryWrapper.eq(Jav::getSeries, javQuery.getSeries());
         }
+        lambdaQueryWrapper.orderByDesc(Jav::getEleId);
         return lambdaQueryWrapper;
     }
 

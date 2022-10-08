@@ -26,4 +26,8 @@ public class RawSql {
             " AND EXISTS( SELECT * FROM  organization t, ele_org_re r  WHERE  e.ELE_ID=r.ELE_ID AND r.ORG_ID = #{organId} )" +
             "</foreach>" +
             "</if>";
+
+    public static final String elementQuery =
+            " AND ele.ID= e.ELE_ID and ele.SHARED_FLAG = 1 and ele.AVAILABLE_FLAG = 1 ";
+
 }

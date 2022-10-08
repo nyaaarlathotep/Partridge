@@ -108,15 +108,6 @@ public class EhServiceImpl implements EhService {
         return getGalleryBasicInfo(ehentaiGallery);
     }
 
-
-    @Override
-    public ListResp<GalleryBasicInfo> getGalleryList(int pageIndex) {
-        Page<EhentaiGallery> page = new Page<>(pageIndex, Settings.getPageSize());
-        ehentaiGalleryService.page(page, new LambdaQueryWrapper<EhentaiGallery>().orderByDesc(EhentaiGallery::getEleId));
-
-        return getGalleryBasicInfoListResp(page);
-    }
-
     @Override
     public ListResp<GalleryBasicInfo> getGalleryList(GalleryQuery galleryQuery, int pageIndex) {
         Page<EhentaiGallery> page = new Page<>(pageIndex, Settings.getPageSize());

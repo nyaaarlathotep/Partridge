@@ -27,14 +27,6 @@ public interface JavMngService {
     ListResp<JavBasicInfo> getJavList(JavQuery javQuery, int pageIndex);
 
     /**
-     * 浏览Jav，返回一个 jav 的 ListResp
-     *
-     * @param pageIndex 当前浏览页码
-     * @return ListResp<JavBasicInfo>
-     */
-    ListResp<JavBasicInfo> getJavList(int pageIndex);
-
-    /**
      * 上传 Jav 的提前准备
      *
      * @param javUploadReq javUploadReq

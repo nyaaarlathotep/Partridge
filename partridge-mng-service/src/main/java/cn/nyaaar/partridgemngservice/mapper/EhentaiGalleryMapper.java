@@ -21,9 +21,9 @@ import java.util.List;
  */
 public interface EhentaiGalleryMapper extends BaseMapper<EhentaiGallery> {
 
-    String querySql = "SELECT DISTINCT e.* FROM ehentai_gallery e ";
+    String querySql = "SELECT DISTINCT e.* FROM ehentai_gallery e, element ele ";
     String wrapperSql = "<script>SELECT * FROM (" +
-            querySql + RawSql.whereStart + RawSql.tagIdsSql + RawSql.whereEnd +
+            querySql + RawSql.whereStart + RawSql.elementQuery + RawSql.tagIdsSql + RawSql.whereEnd +
             ") as q  ${ew.customSqlSegment}</script>";
 
     @Select(wrapperSql)
