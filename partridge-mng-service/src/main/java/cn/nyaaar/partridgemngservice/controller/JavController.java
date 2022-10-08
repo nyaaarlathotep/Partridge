@@ -22,6 +22,7 @@ import java.util.List;
 @RequestMapping("/jav")
 @Slf4j
 public class JavController {
+    // TODO refactor to special video
     private final JavMngService javMngService;
 
     public JavController(JavMngService javMngService) {
