@@ -171,30 +171,6 @@ public class UploadServiceImpl implements UploadService {
         }
     }
 
-    @Override
-    public void delete(Integer eleId) {
-        try {
-            EleFile eleFile = eleFileService.findById(eleId);
-            BusinessExceptionEnum.ELEMENT_FILE_NOT_FOUND.assertNotNull(eleFile);
-            String dir = FileUtil.getFileDir(eleFile.getPath());
-            File dirFile = new File(dir);
-            log.info("[{}] 删除开始", dir);
-            Integer deleteNum = 0;
-            FileUtil.deleteDir(dirFile, deleteNum);
-            log.info("[{}] 删除成功，共删除文件数量：{}", dir, deleteNum);
-
-        } catch (IOException e) {
-            log.error("file delete error, ", e);
-            BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
-        }
-    }
-
-    private void freeQuota(EleFile eleFile, Long elementBytes) {
-        eleFileService.update(Wrappers.lambdaUpdate(EleFile.class)
-                .set(EleFile::getAvailableFlag, PrConstant.INVALIDATED)
-                .eq(EleFile::getId, eleFile.getId()));
-        appUserService.freeUserSpaceLimit(ThreadLocalUtil.getCurrentUser(), elementBytes);
-    }
 
     private static void checkShardMd5(String shardMd5, byte[] shardBytes) {
         BusinessExceptionEnum.VERIFY_MD5_ERR.assertIsTrue(shardMd5.equals(DigestUtils.md5DigestAsHex(shardBytes)));

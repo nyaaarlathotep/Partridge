@@ -9,6 +9,7 @@
         <result column="FILE_PATH" property="filePath" />
         <result column="FILE_SIZE" property="fileSize" />
         <result column="SHARED_FLAG" property="sharedFlag" />
+        <result column="FREED_FLAG" property="freedFlag" />
         <result column="UPLOADER" property="uploader" />
         <result column="AVAILABLE_FLAG" property="availableFlag" />
         <result column="CREATED_TIME" property="createdTime" />
@@ -17,7 +18,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        ID, TYPE, FILE_PATH, FILE_SIZE, SHARED_FLAG, UPLOADER, AVAILABLE_FLAG, CREATED_TIME, UPDATED_TIME
+        ID, TYPE, FILE_PATH, FILE_SIZE, SHARED_FLAG, FREED_FLAG, UPLOADER, AVAILABLE_FLAG, CREATED_TIME, UPDATED_TIME
     </sql>
 
 </mapper>

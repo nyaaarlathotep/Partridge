@@ -51,11 +51,4 @@ public class UploadController {
     }
 
 
-    @Operation(summary = "删除文件", description = "删除文件及其关联分片")
-    @PostMapping(value = "/delete")
-    @LogAnnotation
-    public R<String> delete(@RequestBody Integer eleId) {
-        uploadService.delete(eleId);
-        return new R<>();
-    }
 }

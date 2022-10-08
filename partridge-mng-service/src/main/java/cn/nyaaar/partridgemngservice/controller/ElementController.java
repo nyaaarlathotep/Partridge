@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  * @author nyaaar
  * @Version $Id: ElementController.java, v 0.1 2022-22 15:03 nyaaar Exp $$
  */
-@Tag(name = "element信息")
+@Tag(name = "element")
 @RestController
 @RequestMapping("/element")
 @Slf4j
@@ -50,8 +50,16 @@ public class ElementController {
     @Operation(summary = "分享 element", description = "通过主键id 分享 element")
     @GetMapping(value = "/share")
     @LogAnnotation
-    public R<String> shareElement(@RequestParam Long elementId) {
+    public R<String> shareElement(@RequestParam Integer elementId) {
         elementMngService.share(elementId);
+        return new R<>();
+    }
+
+    @Operation(summary = "删除 element", description = "删除文件及其关联分片")
+    @PostMapping(value = "/delete")
+    @LogAnnotation
+    public R<String> delete(@RequestBody Integer eleId) {
+        elementMngService.delete(eleId);
         return new R<>();
     }
 }

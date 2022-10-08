@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-30
+ * @since 2022-10-08
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -47,10 +47,16 @@ public class Element extends Model<Element> {
     private Long fileSize;
 
     /**
-     * (0-否;1-是)
+     * 分享标志(0-否;1-是)
      */
     @TableField("SHARED_FLAG")
     private Integer sharedFlag;
+
+    /**
+     * 释放标志(0-否;1-是)，释放后上传者将不能删除元素
+     */
+    @TableField("FREED_FLAG")
+    private Integer freedFlag;
 
     /**
      * 上传用户

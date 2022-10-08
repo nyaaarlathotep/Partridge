@@ -40,12 +40,4 @@ public interface UploadService {
      * @param shardBytes shardBytes
      */
     void upload(Integer shardIndex, String fileMd5, String shardMd5, byte[] shardBytes);
-
-    /**
-     * 删除文件与相关分片
-     *
-     * @param eleId eleId
-     */
-    void delete(Integer eleId);
-
 }
