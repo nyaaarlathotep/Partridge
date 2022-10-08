@@ -156,7 +156,7 @@ public class UploadServiceImpl implements UploadService {
         EleFile eleFile = eleFileService.findById(fileUploadInfo.getEleFileId());
         Element element = elementService.getById(eleFile.getEleId());
         try {
-            eleFileService.saveBytesToFile(shardBytes, getDownloadDirChild(ThreadLocalUtil.getCurrentUser(), element, fileMd5),
+            FileUtil.saveBytesToFile(shardBytes, getDownloadDirChild(ThreadLocalUtil.getCurrentUser(), element, fileMd5),
                     getShardName(shardIndex), true);
             log.info("[{}] 分片:[{}]上传成功", fileMd5, shardIndex);
             fileUploadInfo.setShardNum(fileUploadInfo.getShardNum() + 1);
@@ -215,6 +215,7 @@ public class UploadServiceImpl implements UploadService {
                 .eq(FileUploadInfo::getId, fileUploadInfo.getId()));
         eleFileService.update(Wrappers.lambdaUpdate(EleFile.class)
                 .set(EleFile::getPath, fileUploadInfo.getPath())
+                .set(EleFile::getCompletedFlag, PrConstant.YES)
                 .eq(EleFile::getId, eleFile.getId()));
         Long elementBytes = FileUtil.getFolderSize(fileUploadInfo.getPath());
         elementService.update(Wrappers.lambdaUpdate(Element.class)

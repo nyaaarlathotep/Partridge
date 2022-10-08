@@ -25,12 +25,10 @@ public class DownloadServiceImpl implements DownloadService {
 
     private final ThreadPoolTaskExecutor downloadExecutor;
 
-    private final EleFileService eleFileService;
-
-    public DownloadServiceImpl(OkHttpClient okHttpClient, ThreadPoolTaskExecutor downloadExecutor, EleFileService eleFileService) {
+    public DownloadServiceImpl(OkHttpClient okHttpClient,
+                               ThreadPoolTaskExecutor downloadExecutor) {
         this.okHttpClient = okHttpClient;
         this.downloadExecutor = downloadExecutor;
-        this.eleFileService = eleFileService;
     }
 
     @Override
@@ -53,7 +51,7 @@ public class DownloadServiceImpl implements DownloadService {
                 public void onResponse(@NotNull Call call, @NotNull Response response) {
                     try {
                         byte[] bytes = Objects.requireNonNull(response.body()).bytes();
-                        eleFileService.saveBytesToFile(bytes, destDic, fileName, false);
+                        FileUtil.saveBytesToFile(bytes, destDic, fileName, false);
                         if (successHandle != null) {
                             successHandle.run();
                         }

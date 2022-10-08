@@ -122,7 +122,10 @@ public class EhDownload {
         if (failCount > maxFailCount) {
             log.warn("[{}]gallery page download failed...index:{}, fail count:{}", gid, index, failCount);
             downloadingGallery.getDownloadFailPageIndex().remove(index);
-            handlePageDownloadComplete(downloadingGallery);
+            Integer completeNum = downloadingGallery.getDownloadCompleteNum().addAndGet(1);
+            if (completeNum.equals(downloadingGallery.getPages())) {
+                handlePageDownloadComplete(downloadingGallery);
+            }
         } else {
             log.warn("[{}]gallery page download failed...index:{}, fail count:{}, try again...", gid, index, failCount + 1);
             downloadingGallery.getDownloadFailPageIndex().put(index, failCount + 1);
@@ -158,6 +161,7 @@ public class EhDownload {
         eleFile.setPath(PathUtil.simpleConcatUrl(folder, eleFile.getName()));
         eleFile.setPageNum(pageIndex);
         eleFile.setAvailableFlag(PrConstant.VALIDATED);
+        eleFile.setCompletedFlag(PrConstant.YES);
         eleFile.setType(fileTypeEnum.getCode());
         return eleFile;
     }
@@ -165,27 +169,27 @@ public class EhDownload {
     private void handlePageDownloadSuccess(EleFile eleFile, DownloadingGallery downloadingGallery) {
         eleFileService.saveOrUpdate(eleFile);
         elementService.update(Wrappers.lambdaUpdate(Element.class)
-                .set(Element::getFilePath, downloadingGallery.getFolderPath())
+                .set(Element::getFileDir, downloadingGallery.getFolderPath())
                 .eq(Element::getId, downloadingGallery.getEleId()));
-        handlePageDownloadComplete(downloadingGallery);
+        Integer completeNum = downloadingGallery.getDownloadCompleteNum().addAndGet(1);
+        if (completeNum.equals(downloadingGallery.getPages())) {
+            handlePageDownloadComplete(downloadingGallery);
+        }
     }
 
     private void handlePageDownloadComplete(DownloadingGallery downloadingGallery) {
         long gid = downloadingGallery.getGid();
-        Integer completeNum = downloadingGallery.getDownloadCompleteNum().addAndGet(1);
-        if (completeNum.equals(downloadingGallery.getPages())) {
-            Long elementBytes = FileUtil.getFolderSize(downloadingGallery.getFolderPath());
-            downloadingGalleryQueue.remove(gid);
-            elementService.update(Wrappers.lambdaUpdate(Element.class)
-                    .set(Element::getFilePath, downloadingGallery.getFolderPath())
-                    .set(Element::getFileSize, elementBytes)
-                    .eq(Element::getId, downloadingGallery.getEleId()));
-            appUserService.minusUserSpaceLimit(ThreadLocalUtil.getCurrentUser(), elementBytes);
-            ehentaiGalleryService.update(Wrappers.lambdaUpdate(EhentaiGallery.class)
-                    .eq(EhentaiGallery::getGid, gid)
-                    .set(EhentaiGallery::getDownloadFlag, PrConstant.DOWNLOADED));
-            log.info("[{}]gallery download complete!", gid);
-        }
+        Long elementBytes = FileUtil.getFolderSize(downloadingGallery.getFolderPath());
+        downloadingGalleryQueue.remove(gid);
+        elementService.update(Wrappers.lambdaUpdate(Element.class)
+                .set(Element::getFileDir, downloadingGallery.getFolderPath())
+                .set(Element::getFileSize, elementBytes)
+                .eq(Element::getId, downloadingGallery.getEleId()));
+        appUserService.minusUserSpaceLimit(ThreadLocalUtil.getCurrentUser(), elementBytes);
+        ehentaiGalleryService.update(Wrappers.lambdaUpdate(EhentaiGallery.class)
+                .eq(EhentaiGallery::getGid, gid)
+                .set(EhentaiGallery::getDownloadFlag, PrConstant.DOWNLOADED));
+        log.info("[{}]gallery download complete!", gid);
     }
 
     public void downloadGalleryThumb(long gid, String thumbUrl, Long eleId, String title) {
@@ -241,6 +245,7 @@ public class EhDownload {
         }
         return downloadingGalleryQueue;
     }
+
     @NotNull
     public static String getEhFolderPath(String userName, Long eleId, String gid, String title) {
         return PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(),

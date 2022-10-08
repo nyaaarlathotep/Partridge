@@ -3,6 +3,7 @@ package cn.nyaaar.partridgemngservice.service.ehService.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
+import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
@@ -83,7 +84,7 @@ public class EhServiceImpl implements EhService {
                 .eq(EleFile::getEleId, eleId)
                 .in(EleFile::getPageNum, pageIndexes));
 
-        return eleFiles.stream().map(eleFileService::getGalleryPage).toList();
+        return eleFiles.stream().map(this::getGalleryPage).toList();
     }
 
     @Override
@@ -202,6 +203,16 @@ public class EhServiceImpl implements EhService {
     @Override
     public Map<Long, DownloadingGallery> getDownloadingQueue() {
         return ehDownload.getDownloadingQueue();
+    }
+
+    private GalleryPage getGalleryPage(EleFile eleFile) {
+        return new GalleryPage()
+                .setPageIndex(eleFile.getPageNum())
+                .setPageBase64(FileUtil.getFileBase64(eleFile.getPath()))
+                .setFileSuffix(Objects.requireNonNullElse(
+                        FileTypeEnum.getTypeBySuffix(eleFile.getName()),
+                        FileTypeEnum.unknown
+                ).getSuffix());
     }
 
     private static LambdaQueryWrapper<EhentaiGallery> getQueryWrapper(GalleryQuery galleryQuery) {

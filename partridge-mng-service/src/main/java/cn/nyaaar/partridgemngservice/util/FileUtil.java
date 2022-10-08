@@ -4,6 +4,9 @@ package cn.nyaaar.partridgemngservice.util;
 import cn.hutool.core.util.ArrayUtil;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.util.Base64;
@@ -384,6 +387,44 @@ public class FileUtil {
                     deleteNum++;
                 }
             }
+        }
+    }
+
+
+    /**
+     * 通过 eleFilePath 获得 eleFile 的 base64
+     *
+     * @param eleFilePath eleFile path
+     * @return eleFile base64
+     */
+    public static String getFileBase64(String eleFilePath) {
+        // TODO save after legalize
+        File file = new File(legalizeFileName(eleFilePath));
+        String fileBase64 = "";
+        if (file.exists()) {
+            fileBase64 = FileUtil.file2Base64(file);
+        }
+        return fileBase64;
+    }
+
+    /**
+     * 保存文件字节至目标位置
+     *
+     * @param bytes      bytes
+     * @param destDic    destDic，不带fileName
+     * @param fileName   fileName
+     * @param reDownload 如果文件存在是否重新下载
+     * @throws IOException IOException
+     */
+    public static void saveBytesToFile(byte[] bytes, String destDic, String fileName, boolean reDownload) throws IOException {
+        destDic = FileUtil.legalizeDirName(destDic);
+        Path dic = Path.of(destDic);
+        if (Files.notExists(dic)) {
+            Files.createDirectories(dic);
+        }
+        Path filePath = Path.of(PathUtil.simpleConcatUrl(destDic, FileUtil.legalizeFileName(fileName)));
+        if (reDownload || Files.notExists(filePath)) {
+            Files.write(filePath, bytes, StandardOpenOption.CREATE);
         }
     }
 }

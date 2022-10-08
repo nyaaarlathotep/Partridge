@@ -1,11 +1,8 @@
 package cn.nyaaar.partridgemngservice.service;
 
 import cn.nyaaar.partridgemngservice.entity.EleFile;
-import cn.nyaaar.partridgemngservice.model.eh.GalleryPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.nyaaar.partridgemngservice.model.QueryData;
-
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -14,7 +11,7 @@ import java.util.List;
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-26
+ * @since 2022-10-08
  */
 public interface EleFileService extends IService<EleFile> {
 
@@ -68,23 +65,4 @@ public interface EleFileService extends IService<EleFile> {
      * @return EleFile
      */
     EleFile findById(Integer id);
-
-    /**
-     * 通过 eleFile 获得 GalleryPage
-     *
-     * @param eleFile eleFile
-     * @return GalleryPage`
-     */
-    GalleryPage getGalleryPage(EleFile eleFile);
-
-    /**
-     * 保存文件字节至目标位置
-     *
-     * @param bytes      bytes
-     * @param destDic    destDic，不带fileName
-     * @param fileName   fileName
-     * @param reDownload 如果文件存在是否重新下载
-     * @throws IOException IOException
-     */
-    void saveBytesToFile(byte[] bytes, String destDic, String fileName, boolean reDownload) throws IOException;
 }

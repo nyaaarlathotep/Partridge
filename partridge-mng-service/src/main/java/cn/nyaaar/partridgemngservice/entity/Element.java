@@ -37,8 +37,8 @@ public class Element extends Model<Element> {
     /**
      * 关联文件所在目录
      */
-    @TableField("FILE_PATH")
-    private String filePath;
+    @TableField("FILE_DIR")
+    private String fileDir;
 
     /**
      * 关联文件总大小，单位为 B

@@ -1,7 +1,6 @@
 package cn.nyaaar.partridgemngservice.service.element.impl;
 
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
-import cn.nyaaar.partridgemngservice.entity.EleFile;
 import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.service.EleFileService;
@@ -38,7 +37,7 @@ public class ElementMngServiceImpl implements ElementMngService {
     }
 
     @Override
-    public void share(Integer elementId) {
+    public void share(Long elementId) {
         Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, elementId));
         BusinessExceptionEnum.ELEMENT_NOT_FOUND.assertNotNull(element);
 
@@ -49,14 +48,12 @@ public class ElementMngServiceImpl implements ElementMngService {
 
 
     @Override
-    public void delete(Integer eleId) {
-        EleFile eleFile = eleFileService.findById(eleId);
-        BusinessExceptionEnum.ELEMENT_FILE_NOT_FOUND.assertNotNull(eleFile);
-        Element element = elementService.getById(eleFile.getEleId());
-        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(checkDeletePermission(element));
-        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(Objects.equals(PrConstant.YES, element.getFreedFlag()));
+    public void delete(Long eleId) {
+        Element element = elementService.getById(eleId);
+        BusinessExceptionEnum.ELEMENT_FILE_NOT_FOUND.assertNotNull(element);
+        checkDeletePermission(eleId, element);
         try {
-            String dir = FileUtil.getFileDir(eleFile.getPath());
+            String dir = FileUtil.getFileDir(element.getFileDir());
             File dirFile = new File(dir);
             log.info("[{}] 删除开始", dir);
             Integer deleteNum = 0;
@@ -66,29 +63,48 @@ public class ElementMngServiceImpl implements ElementMngService {
             log.error("file delete error, ", e);
             BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
         }
-        eleFileService.update(Wrappers.lambdaUpdate(EleFile.class)
-                .set(EleFile::getAvailableFlag, PrConstant.INVALIDATED)
-                .eq(EleFile::getId, eleFile.getId()));
+        elementService.update(Wrappers.lambdaUpdate(Element.class)
+                .set(Element::getAvailableFlag, PrConstant.INVALIDATED)
+                .eq(Element::getId, eleId));
     }
 
-    private static boolean checkDeletePermission(Element element) {
-        if ("root".equals(ThreadLocalUtil.getCurrentUser())) {
-            return true;
-        }
-        return Objects.equals(ThreadLocalUtil.getCurrentUser(), element.getUploader());
+    private void checkDeletePermission(Long eleId, Element element) {
+        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(checkWritePermission(eleId));
+        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(Objects.equals(PrConstant.YES, element.getFreedFlag()));
     }
 
     @Override
-    public void like(Integer elementId) {
+    public void like(Long elementId) {
 
     }
 
     @Override
-    public void publishElement(Integer elementId) {
+    public void publishElement(Long eleId) {
+        Element element = elementService.getById(eleId);
+        BusinessExceptionEnum.ELEMENT_FILE_NOT_FOUND.assertNotNull(element);
+//        List<EleFile>
 
     }
 
     private void freeQuota(Long elementBytes) {
         appUserService.freeUserSpaceLimit(ThreadLocalUtil.getCurrentUser(), elementBytes);
+    }
+
+    @Override
+    public boolean checkReadPermission(Long elementId) {
+        if ("root".equals(ThreadLocalUtil.getCurrentUser())) {
+            return true;
+        }
+        Element element = elementService.getById(elementId);
+        return Objects.equals(PrConstant.YES, element.getSharedFlag());
+    }
+
+    @Override
+    public boolean checkWritePermission(Long elementId) {
+        if ("root".equals(ThreadLocalUtil.getCurrentUser())) {
+            return true;
+        }
+        Element element = elementService.getById(elementId);
+        return Objects.equals(ThreadLocalUtil.getCurrentUser(), element.getUploader());
     }
 }

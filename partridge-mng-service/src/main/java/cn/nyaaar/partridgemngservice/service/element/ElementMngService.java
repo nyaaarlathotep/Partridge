@@ -6,16 +6,20 @@ package cn.nyaaar.partridgemngservice.service.element;
  */
 public interface ElementMngService {
 
-    void share(Integer elementId);
+    void share(Long elementId);
 
     /**
      * 检查是否可以删除，删除文件相关，并释放配额
      *
      * @param eleId eleId
      */
-    void delete(Integer eleId);
+    void delete(Long eleId);
 
-    void like(Integer elementId);
+    void like(Long elementId);
 
-    void publishElement(Integer elementId);
+    void publishElement(Long elementId);
+
+    boolean checkReadPermission(Long elementId);
+    
+    boolean checkWritePermission(Long elementId);
 }
