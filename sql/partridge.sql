@@ -11,7 +11,7 @@
  Target Server Version : 80027
  File Encoding         : 65001
 
- Date: 27/09/2022 17:05:57
+ Date: 08/10/2022 17:52:51
 */
 
 SET NAMES utf8mb4;
@@ -27,7 +27,7 @@ CREATE TABLE `actor`  (
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 185 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 184 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for author
@@ -39,7 +39,7 @@ CREATE TABLE `author`  (
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for ehentai_gallery
@@ -77,7 +77,7 @@ CREATE TABLE `ele_actor_re`  (
   `ACTOR_ID` int NOT NULL,
   PRIMARY KEY (`ID`) USING BTREE,
   UNIQUE INDEX `unique`(`ELE_ID`, `ACTOR_ID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 950 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 949 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for ele_author_re
@@ -89,19 +89,20 @@ CREATE TABLE `ele_author_re`  (
   `AUTHOR_ID` int NOT NULL,
   PRIMARY KEY (`ID`) USING BTREE,
   UNIQUE INDEX `unique`(`ELE_ID`, `AUTHOR_ID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for ele_file
 -- ----------------------------
 DROP TABLE IF EXISTS `ele_file`;
 CREATE TABLE `ele_file`  (
-  `ID` int NOT NULL AUTO_INCREMENT,
+  `ID` bigint NOT NULL AUTO_INCREMENT,
   `ELE_ID` bigint NULL DEFAULT NULL,
   `NAME` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `TYPE` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `PATH` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `PAGE_NUM` tinyint NULL DEFAULT NULL COMMENT 'ehentai_gallery 对应画廊文件页码',
+  `COMPLETED_FLAG` tinyint NULL DEFAULT 0 COMMENT '完成标志(0-禁用;1-启用)，可以被删除',
   `AVAILABLE_FLAG` tinyint NULL DEFAULT NULL COMMENT '启用标志(0-禁用;1-启用)',
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
@@ -118,7 +119,7 @@ CREATE TABLE `ele_org_re`  (
   `ORG_ID` int NOT NULL,
   PRIMARY KEY (`ID`) USING BTREE,
   UNIQUE INDEX `unique`(`ELE_ID`, `ORG_ID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 663 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 662 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for ele_tag_re
@@ -139,15 +140,39 @@ DROP TABLE IF EXISTS `element`;
 CREATE TABLE `element`  (
   `ID` bigint NOT NULL AUTO_INCREMENT,
   `TYPE` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `FILE_PATH` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '关联文件所在目录',
-  `FILE_SIZE` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '关联文件总大小，单位为 B',
-  `SHARED_FLAG` tinyint NULL DEFAULT NULL COMMENT '(0-否;1-是)',
+  `FILE_DIR` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '关联文件所在目录',
+  `FILE_SIZE` bigint NULL DEFAULT 0 COMMENT '关联文件总大小，单位为 B',
+  `SHARED_FLAG` tinyint NULL DEFAULT 0 COMMENT '分享标志(0-否;1-是)',
+  `PUBLISHED_FLAG` tinyint NULL DEFAULT 0 COMMENT '释放标志(0-否;1-是)，释放后上传者将不能删除元素',
   `UPLOADER` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '上传用户',
-  `AVAILABLE_FLAG` tinyint NULL DEFAULT NULL COMMENT '启用标志(0-禁用;1-启用)',
+  `AVAILABLE_FLAG` tinyint NULL DEFAULT 0 COMMENT '启用标志(0-禁用;1-启用)',
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 554 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '基本元素表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for file_upload_info
+-- ----------------------------
+DROP TABLE IF EXISTS `file_upload_info`;
+CREATE TABLE `file_upload_info`  (
+  `ID` int NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `ELE_FILE_ID` bigint NULL DEFAULT NULL COMMENT '对应 ELE_FILE 的 id',
+  `PATH` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '绝对路径',
+  `UPLOADER_PATH` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文件在上传者文件系统的路径',
+  `NAME` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文件名',
+  `SUFFIX` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文件后缀',
+  `SIZE` bigint NULL DEFAULT 0 COMMENT '文件大小(字节B)',
+  `SHARD_NUM` int NULL DEFAULT NULL COMMENT '已经上传的分片',
+  `SHARD_SIZE` int NULL DEFAULT NULL COMMENT '分片大小(字节B)',
+  `SHARD_TOTAL` int NULL DEFAULT NULL COMMENT '分片总数',
+  `FILE_KEY` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文件标识',
+  `UPLOAD_FLAG` tinyint NULL DEFAULT NULL COMMENT '上传是否完成标志位，(0-未完成;1-完成)',
+  `CREATED_TIME` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `UPDATED_TIME` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`ID`) USING BTREE,
+  INDEX `file_key`(`FILE_KEY`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for jav
@@ -177,7 +202,7 @@ CREATE TABLE `organization`  (
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '组织表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '组织表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for pr_user
