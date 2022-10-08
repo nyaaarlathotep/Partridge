@@ -18,6 +18,7 @@ import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.file.UploadService;
 import cn.nyaaar.partridgemngservice.service.jav.JavMngService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
+import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -56,11 +57,11 @@ public class JavMngServiceImpl implements JavMngService {
                              ActorService actorService,
                              EleActorReService eleActorReService,
                              EleOrgReService eleOrgReService,
-                             TagInfoService tagInfoService, 
-                             ElementService elementService, 
-                             EleFileService eleFileService, 
-                             UploadService uploadService, 
-                             FileUploadInfoService fileUploadInfoService, 
+                             TagInfoService tagInfoService,
+                             ElementService elementService,
+                             EleFileService eleFileService,
+                             UploadService uploadService,
+                             FileUploadInfoService fileUploadInfoService,
                              AppUserService appUserService) {
         this.javService = javService;
         this.organizationService = organizationService;
@@ -113,7 +114,7 @@ public class JavMngServiceImpl implements JavMngService {
                 .setEleId(element.getId())
                 .setType(FileTypeEnum.getTypeBySuffix(javUploadReq.getFileName()).getSuffix())
                 .setAvailableFlag(PrConstant.VALIDATED)
-                .setName(javUploadReq.getFileName());
+                .setName(FileUtil.legalizeFileName(javUploadReq.getFileName()));
         eleFileService.save(eleFile);
         CheckResp checkResp = null;
         try {

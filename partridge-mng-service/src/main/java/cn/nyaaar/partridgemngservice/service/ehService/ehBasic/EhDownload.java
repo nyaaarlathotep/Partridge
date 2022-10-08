@@ -249,6 +249,6 @@ public class EhDownload {
     @NotNull
     public static String getEhFolderPath(String userName, Long eleId, String gid, String title) {
         return PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(),
-                userName, SourceEnum.Ehentai.getCode(), String.valueOf(eleId), gid + "-" + title);
+                userName, SourceEnum.Ehentai.getCode(), String.valueOf(eleId), gid + "-" + FileUtil.legalizeFileName(title));
     }
 }

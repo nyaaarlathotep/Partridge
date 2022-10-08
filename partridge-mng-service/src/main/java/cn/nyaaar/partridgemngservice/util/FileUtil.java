@@ -357,8 +357,8 @@ public class FileUtil {
     }
 
     public static String legalizeFileName(String originName) {
-        originName = originName.replace("/", "");
-        originName = originName.replace("\\", "");
+        originName = originName.replace("/", "-");
+        originName = originName.replace("\\", "-");
         return legalizeDirName(originName);
     }
 
@@ -398,8 +398,7 @@ public class FileUtil {
      * @return eleFile base64
      */
     public static String getFileBase64(String eleFilePath) {
-        // TODO save after legalize
-        File file = new File(legalizeFileName(eleFilePath));
+        File file = new File(eleFilePath);
         String fileBase64 = "";
         if (file.exists()) {
             fileBase64 = FileUtil.file2Base64(file);
@@ -417,7 +416,6 @@ public class FileUtil {
      * @throws IOException IOException
      */
     public static void saveBytesToFile(byte[] bytes, String destDic, String fileName, boolean reDownload) throws IOException {
-        destDic = FileUtil.legalizeDirName(destDic);
         Path dic = Path.of(destDic);
         if (Files.notExists(dic)) {
             Files.createDirectories(dic);
