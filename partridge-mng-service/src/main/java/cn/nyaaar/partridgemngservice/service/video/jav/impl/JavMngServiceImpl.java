@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,14 +31,9 @@ import java.util.Objects;
 public class JavMngServiceImpl extends Video implements JavMngService {
 
     private final JavService javService;
-
     private final OrganizationService organizationService;
-
     private final ActorService actorService;
-
-
     private final TagInfoService tagInfoService;
-    private final UploadService uploadService;
     private final ElementMngService elementMngService;
 
     public JavMngServiceImpl(JavService javService,
@@ -50,14 +44,13 @@ public class JavMngServiceImpl extends Video implements JavMngService {
                              EleFileService eleFileService,
                              UploadService uploadService,
                              FileUploadInfoService fileUploadInfoService,
-                             AppUserService appUserService, 
+                             AppUserService appUserService,
                              ElementMngService elementMngService) {
-        super(elementService, appUserService, eleFileService, fileUploadInfoService);
+        super(elementService, appUserService, eleFileService, fileUploadInfoService, uploadService);
         this.javService = javService;
         this.organizationService = organizationService;
         this.actorService = actorService;
         this.tagInfoService = tagInfoService;
-        this.uploadService = uploadService;
         this.elementMngService = elementMngService;
     }
 
@@ -82,14 +75,8 @@ public class JavMngServiceImpl extends Video implements JavMngService {
         checkQuota();
         EleFile eleFile = preUploadHandle(javUploadReq);
         // TODO rpc call pelican to crawl javInfo
-        CheckResp checkResp = null;
-        try {
-            checkResp = uploadService.check(javUploadReq.getFileName(), javUploadReq.getFileMd5(),
-                    javUploadReq.getFileSize(), eleFile, javUploadReq.getUploaderPath());
-        } catch (IOException e) {
-            log.error("check error, ", e);
-            BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
-        }
+        CheckResp checkResp = getCheckResp(javUploadReq, eleFile);
+        postUploadHandle();
         return checkResp;
     }
 
@@ -181,8 +168,10 @@ public class JavMngServiceImpl extends Video implements JavMngService {
         JavBasicInfo javBasicInfo = new JavBasicInfo();
         BeanUtil.copyProperties(jav, javBasicInfo);
         javBasicInfo.setActors(elementMngService.getEleActors(jav.getEleId()).stream().map(Actor::getName).toList());
-        javBasicInfo.setProducer(elementMngService.getEleOrgan(jav.getEleId(), EleOrgReTypeEnum.produce).map(Organization::getName).orElse(""));
-        javBasicInfo.setPublisher(elementMngService.getEleOrgan(jav.getEleId(), EleOrgReTypeEnum.publish).map(Organization::getName).orElse(""));
+        javBasicInfo.setProducer(elementMngService.getEleOrgan(jav.getEleId(), EleOrgReTypeEnum.produce)
+                .map(Organization::getName).orElse(""));
+        javBasicInfo.setPublisher(elementMngService.getEleOrgan(jav.getEleId(), EleOrgReTypeEnum.publish)
+                .map(Organization::getName).orElse(""));
         javBasicInfo.setTags(elementMngService.getTagInfos(jav.getEleId()).stream().map(TagDto::new).toList());
         return javBasicInfo;
     }

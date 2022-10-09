@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/jav")
 @Slf4j
 public class JavController {
-    // TODO refactor to special video
     private final JavMngService javMngService;
 
     public JavController(JavMngService javMngService) {
@@ -52,6 +51,4 @@ public class JavController {
 
         return new R<>(javMngService.uploadJav(javUploadReq));
     }
-
-
 }

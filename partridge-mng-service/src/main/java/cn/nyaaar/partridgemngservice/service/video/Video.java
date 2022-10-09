@@ -8,17 +8,19 @@ import cn.nyaaar.partridgemngservice.entity.EleFile;
 import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.entity.FileUploadInfo;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
-import cn.nyaaar.partridgemngservice.model.jav.JavUploadReq;
+import cn.nyaaar.partridgemngservice.model.file.CheckResp;
+import cn.nyaaar.partridgemngservice.model.file.FileReq;
 import cn.nyaaar.partridgemngservice.service.EleFileService;
 import cn.nyaaar.partridgemngservice.service.ElementService;
 import cn.nyaaar.partridgemngservice.service.FileUploadInfoService;
+import cn.nyaaar.partridgemngservice.service.file.UploadService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,22 +28,24 @@ import java.util.Objects;
  * @author yuegenhua
  * @Version $Id: Video.java, v 0.1 2022-09 15:30 yuegenhua Exp $$
  */
-@Service
 @Slf4j
 public abstract class Video {
     private final ElementService elementService;
     private final AppUserService appUserService;
     private final EleFileService eleFileService;
     private final FileUploadInfoService fileUploadInfoService;
+    private final UploadService uploadService;
 
-    protected Video(ElementService elementService, 
-                    AppUserService appUserService, 
-                    EleFileService eleFileService, 
-                    FileUploadInfoService fileUploadInfoService) {
+    protected Video(ElementService elementService,
+                    AppUserService appUserService,
+                    EleFileService eleFileService,
+                    FileUploadInfoService fileUploadInfoService,
+                    UploadService uploadService) {
         this.elementService = elementService;
         this.appUserService = appUserService;
         this.eleFileService = eleFileService;
         this.fileUploadInfoService = fileUploadInfoService;
+        this.uploadService = uploadService;
     }
 
     public void checkQuota() {
@@ -56,14 +60,14 @@ public abstract class Video {
                         .eq(FileUploadInfo::getEleFileId, eleFile.getId())
                         .eq(FileUploadInfo::getUploadFlag, PrConstant.UPLOADING))).filter(Objects::nonNull)
                 .toList();
-        if (uploadingFiles.size() >= Settings.getJavUploadingMax()) {
+        if (uploadingFiles.size() >= Settings.getFileUploadingMax()) {
             BusinessExceptionEnum.USER_CUSTOM.assertFail("已存在 " + uploadingFiles.size() + " 个正在上传的文件，请先上传完成。");
         }
         BusinessExceptionEnum.SPACE_INSUFFICIENT.assertIsTrue(appUserService.checkUserSpaceLimit(ThreadLocalUtil.getCurrentUser()));
     }
 
 
-    public EleFile preUploadHandle(JavUploadReq javUploadReq) {
+    public EleFile preUploadHandle(FileReq fileReq) {
         Element element = new Element()
                 .setType(SourceEnum.Jav.getCode())
                 .setUploader(ThreadLocalUtil.getCurrentUser())
@@ -73,10 +77,25 @@ public abstract class Video {
         elementService.save(element);
         EleFile eleFile = new EleFile()
                 .setEleId(element.getId())
-                .setType(FileTypeEnum.getTypeBySuffix(javUploadReq.getFileName()).getSuffix())
+                .setType(FileTypeEnum.getTypeBySuffix(fileReq.getFileName()).getSuffix())
                 .setAvailableFlag(PrConstant.VALIDATED)
-                .setName(FileUtil.legalizeFileName(javUploadReq.getFileName()));
+                .setName(FileUtil.legalizeFileName(fileReq.getFileName()));
         eleFileService.save(eleFile);
         return eleFile;
+    }
+
+    public void postUploadHandle() {
+       
+    }
+
+    public CheckResp getCheckResp(FileReq fileReq, EleFile eleFile) {
+        try {
+            return uploadService.check(fileReq.getFileName(), fileReq.getFileMd5(),
+                    fileReq.getFileSize(), eleFile, fileReq.getUploaderPath());
+        } catch (IOException e) {
+            log.error("check error, ", e);
+            BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
+        }
+        return null;
     }
 }
