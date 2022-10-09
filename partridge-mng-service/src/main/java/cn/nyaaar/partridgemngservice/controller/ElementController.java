@@ -4,6 +4,7 @@ import cn.nyaaar.partridgemngservice.common.annotation.LogAnnotation;
 import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.ElementDto;
+import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.model.response.R;
 import cn.nyaaar.partridgemngservice.service.ElementService;
 import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * elementController
@@ -24,8 +27,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/element")
 @Slf4j
 public class ElementController {
-    // TODO abstract upload element file...
-
     private final ElementService elementService;
     private final ElementMngService elementMngService;
 
@@ -61,5 +62,12 @@ public class ElementController {
     public R<String> delete(@RequestBody Long eleId) {
         elementMngService.delete(eleId);
         return new R<>();
+    }
+
+    @Operation(summary = "获取未上传完成的 elements 的 checkResp", description = "返回 check 的结果列表")
+    @GetMapping(value = "/uploading")
+    @LogAnnotation
+    public R<List<CheckResp>> getUploadingJavs() {
+        return new R<>(elementMngService.getUploadingElements());
     }
 }

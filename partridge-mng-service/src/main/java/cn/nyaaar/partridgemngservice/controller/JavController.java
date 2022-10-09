@@ -8,14 +8,13 @@ import cn.nyaaar.partridgemngservice.model.jav.JavQuery;
 import cn.nyaaar.partridgemngservice.model.jav.JavUploadReq;
 import cn.nyaaar.partridgemngservice.model.response.R;
 import cn.nyaaar.partridgemngservice.model.validate.FileCheck;
-import cn.nyaaar.partridgemngservice.service.jav.JavMngService;
+import cn.nyaaar.partridgemngservice.service.video.jav.JavMngService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @Tag(name = "jav", description = "jav 相关 Controller")
 @RestController
@@ -54,12 +53,5 @@ public class JavController {
         return new R<>(javMngService.uploadJav(javUploadReq));
     }
 
-    @Operation(summary = "获取未上传完成的 Jav", description = "返回 check 的结果列表")
-    @GetMapping(value = "/uploading")
-    @LogAnnotation
-    public R<List<CheckResp>> getUploadingJavs() {
-
-        return new R<>(javMngService.getUploadingJavs());
-    }
 
 }

@@ -1,5 +1,6 @@
 package cn.nyaaar.partridgemngservice.service.file;
 
+import cn.nyaaar.partridgemngservice.entity.EleFile;
 import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 
 import java.io.IOException;
@@ -16,12 +17,12 @@ public interface UploadService {
      * @param fileName     fileName
      * @param fileMd5      fileMd5
      * @param fileSize     fileSize
-     * @param eleFileId    eleFileId
+     * @param eleFile    eleFile
      * @param uploaderPath uploaderPath
      * @return 缺失分片序号
      * @throws IOException 文件操作异常
      */
-    CheckResp check(String fileName, String fileMd5, Long fileSize, Long eleFileId, String uploaderPath) throws IOException;
+    CheckResp check(String fileName, String fileMd5, Long fileSize, EleFile eleFile, String uploaderPath) throws IOException;
 
     /**
      * 检查文件是否分片是否上传完成，如果完成，则进行合并，只能在后面几次调用

@@ -2,27 +2,23 @@ package cn.nyaaar.partridgemngservice.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-
 import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-
 import java.io.Serializable;
 import java.io.Serial;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
  * <p>
- *
+ * 组织表
  * </p>
  *
  * @author nyaaar
- * @since 2022-08-22
+ * @since 2022-10-09
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -37,6 +33,12 @@ public class Organization extends Model<Organization> {
 
     @TableField("NAME")
     private String name;
+
+    /**
+     * 发行商，制作商
+     */
+    @TableField("TYPE")
+    private String type;
 
     @TableField(value = "CREATED_TIME", fill = FieldFill.INSERT)
     private Date createdTime;

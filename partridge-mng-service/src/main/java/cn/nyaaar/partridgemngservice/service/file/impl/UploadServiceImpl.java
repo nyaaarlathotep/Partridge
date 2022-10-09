@@ -55,8 +55,7 @@ public class UploadServiceImpl implements UploadService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public CheckResp check(String fileName, String fileMd5, Long fileSize, Long eleFileId, String uploaderPath) throws IOException {
-        EleFile eleFile = eleFileService.findById(eleFileId);
+    public CheckResp check(String fileName, String fileMd5, Long fileSize, EleFile eleFile, String uploaderPath) throws IOException {
         Element element = elementService.getById(eleFile.getEleId());
         File fileDir = new File(getDownloadDir(ThreadLocalUtil.getCurrentUser(), element), fileMd5);
         File currentFile = new File(fileDir, fileName);
@@ -72,7 +71,7 @@ public class UploadServiceImpl implements UploadService {
             int shardTotal = (int) Math.ceil(1.0 * fileSize / Settings.getShardSize());
             fileUploadInfo = new FileUploadInfo()
                     .setFileKey(fileMd5)
-                    .setEleFileId(eleFileId)
+                    .setEleFileId(eleFile.getId())
                     .setPath(currentFile.getAbsolutePath())
                     .setUploaderPath(uploaderPath)
                     .setName(fileName)

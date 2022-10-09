@@ -14,6 +14,7 @@ import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
 import cn.nyaaar.partridgemngservice.service.ehService.ehBasic.EhDownload;
 import cn.nyaaar.partridgemngservice.service.ehService.ehBasic.EhEngine;
+import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.StringUtils;
@@ -43,7 +44,8 @@ public class EhServiceImpl implements EhService {
     private final EhentaiGalleryService ehentaiGalleryService;
     private final EleFileService eleFileService;
     private final ElementService elementService;
-    private final AppUserService appUserService;
+    private final ElementMngService elementMngService;
+    final AppUserService appUserService;
 
     private final TagInfoService tagInfoService;
 
@@ -53,13 +55,14 @@ public class EhServiceImpl implements EhService {
                          ElementService elementService,
                          TagInfoService tagInfoService,
                          EhDownload ehDownload,
-                         AppUserService appUserService) {
+                         ElementMngService elementMngService, AppUserService appUserService) {
         this.ehEngine = ehEngine;
         this.ehentaiGalleryService = ehentaiGalleryService;
         this.eleFileService = eleFileService;
         this.elementService = elementService;
         this.tagInfoService = tagInfoService;
         this.ehDownload = ehDownload;
+        this.elementMngService = elementMngService;
         this.appUserService = appUserService;
     }
 
@@ -186,7 +189,7 @@ public class EhServiceImpl implements EhService {
     private GalleryBasicInfo getGalleryBasicInfo(EhentaiGallery ehentaiGallery) {
         GalleryBasicInfo basicInfo = new GalleryBasicInfo();
         BeanUtil.copyProperties(ehentaiGallery, basicInfo);
-        List<TagInfo> tagInfos = tagInfoService.getTagInfos(basicInfo.getEleId());
+        List<TagInfo> tagInfos = elementMngService.getTagInfos(basicInfo.getEleId());
         basicInfo.setTags(tagInfos.stream().map(TagDto::new).toList());
         return basicInfo;
     }

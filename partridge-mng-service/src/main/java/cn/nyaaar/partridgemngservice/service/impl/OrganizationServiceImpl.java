@@ -9,22 +9,21 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import cn.nyaaar.partridgemngservice.model.QueryData;
-
 import java.util.List;
 
 /**
  * <p>
- * 服务实现类
+ * 组织表 服务实现类
  * </p>
  *
  * @author nyaaar
- * @since 2022-08-22
+ * @since 2022-10-09
  */
 @Service
 public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Organization> implements OrganizationService {
 
     @Override
-    public QueryData<Organization> findListByPage(Organization where, Integer page, Integer pageCount) {
+    public QueryData<Organization> findListByPage(Organization where, Integer page, Integer pageCount){
         IPage<Organization> wherePage = new Page<>(page, pageCount);
 
         IPage<Organization> iPage = baseMapper.selectPage(wherePage, Wrappers.query(where));
@@ -33,33 +32,34 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
     }
 
     @Override
-    public List<Organization> findList(Organization where) {
+    public List<Organization> findList(Organization where){
 
-        return baseMapper.selectList(Wrappers.query(where));
+        return baseMapper.selectList( Wrappers.query(where));
     }
 
 
-    @Override
-    public Integer add(Organization organization) {
 
+    @Override
+    public Integer add(Organization organization){
+ 
         return baseMapper.insert(organization);
     }
 
     @Override
-    public Integer delete(Integer id) {
-
+    public Integer delete(Integer id){
+    
         return baseMapper.deleteById(id);
     }
 
     @Override
-    public Integer updateData(Organization organization) {
-
+    public Integer updateData(Organization organization){
+    
         return baseMapper.updateById(organization);
     }
 
     @Override
-    public Organization findById(Integer id) {
-
+    public Organization findById(Integer id){
+    
         return baseMapper.selectById(id);
     }
 }

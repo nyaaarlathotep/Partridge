@@ -1,11 +1,7 @@
-package cn.nyaaar.partridgemngservice.service.jav.impl;
+package cn.nyaaar.partridgemngservice.service.video.jav.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
-import cn.nyaaar.partridgemngservice.common.constants.Settings;
 import cn.nyaaar.partridgemngservice.common.enums.EleOrgReTypeEnum;
-import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
-import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.TagDto;
@@ -15,11 +11,11 @@ import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.jav.JavQuery;
 import cn.nyaaar.partridgemngservice.model.jav.JavUploadReq;
 import cn.nyaaar.partridgemngservice.service.*;
+import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
 import cn.nyaaar.partridgemngservice.service.file.UploadService;
-import cn.nyaaar.partridgemngservice.service.jav.JavMngService;
+import cn.nyaaar.partridgemngservice.service.video.jav.JavMngService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
-import cn.nyaaar.partridgemngservice.util.FileUtil;
-import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
+import cn.nyaaar.partridgemngservice.service.video.Video;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -33,7 +29,7 @@ import java.util.Objects;
 
 @Service
 @Slf4j
-public class JavMngServiceImpl implements JavMngService {
+public class JavMngServiceImpl extends Video implements JavMngService {
 
     private final JavService javService;
 
@@ -41,39 +37,28 @@ public class JavMngServiceImpl implements JavMngService {
 
     private final ActorService actorService;
 
-    private final EleActorReService eleActorReService;
-
-    private final EleOrgReService eleOrgReService;
 
     private final TagInfoService tagInfoService;
-    private final ElementService elementService;
-    private final EleFileService eleFileService;
     private final UploadService uploadService;
-    private final FileUploadInfoService fileUploadInfoService;
-    private final AppUserService appUserService;
+    private final ElementMngService elementMngService;
 
     public JavMngServiceImpl(JavService javService,
                              OrganizationService organizationService,
                              ActorService actorService,
-                             EleActorReService eleActorReService,
-                             EleOrgReService eleOrgReService,
                              TagInfoService tagInfoService,
                              ElementService elementService,
                              EleFileService eleFileService,
                              UploadService uploadService,
                              FileUploadInfoService fileUploadInfoService,
-                             AppUserService appUserService) {
+                             AppUserService appUserService, 
+                             ElementMngService elementMngService) {
+        super(elementService, appUserService, eleFileService, fileUploadInfoService);
         this.javService = javService;
         this.organizationService = organizationService;
         this.actorService = actorService;
-        this.eleActorReService = eleActorReService;
-        this.eleOrgReService = eleOrgReService;
         this.tagInfoService = tagInfoService;
-        this.elementService = elementService;
-        this.eleFileService = eleFileService;
         this.uploadService = uploadService;
-        this.fileUploadInfoService = fileUploadInfoService;
-        this.appUserService = appUserService;
+        this.elementMngService = elementMngService;
     }
 
     @Override
@@ -95,24 +80,12 @@ public class JavMngServiceImpl implements JavMngService {
     @Override
     public CheckResp uploadJav(JavUploadReq javUploadReq) {
         checkQuota();
-        Element element = new Element()
-                .setType(SourceEnum.Jav.getCode())
-                .setUploader(ThreadLocalUtil.getCurrentUser())
-                .setFileSize(0L)
-                .setAvailableFlag(PrConstant.VALIDATED)
-                .setSharedFlag(PrConstant.NO);
-        elementService.save(element);
+        EleFile eleFile = preUploadHandle(javUploadReq);
         // TODO rpc call pelican to crawl javInfo
-        EleFile eleFile = new EleFile()
-                .setEleId(element.getId())
-                .setType(FileTypeEnum.getTypeBySuffix(javUploadReq.getFileName()).getSuffix())
-                .setAvailableFlag(PrConstant.VALIDATED)
-                .setName(FileUtil.legalizeFileName(javUploadReq.getFileName()));
-        eleFileService.save(eleFile);
         CheckResp checkResp = null;
         try {
             checkResp = uploadService.check(javUploadReq.getFileName(), javUploadReq.getFileMd5(),
-                    javUploadReq.getFileSize(), eleFile.getId(), javUploadReq.getUploaderPath());
+                    javUploadReq.getFileSize(), eleFile, javUploadReq.getUploaderPath());
         } catch (IOException e) {
             log.error("check error, ", e);
             BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
@@ -120,41 +93,6 @@ public class JavMngServiceImpl implements JavMngService {
         return checkResp;
     }
 
-    private void checkQuota() {
-        String userName = ThreadLocalUtil.getCurrentUser();
-        List<FileUploadInfo> uploadingFiles = elementService
-                .list(Wrappers.lambdaQuery(Element.class)
-                        .eq(Element::getUploader, userName))
-                .stream()
-                .map(element -> eleFileService.getOne(Wrappers.lambdaQuery(EleFile.class)
-                        .eq(EleFile::getEleId, element.getId()))).filter(Objects::nonNull)
-                .map(eleFile -> fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
-                        .eq(FileUploadInfo::getEleFileId, eleFile.getId())
-                        .eq(FileUploadInfo::getUploadFlag, PrConstant.UPLOADING))).filter(Objects::nonNull)
-                .toList();
-        if (uploadingFiles.size() >= Settings.getJavUploadingMax()) {
-            BusinessExceptionEnum.USER_CUSTOM.assertFail("已存在 " + uploadingFiles.size() + " 个正在上传的文件，请先上传完成。");
-        }
-        BusinessExceptionEnum.SPACE_INSUFFICIENT.assertIsTrue(appUserService.checkUserSpaceLimit(ThreadLocalUtil.getCurrentUser()));
-    }
-
-    @Override
-    public List<CheckResp> getUploadingJavs() {
-        String userName = ThreadLocalUtil.getCurrentUser();
-        return elementService
-                .list(Wrappers.lambdaQuery(Element.class)
-                        .eq(Element::getUploader, userName)
-                        .eq(Element::getAvailableFlag, PrConstant.VALIDATED))
-                .stream()
-                .map(element -> eleFileService.getOne(Wrappers.lambdaQuery(EleFile.class)
-                        .eq(EleFile::getEleId, element.getId())
-                        .eq(EleFile::getAvailableFlag, PrConstant.VALIDATED))).filter(Objects::nonNull)
-                .map(eleFile -> fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
-                        .eq(FileUploadInfo::getEleFileId, eleFile.getId())
-                        .eq(FileUploadInfo::getUploadFlag, PrConstant.UPLOADING))).filter(Objects::nonNull)
-                .map(fileUploadInfo -> uploadService.check(fileUploadInfo.getEleFileId())).filter(Objects::nonNull)
-                .toList();
-    }
 
     private void queryPage(JavQuery javQuery, Page<Jav> page, LambdaQueryWrapper<Jav> lambdaQueryWrapper) {
         List<Integer> actorIds = null;
@@ -242,31 +180,10 @@ public class JavMngServiceImpl implements JavMngService {
     private JavBasicInfo getJavBasicInfo(Jav jav) {
         JavBasicInfo javBasicInfo = new JavBasicInfo();
         BeanUtil.copyProperties(jav, javBasicInfo);
-        List<EleActorRe> eleActorRes = eleActorReService.list(new LambdaQueryWrapper<EleActorRe>().
-                eq(EleActorRe::getEleId, jav.getEleId()));
-
-        if (!eleActorRes.isEmpty()) {
-            List<Actor> actors = actorService.list(new LambdaQueryWrapper<Actor>().in(Actor::getId,
-                    eleActorRes.stream().map(EleActorRe::getActorId).toList()));
-            javBasicInfo.setActors(actors.stream().map(Actor::getName).toList());
-        }
-
-        EleOrgRe eleOrgReProduce = eleOrgReService.getOne(new LambdaQueryWrapper<EleOrgRe>().
-                eq(EleOrgRe::getEleId, jav.getEleId()).
-                eq(EleOrgRe::getReType, EleOrgReTypeEnum.produce.getRe()));
-        if (eleOrgReProduce != null) {
-            Organization producer = organizationService.findById(eleOrgReProduce.getOrgId());
-            javBasicInfo.setProducer(producer.getName());
-        }
-        EleOrgRe eleOrgRePublisher = eleOrgReService.getOne(new LambdaQueryWrapper<EleOrgRe>().
-                eq(EleOrgRe::getEleId, jav.getEleId()).
-                eq(EleOrgRe::getReType, EleOrgReTypeEnum.publish.getRe()));
-        if (eleOrgRePublisher != null) {
-            Organization producer = organizationService.findById(eleOrgRePublisher.getOrgId());
-            javBasicInfo.setPublisher(producer.getName());
-        }
-        List<TagInfo> tagInfos = tagInfoService.getTagInfos(javBasicInfo.getEleId());
-        javBasicInfo.setTags(tagInfos.stream().map(TagDto::new).toList());
+        javBasicInfo.setActors(elementMngService.getEleActors(jav.getEleId()).stream().map(Actor::getName).toList());
+        javBasicInfo.setProducer(elementMngService.getEleOrgan(jav.getEleId(), EleOrgReTypeEnum.produce).map(Organization::getName).orElse(""));
+        javBasicInfo.setPublisher(elementMngService.getEleOrgan(jav.getEleId(), EleOrgReTypeEnum.publish).map(Organization::getName).orElse(""));
+        javBasicInfo.setTags(elementMngService.getTagInfos(jav.getEleId()).stream().map(TagDto::new).toList());
         return javBasicInfo;
     }
 }

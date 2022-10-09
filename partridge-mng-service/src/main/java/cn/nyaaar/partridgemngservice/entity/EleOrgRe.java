@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-07
+ * @since 2022-10-09
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -34,9 +34,6 @@ public class EleOrgRe extends Model<EleOrgRe> {
 
     @TableField("ORG_ID")
     private Integer orgId;
-
-    @TableField("RE_TYPE")
-    private String reType;
 
 
     @Override
