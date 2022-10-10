@@ -6,7 +6,6 @@ import org.springdoc.core.SwaggerUiConfigParameters;
 import org.springdoc.core.providers.ActuatorProvider;
 import org.springdoc.webmvc.ui.SwaggerIndexTransformer;
 import org.springdoc.webmvc.ui.SwaggerWebMvcConfigurer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -20,13 +19,14 @@ import java.util.Optional;
 @Configuration
 @Slf4j
 public class InterceptorConfig extends SwaggerWebMvcConfigurer {
-    @Autowired
-    private UserInterceptor userInterceptor;
+    private final UserInterceptor userInterceptor;
 
     public InterceptorConfig(SwaggerUiConfigParameters swaggerUiConfigParameters,
                              SwaggerIndexTransformer swaggerIndexTransformer,
-                             Optional<ActuatorProvider> actuatorProvider) {
+                             Optional<ActuatorProvider> actuatorProvider,
+                             UserInterceptor userInterceptor) {
         super(swaggerUiConfigParameters, swaggerIndexTransformer, actuatorProvider);
+        this.userInterceptor = userInterceptor;
     }
 
     @Override

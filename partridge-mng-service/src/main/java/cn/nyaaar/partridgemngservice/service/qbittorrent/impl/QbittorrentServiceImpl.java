@@ -52,6 +52,18 @@ public class QbittorrentServiceImpl implements QbittorrentService {
         return Collections.emptyList();
     }
 
+    // Add new torrent
+    // urls: magnet:?xt=urn:btih:33316737bd9afec091f389d057ae5613c3aaf06e&tr=http%3a%2f%2ft.nyaatracker.com%2fannounce&tr=http%3a%2f%2ftracker.kamigami.org%3a2710%2fannounce&tr=http%3a%2f%2fshare.camoe.cn%3a8080%2fannounce&tr=http%3a%2f%2fopentracker.acgnx.se%2fannounce&tr=http%3a%2f%2fanidex.moe%3a6969%2fannounce&tr=http%3a%2f%2ft.acg.rip%3a6699%2fannounce&tr=https%3a%2f%2ftr.bangumi.moe%3a9696%2fannounce&tr=udp%3a%2f%2ftr.bangumi.moe%3a6969%2fannounce&tr=http%3a%2f%2fopen.acgtracker.com%3a1096%2fannounce&tr=udp%3a%2f%2ftracker.opentrackr.org%3a1337%2fannounce
+    //autoTMM: false
+    //savepath: /downloads/anime/孤独摇滚/S01
+    //cookie:
+    //rename:
+    //category:
+    //paused: false
+    //contentLayout: Original
+    //dlLimit: NaN
+    //upLimit: NaN
+
     public String sid() {
         String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), "auth/login");
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
