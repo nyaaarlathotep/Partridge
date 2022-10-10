@@ -269,6 +269,10 @@ public class Settings {
 
     private static final int DEFAULT_UPLOADING_FILE_MAX = 3;
     private static final String UPLOADING_FILE_MAX = "uploading_jav_max";
+
+    private static final String QBITTORRENT_URL = "qbittorrent_url";
+    private static final String DEFAULT_QBITTORRENT_URL = "http://localhost:8080/api/v2";
+
     private static final Map<String, Object> sSettingsPre = new HashMap<>();
     private static EhConfig sEhConfig;
 
@@ -1195,5 +1199,9 @@ public class Settings {
 
     public static Integer getFileUploadingMax() {
         return getInt(UPLOADING_FILE_MAX, DEFAULT_UPLOADING_FILE_MAX);
+    }
+
+    public static String getQbittorrentUrl() {
+        return getString(QBITTORRENT_URL, DEFAULT_QBITTORRENT_URL);
     }
 }

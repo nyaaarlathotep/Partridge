@@ -5,7 +5,7 @@ import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.model.file.FileReq;
 import cn.nyaaar.partridgemngservice.model.response.R;
 import cn.nyaaar.partridgemngservice.model.validate.FileUpload;
-import cn.nyaaar.partridgemngservice.service.file.UploadService;
+import cn.nyaaar.partridgemngservice.service.transmit.UploadService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;

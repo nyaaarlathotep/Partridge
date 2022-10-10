@@ -7,7 +7,7 @@ import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
-import cn.nyaaar.partridgemngservice.service.file.UploadService;
+import cn.nyaaar.partridgemngservice.service.transmit.UploadService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
@@ -15,6 +15,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -109,14 +110,15 @@ public class ElementMngServiceImpl implements ElementMngService {
     }
 
     @Override
-    public void publishElement(Long eleId) {
+    @Transactional(rollbackFor = Exception.class)
+    public void publish(Long eleId) {
         Element element = elementService.getById(eleId);
         BusinessExceptionEnum.ELEMENT_FILE_NOT_FOUND.assertNotNull(element);
         checkEleFilesCompleted(eleId);
-        appUserService.freeUserSpaceLimit(ThreadLocalUtil.getCurrentUser(), element.getFileSize());
         elementService.update(Wrappers.lambdaUpdate(Element.class)
                 .set(Element::getPublishedFlag, PrConstant.YES)
                 .eq(Element::getId, eleId));
+        appUserService.freeUserSpaceLimit(ThreadLocalUtil.getCurrentUser(), element.getFileSize());
     }
 
     @Override

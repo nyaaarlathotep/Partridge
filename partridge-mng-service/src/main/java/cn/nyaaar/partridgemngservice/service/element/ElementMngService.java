@@ -15,6 +15,11 @@ import java.util.Optional;
  */
 public interface ElementMngService {
 
+    /**
+     * 分享 element 对所有用户可见
+     *
+     * @param elementId elementId
+     */
     void share(Long elementId);
 
     /**
@@ -26,10 +31,27 @@ public interface ElementMngService {
 
     void like(Long elementId);
 
-    void publishElement(Long elementId);
+    /**
+     * 公开 element，上传者释放对应存储空间，但将无法删除此 element
+     *
+     * @param elementId elementId
+     */
+    void publish(Long elementId);
 
+    /**
+     * 检查当前登录用户对于 element 是否有读权限
+     *
+     * @param elementId elementId
+     * @return 是否有权限
+     */
     boolean checkReadPermission(Long elementId);
-    
+
+    /**
+     * 检查当前登录用户对于 element 是否有写权限
+     *
+     * @param elementId elementId
+     * @return 是否有权限
+     */
     boolean checkWritePermission(Long elementId);
 
     /**
@@ -38,8 +60,22 @@ public interface ElementMngService {
      * @return List<CheckResp>
      */
     List<CheckResp> getUploadingElements();
-    
+
+    /**
+     * 获得 element 对应的特定类型的机构
+     *
+     * @param elementId        elementId
+     * @param eleOrgReTypeEnum eleOrgReTypeEnum
+     * @return Optional<Organization>
+     */
     Optional<Organization> getEleOrgan(Long elementId, EleOrgReTypeEnum eleOrgReTypeEnum);
+
+    /**
+     * 获得 element 对应的演员
+     *
+     * @param elementId elementId
+     * @return List<Actor>
+     */
     List<Actor> getEleActors(Long elementId);
 
 

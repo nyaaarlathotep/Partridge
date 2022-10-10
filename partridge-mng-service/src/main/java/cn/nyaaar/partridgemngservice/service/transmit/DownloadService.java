@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.service.file;
+package cn.nyaaar.partridgemngservice.service.transmit;
 
 
 /**
@@ -10,4 +10,6 @@ public interface DownloadService {
     void downloadUrlToDest(String url, String dest, String fileName, Runnable successHandle, Runnable failHandle, boolean reDownload);
 
     String downloadUrlToBase64(String url);
+
+    void addTorrentJob();
 }

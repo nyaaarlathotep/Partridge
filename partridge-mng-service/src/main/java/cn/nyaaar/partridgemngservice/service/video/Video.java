@@ -13,7 +13,7 @@ import cn.nyaaar.partridgemngservice.model.file.FileReq;
 import cn.nyaaar.partridgemngservice.service.EleFileService;
 import cn.nyaaar.partridgemngservice.service.ElementService;
 import cn.nyaaar.partridgemngservice.service.FileUploadInfoService;
-import cn.nyaaar.partridgemngservice.service.file.UploadService;
+import cn.nyaaar.partridgemngservice.service.transmit.UploadService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;

@@ -1,8 +1,7 @@
-package cn.nyaaar.partridgemngservice.service.file.impl;
+package cn.nyaaar.partridgemngservice.service.transmit.impl;
 
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
-import cn.nyaaar.partridgemngservice.service.EleFileService;
-import cn.nyaaar.partridgemngservice.service.file.DownloadService;
+import cn.nyaaar.partridgemngservice.service.transmit.DownloadService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.requestBuilder.EhRequestBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -81,5 +80,10 @@ public class DownloadServiceImpl implements DownloadService {
             BusinessExceptionEnum.HTTP_REQUEST_FAILED.assertFail();
         }
         return urlBase64;
+    }
+
+    @Override
+    public void addTorrentJob() {
+        
     }
 }

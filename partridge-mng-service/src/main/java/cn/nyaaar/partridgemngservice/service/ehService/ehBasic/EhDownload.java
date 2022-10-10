@@ -16,7 +16,7 @@ import cn.nyaaar.partridgemngservice.model.eh.GalleryPage;
 import cn.nyaaar.partridgemngservice.service.EhentaiGalleryService;
 import cn.nyaaar.partridgemngservice.service.EleFileService;
 import cn.nyaaar.partridgemngservice.service.ElementService;
-import cn.nyaaar.partridgemngservice.service.file.DownloadService;
+import cn.nyaaar.partridgemngservice.service.transmit.DownloadService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.PathUtil;

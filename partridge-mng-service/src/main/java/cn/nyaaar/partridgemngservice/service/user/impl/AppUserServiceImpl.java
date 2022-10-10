@@ -9,6 +9,7 @@ import cn.nyaaar.partridgemngservice.exception.ValidationException;
 import cn.nyaaar.partridgemngservice.model.user.RegistrationReq;
 import cn.nyaaar.partridgemngservice.service.PrUserService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.regex.Pattern;
 
@@ -127,9 +129,13 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void freeUserSpaceLimit(String userName, Long spaceBytes) {
         if (null == spaceBytes || spaceBytes <= 0) {
             return;
+        }
+        if (StringUtils.isBlank(userName)) {
+            BusinessExceptionEnum.PERMISSION_DENY.assertFail();
         }
         PrUser prUser = prUserService.getOne(Wrappers.lambdaQuery(PrUser.class)
                 .eq(PrUser::getUserName, userName));

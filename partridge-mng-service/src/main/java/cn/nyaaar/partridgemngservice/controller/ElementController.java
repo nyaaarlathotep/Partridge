@@ -51,8 +51,16 @@ public class ElementController {
     @Operation(summary = "分享 element", description = "通过主键id 分享 element")
     @GetMapping(value = "/share")
     @LogAnnotation
-    public R<String> shareElement(@RequestParam Long elementId) {
+    public R<String> share(@RequestParam Long elementId) {
         elementMngService.share(elementId);
+        return new R<>();
+    }
+
+    @Operation(summary = "公开 element", description = "通过主键id 公开 element")
+    @GetMapping(value = "/publish")
+    @LogAnnotation
+    public R<String> publish(@RequestParam Long elementId) {
+        elementMngService.publish(elementId);
         return new R<>();
     }
 

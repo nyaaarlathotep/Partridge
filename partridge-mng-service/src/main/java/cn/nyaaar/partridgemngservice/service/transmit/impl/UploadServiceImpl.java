@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.service.file.impl;
+package cn.nyaaar.partridgemngservice.service.transmit.impl;
 
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
@@ -11,7 +11,7 @@ import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.service.EleFileService;
 import cn.nyaaar.partridgemngservice.service.ElementService;
 import cn.nyaaar.partridgemngservice.service.FileUploadInfoService;
-import cn.nyaaar.partridgemngservice.service.file.UploadService;
+import cn.nyaaar.partridgemngservice.service.transmit.UploadService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.PathUtil;

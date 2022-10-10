@@ -12,7 +12,7 @@ import cn.nyaaar.partridgemngservice.model.jav.JavQuery;
 import cn.nyaaar.partridgemngservice.model.jav.JavUploadReq;
 import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
-import cn.nyaaar.partridgemngservice.service.file.UploadService;
+import cn.nyaaar.partridgemngservice.service.transmit.UploadService;
 import cn.nyaaar.partridgemngservice.service.video.jav.JavMngService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.service.video.Video;

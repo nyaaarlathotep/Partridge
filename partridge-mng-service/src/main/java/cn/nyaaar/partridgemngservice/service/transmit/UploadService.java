@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.service.file;
+package cn.nyaaar.partridgemngservice.service.transmit;
 
 import cn.nyaaar.partridgemngservice.entity.EleFile;
 import cn.nyaaar.partridgemngservice.model.file.CheckResp;
