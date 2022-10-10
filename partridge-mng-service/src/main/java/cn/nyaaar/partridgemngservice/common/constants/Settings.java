@@ -272,7 +272,11 @@ public class Settings {
 
     private static final String QBITTORRENT_URL = "qbittorrent_url";
     private static final String DEFAULT_QBITTORRENT_URL = "http://localhost:8080/api/v2";
-
+    private static final String QBITTORRENT_USER = "qbittorrent_user";
+    private static final String DEFAULT_QBITTORRENT_USER = "admin";
+    private static final String QBITTORRENT_PASSWORD="qbittorrent_password";
+    private static final String DEFAULT_QBITTORRENT_PASSWORD="adminadmin";
+    
     private static final Map<String, Object> sSettingsPre = new HashMap<>();
     private static EhConfig sEhConfig;
 
@@ -1203,5 +1207,13 @@ public class Settings {
 
     public static String getQbittorrentUrl() {
         return getString(QBITTORRENT_URL, DEFAULT_QBITTORRENT_URL);
+    }
+
+    public static String getQbittorrentUser(){
+        return getString(QBITTORRENT_USER,DEFAULT_QBITTORRENT_USER);
+    }
+    
+    public static String getQbittorrentPassword(){
+        return getString(QBITTORRENT_PASSWORD,DEFAULT_QBITTORRENT_PASSWORD);
     }
 }

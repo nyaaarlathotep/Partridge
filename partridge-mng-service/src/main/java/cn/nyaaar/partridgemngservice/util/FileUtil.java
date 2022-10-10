@@ -2,6 +2,7 @@ package cn.nyaaar.partridgemngservice.util;
 
 
 import cn.hutool.core.util.ArrayUtil;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -420,9 +421,39 @@ public class FileUtil {
         if (Files.notExists(dic)) {
             Files.createDirectories(dic);
         }
-        Path filePath = Path.of(PathUtil.simpleConcatUrl(destDic, FileUtil.legalizeFileName(fileName)));
+        Path filePath = Path.of(FileUtil.simpleConcatPath(destDic, FileUtil.legalizeFileName(fileName)));
         if (reDownload || Files.notExists(filePath)) {
             Files.write(filePath, bytes, StandardOpenOption.CREATE);
         }
+    }
+
+    public static String simpleConcatPath(String... paths) {
+        StringBuilder finalUrl = new StringBuilder();
+        if (ArrayUtils.isEmpty(paths)) {
+            return finalUrl.toString();
+        }
+
+        for (int i = 0; i < paths.length; i++) {
+            String path = paths[i];
+            if (org.apache.commons.lang3.StringUtils.isBlank(path)) {
+                continue;
+            }
+
+            // 移除起始的分隔符
+            if (path.startsWith(File.separator)) {
+                path = path.substring(1);
+            }
+
+            // 如果是最后一个字符串，则不用添加分隔符
+            if (i != paths.length - 1) {
+                // 在url结尾添加分隔符
+                if (!path.endsWith(File.separator)) {
+                    path += File.separator;
+                }
+            }
+            finalUrl.append(path);
+        }
+
+        return finalUrl.toString();
     }
 }

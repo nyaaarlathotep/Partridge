@@ -14,7 +14,6 @@ import cn.nyaaar.partridgemngservice.service.FileUploadInfoService;
 import cn.nyaaar.partridgemngservice.service.transmit.UploadService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
-import cn.nyaaar.partridgemngservice.util.PathUtil;
 import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
@@ -224,7 +223,7 @@ public class UploadServiceImpl implements UploadService {
     }
 
     private static String getDownloadDir(String userName, Element element) {
-        return PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(),
+        return FileUtil.simpleConcatPath(Settings.getDownloadRootPath(),
                 userName, element.getType(), String.valueOf(element.getId()));
     }
 
@@ -232,6 +231,6 @@ public class UploadServiceImpl implements UploadService {
         String[] dirs = new String[names.length + 1];
         dirs[0] = getDownloadDir(userName, element);
         System.arraycopy(names, 0, dirs, 1, names.length);
-        return PathUtil.simpleConcatUrl(dirs);
+        return FileUtil.simpleConcatPath(dirs);
     }
 }

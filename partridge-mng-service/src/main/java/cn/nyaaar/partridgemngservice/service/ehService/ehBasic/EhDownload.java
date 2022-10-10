@@ -19,7 +19,6 @@ import cn.nyaaar.partridgemngservice.service.ElementService;
 import cn.nyaaar.partridgemngservice.service.transmit.DownloadService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
-import cn.nyaaar.partridgemngservice.util.PathUtil;
 import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
@@ -158,7 +157,7 @@ public class EhDownload {
         EleFile eleFile = new EleFile();
         eleFile.setEleId(eleId);
         eleFile.setName(pageIndex + fileTypeEnum.getSuffix());
-        eleFile.setPath(PathUtil.simpleConcatUrl(folder, eleFile.getName()));
+        eleFile.setPath(FileUtil.simpleConcatPath(folder, eleFile.getName()));
         eleFile.setPageNum(pageIndex);
         eleFile.setAvailableFlag(PrConstant.VALIDATED);
         eleFile.setCompletedFlag(PrConstant.YES);
@@ -248,7 +247,7 @@ public class EhDownload {
 
     @NotNull
     public static String getEhFolderPath(String userName, Long eleId, String gid, String title) {
-        return PathUtil.simpleConcatUrl(Settings.getDownloadRootPath(),
+        return FileUtil.simpleConcatPath(Settings.getDownloadRootPath(),
                 userName, SourceEnum.Ehentai.getCode(), String.valueOf(eleId), gid + "-" + FileUtil.legalizeFileName(title));
     }
 }

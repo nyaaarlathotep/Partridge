@@ -42,6 +42,8 @@ public enum BusinessExceptionEnum implements BusinessExceptionAssert {
     ELEMENT_FILE_NOT_FOUND(200015, "没有找到对应文件"),
     GALLERY_NOT_FOUND(200016, "没有找到对应画廊"),
     PAGE_NOT_FOUND(200017, "没有找到对应页码"),
+    
+    QBITTORRENT_LOGIN_ERROR(200101,"qbittorrent 登录失败，请联系管理员"),
     ;
 
     final int code;

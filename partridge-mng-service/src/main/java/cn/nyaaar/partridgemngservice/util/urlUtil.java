@@ -3,10 +3,14 @@ package cn.nyaaar.partridgemngservice.util;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 
-public class PathUtil {
+public class urlUtil {
+    // URL分隔符
+    public static final String URL_SEPARATOR = "/";
 
+    /**
+     * 简单连接url
+     */
     public static String simpleConcatUrl(String... urls) {
         StringBuilder finalUrl = new StringBuilder();
         if (ArrayUtils.isEmpty(urls)) {
@@ -19,23 +23,20 @@ public class PathUtil {
                 continue;
             }
 
-            // 移除起始的分隔符
-            if (url.startsWith(File.separator)) {
+            // 移除url起始的分隔符
+            if (url.startsWith(URL_SEPARATOR)) {
                 url = url.substring(1);
             }
 
-            // 如果是最后一个字符串，则不用添加分隔符
+            // 如果是最后一个url字符串，则不用添加分隔符
             if (i != urls.length - 1) {
                 // 在url结尾添加分隔符
-                if (!url.endsWith(File.separator)) {
-                    url += File.separator;
+                if (!url.endsWith(URL_SEPARATOR)) {
+                    url += URL_SEPARATOR;
                 }
             }
             finalUrl.append(url);
         }
-
         return finalUrl.toString();
     }
-
-
 }
