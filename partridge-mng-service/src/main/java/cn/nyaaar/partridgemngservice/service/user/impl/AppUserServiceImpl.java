@@ -2,10 +2,10 @@ package cn.nyaaar.partridgemngservice.service.user.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
+import cn.nyaaar.partridgemngservice.common.constants.Settings;
 import cn.nyaaar.partridgemngservice.common.enums.PrivilegeEnum;
 import cn.nyaaar.partridgemngservice.entity.PrUser;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
-import cn.nyaaar.partridgemngservice.exception.ValidationException;
 import cn.nyaaar.partridgemngservice.model.user.RegistrationReq;
 import cn.nyaaar.partridgemngservice.service.PrUserService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
@@ -28,6 +28,12 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
 
     private final PrUserService prUserService;
     private final PasswordEncoder passwordEncoder;
+
+    private final static Long GBToBytes = 1073741824L;
+
+    private final static String emailPattern = "[^@ \\t\\r\\n]+@[^@ \\t\\r\\n]+\\.[^@ \\t\\r\\n]+";
+    private final static String userNamePattern = "^[a-z0-9_-]{3,15}$";
+    private final static String passwordPattern = "^(?=.*[a-zA-Z])(?=.*\\d).{8,}$";
 
     public AppUserServiceImpl(PrUserService prUserService, PasswordEncoder passwordEncoder) {
         this.prUserService = prUserService;
@@ -58,11 +64,14 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
 
     @Override
     public String register(RegistrationReq request) {
-        String pattern = "[^@ \\t\\r\\n]+@[^@ \\t\\r\\n]+\\.[^@ \\t\\r\\n]+";
-        boolean isValidEmail = Pattern.matches(pattern, request.getEmail());
-
-        if (!isValidEmail) {
-            throw new ValidationException(BusinessExceptionEnum.FIELD_ERROR, null, "邮箱格式异常");
+        if (!Pattern.matches(emailPattern, request.getEmail())) {
+            BusinessExceptionEnum.FIELD_ERROR.assertFail("邮箱格式异常。");
+        }
+        if (!Pattern.matches(userNamePattern, request.getUserName())) {
+            BusinessExceptionEnum.FIELD_ERROR.assertFail("用户名不符合要求，需要可以包括_和-的字母数字字符串，长度为3至16个字符。");
+        }
+        if (!Pattern.matches(passwordPattern, request.getPassword())) {
+            BusinessExceptionEnum.FIELD_ERROR.assertFail("密码不符合要求，需要至少八个字符，至少包含字母、数字。");
         }
         BusinessExceptionEnum.USER_EXIST.assertIsNull(prUserService.getOne(Wrappers.lambdaQuery(PrUser.class)
                 .eq(PrUser::getUserName, request.getUserName())));
@@ -76,7 +85,7 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
                 .setPassword(encoderPassword)
                 .setEmail(request.getEmail())
                 .setValidated(PrConstant.VALIDATED)
-                .setSpaceQuota(100 * 1073741824L)
+                .setSpaceQuota(Settings.getUserSpaceQuota() * GBToBytes)
                 .setLastLoginTime(DateUtil.date());
         System.out.println("使用security加密后的密码为：" + encoderPassword);
         prUserService.save(prUser);

@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @Slf4j
+@SuppressWarnings("unused")
 public class Settings {
 
     /********************
@@ -268,8 +269,9 @@ public class Settings {
     private static final String SHARD_SIZE = "chuck_size";
 
     private static final int DEFAULT_UPLOADING_FILE_MAX = 3;
-    private static final String UPLOADING_FILE_MAX = "uploading_jav_max";
-
+    private static final String UPLOADING_FILE_MAX = "uploading_file_max";
+    private static final int DEFAULT_USER_SPACE_QUOTA = 100;
+    private static final String USER_SPACE_QUOTA = "user_space_quota";
     private static final String QBITTORRENT_URL = "qbittorrent_url";
     private static final String DEFAULT_QBITTORRENT_URL = "http://localhost:8080/api/v2";
     private static final String QBITTORRENT_USER = "qbittorrent_user";
@@ -1215,5 +1217,8 @@ public class Settings {
     
     public static String getQbittorrentPassword(){
         return getString(QBITTORRENT_PASSWORD,DEFAULT_QBITTORRENT_PASSWORD);
+    }
+    public static int getUserSpaceQuota(){
+        return getInt(USER_SPACE_QUOTA,DEFAULT_USER_SPACE_QUOTA);
     }
 }

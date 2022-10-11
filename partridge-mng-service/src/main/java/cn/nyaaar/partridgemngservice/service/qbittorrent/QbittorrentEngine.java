@@ -38,16 +38,14 @@ public class QbittorrentEngine {
     public List<Torrent> getTorrents(String userName) {
         HttpHeaders headers = new HttpHeaders();
         headers.put(HttpHeaders.COOKIE, Collections.singletonList(sid()));
-        Map<String, String> map = new HashMap<>();
         String partialUrl = "torrents/info";
         if (StringUtils.isNotEmpty(userName)) {
-            map.put("tag", "username:" + userName);
-            partialUrl = partialUrl + "?tag={tag}";
+            partialUrl = partialUrl + "?tag=" + "username:" + userName;
         }
         String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), partialUrl);
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(null, headers);
         try {
-            ResponseEntity<String> res = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class, map);
+            ResponseEntity<String> res = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
             return JSON.parseObject(res.getBody(), new TypeReference<>() {
             });
         } catch (Exception e) {
