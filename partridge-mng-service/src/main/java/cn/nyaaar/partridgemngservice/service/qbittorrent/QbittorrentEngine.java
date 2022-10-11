@@ -5,6 +5,7 @@ import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.qbittorrent.Torrent;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
+import cn.nyaaar.partridgemngservice.util.StringUtils;
 import cn.nyaaar.partridgemngservice.util.urlUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
@@ -18,9 +19,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author yuegenhua
@@ -36,13 +35,19 @@ public class QbittorrentEngine {
         this.restTemplate = restTemplate;
     }
 
-    public List<Torrent> getTorrents() {
-        String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), "torrents/info");
+    public List<Torrent> getTorrents(String userName) {
         HttpHeaders headers = new HttpHeaders();
         headers.put(HttpHeaders.COOKIE, Collections.singletonList(sid()));
+        Map<String, String> map = new HashMap<>();
+        String partialUrl = "torrents/info";
+        if (StringUtils.isNotEmpty(userName)) {
+            map.put("tag", "username:" + userName);
+            partialUrl = partialUrl + "?tag={tag}";
+        }
+        String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), partialUrl);
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(null, headers);
         try {
-            ResponseEntity<String> res = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
+            ResponseEntity<String> res = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class, map);
             return JSON.parseObject(res.getBody(), new TypeReference<>() {
             });
         } catch (Exception e) {

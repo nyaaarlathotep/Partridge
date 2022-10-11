@@ -29,7 +29,8 @@ public class QbittorrentServiceTest {
 
     @Test
     public void torrentsTest() {
-        log.info(qbittorrentService.getTorrents().toString());
+        log.info(qbittorrentService.getTorrents("").toString());
+        log.info(qbittorrentService.getTorrents("test").toString());
     }
 
     @Test
