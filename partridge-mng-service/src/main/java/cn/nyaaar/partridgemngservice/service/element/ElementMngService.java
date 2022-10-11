@@ -14,6 +14,7 @@ import java.util.Optional;
  * @Version $Id: ElementService.java, v 0.1 2022-30 17:31 yuegenhua Exp $$
  */
 public interface ElementMngService {
+    // TODO elementControl
 
     /**
      * 分享 element 对所有用户可见

@@ -1,9 +1,10 @@
-package cn.nyaaar.partridgemngservice.service.qbittorrent.impl;
+package cn.nyaaar.partridgemngservice.service.qbittorrent;
 
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
+import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.qbittorrent.Torrent;
-import cn.nyaaar.partridgemngservice.service.qbittorrent.QbittorrentService;
+import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.urlUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
@@ -27,15 +28,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-public class QbittorrentServiceImpl implements QbittorrentService {
+public class QbittorrentEngine {
 
     private final RestTemplate restTemplate;
 
-    public QbittorrentServiceImpl(RestTemplate restTemplate) {
+    public QbittorrentEngine(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    @Override
     public List<Torrent> getTorrents() {
         String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), "torrents/info");
         HttpHeaders headers = new HttpHeaders();
@@ -46,10 +46,35 @@ public class QbittorrentServiceImpl implements QbittorrentService {
             return JSON.parseObject(res.getBody(), new TypeReference<>() {
             });
         } catch (Exception e) {
-            log.error("qbittorrent login error", e);
-            BusinessExceptionEnum.QBITTORRENT_LOGIN_ERROR.assertFail();
+            log.error("qbittorrent getTorrents error", e);
+            BusinessExceptionEnum.QBITTORRENT_ERROR.assertFail();
         }
         return Collections.emptyList();
+    }
+
+    public void addTorrent(String torrentUrl, String userName, Element element) {
+        String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), "torrents/add");
+        HttpHeaders headers = new HttpHeaders();
+        headers.put(HttpHeaders.COOKIE, Collections.singletonList(sid()));
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("urls", torrentUrl);
+        map.add("savepath", getDownloadDir(userName, element));
+        map.add("paused", "false");
+        map.add("contentLayout", "Original");
+        map.add("autoTMM", "false");
+        map.add("category", element.getType());
+        map.add("tags", "username:" + userName);
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
+        try {
+            ResponseEntity<String> res = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
+            if (res.getStatusCodeValue() != 200) {
+                log.error("torrent: {}, res: {}", torrentUrl, res.getBody());
+                BusinessExceptionEnum.COMMON_BUSINESS_ERROR.assertFail("torrent 无效");
+            }
+        } catch (Exception e) {
+            log.error("qbittorrent addTorrent error", e);
+            BusinessExceptionEnum.QBITTORRENT_ERROR.assertFail();
+        }
     }
 
     // Add new torrent
@@ -77,8 +102,13 @@ public class QbittorrentServiceImpl implements QbittorrentService {
             sid = sidString.substring(0, sidString.indexOf(";"));
         } catch (Exception e) {
             log.error("qbittorrent login error", e);
-            BusinessExceptionEnum.QBITTORRENT_LOGIN_ERROR.assertFail();
+            BusinessExceptionEnum.QBITTORRENT_ERROR.assertFail();
         }
         return sid;
+    }
+
+    private static String getDownloadDir(String userName, Element element) {
+        return FileUtil.simpleConcatPath(Settings.getDownloadRootPath(),
+                userName, element.getType(), String.valueOf(element.getId()));
     }
 }
