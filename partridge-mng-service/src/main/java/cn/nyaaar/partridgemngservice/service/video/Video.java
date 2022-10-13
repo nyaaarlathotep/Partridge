@@ -49,6 +49,11 @@ public abstract class Video {
     }
 
     public void checkQuota() {
+        BusinessExceptionEnum.SPACE_INSUFFICIENT.assertIsTrue(
+                appUserService.checkUserSpaceLimit(ThreadLocalUtil.getCurrentUser()));
+    }
+
+    public void checkUploadLimit() {
         String userName = ThreadLocalUtil.getCurrentUser();
         List<FileUploadInfo> uploadingFiles = elementService
                 .list(Wrappers.lambdaQuery(Element.class)
@@ -63,11 +68,10 @@ public abstract class Video {
         if (uploadingFiles.size() >= Settings.getFileUploadingMax()) {
             BusinessExceptionEnum.USER_CUSTOM.assertFail("已存在 " + uploadingFiles.size() + " 个正在上传的文件，请先上传完成。");
         }
-        BusinessExceptionEnum.SPACE_INSUFFICIENT.assertIsTrue(appUserService.checkUserSpaceLimit(ThreadLocalUtil.getCurrentUser()));
     }
 
 
-    public EleFile preUploadHandle(FileReq fileReq) {
+    public EleFile createEle(FileReq fileReq) {
         Element element = new Element()
                 .setType(SourceEnum.Jav.getCode())
                 .setUploader(ThreadLocalUtil.getCurrentUser())

@@ -33,4 +33,6 @@ public interface JavMngService {
      */
     CheckResp uploadJav(JavUploadReq javUploadReq);
 
+    void downloadJavTorrent(String torrent, String code);
+
 }

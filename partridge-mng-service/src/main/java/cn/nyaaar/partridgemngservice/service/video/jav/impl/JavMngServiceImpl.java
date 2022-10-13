@@ -73,13 +73,18 @@ public class JavMngServiceImpl extends Video implements JavMngService {
     @Override
     public CheckResp uploadJav(JavUploadReq javUploadReq) {
         checkQuota();
-        EleFile eleFile = preUploadHandle(javUploadReq);
+        checkUploadLimit();
+        EleFile eleFile = createEle(javUploadReq);
         // TODO rpc call pelican to crawl javInfo
         CheckResp checkResp = getCheckResp(javUploadReq, eleFile);
         postUploadHandle();
         return checkResp;
     }
 
+    @Override
+    public void downloadJavTorrent(String torrent, String code) {
+        
+    }
 
     private void queryPage(JavQuery javQuery, Page<Jav> page, LambdaQueryWrapper<Jav> lambdaQueryWrapper) {
         List<Integer> actorIds = null;

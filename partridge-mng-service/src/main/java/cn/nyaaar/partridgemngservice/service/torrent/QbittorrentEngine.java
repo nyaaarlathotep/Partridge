@@ -1,9 +1,10 @@
-package cn.nyaaar.partridgemngservice.service.qbittorrent;
+package cn.nyaaar.partridgemngservice.service.torrent;
 
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
 import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.qbittorrent.Torrent;
+import cn.nyaaar.partridgemngservice.model.qbittorrent.TorrentContent;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.StringUtils;
 import cn.nyaaar.partridgemngservice.util.urlUtil;
@@ -55,6 +56,25 @@ public class QbittorrentEngine {
         return Collections.emptyList();
     }
 
+    public List<TorrentContent> getTorrentContents(String torrentHash) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.put(HttpHeaders.COOKIE, Collections.singletonList(sid()));
+        String partialUrl = "torrents/files?hash=" + torrentHash;
+
+        String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), partialUrl);
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(null, headers);
+        try {
+            ResponseEntity<String> res = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
+            return JSON.parseObject(res.getBody(), new TypeReference<>() {
+            });
+        } catch (Exception e) {
+            log.error("qbittorrent getTorrentContents error", e);
+            BusinessExceptionEnum.QBITTORRENT_ERROR.assertFail();
+        }
+        return Collections.emptyList();
+    }
+
+
     public void addTorrent(String torrentUrl, String userName, Element element) {
         String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), "torrents/add");
         HttpHeaders headers = new HttpHeaders();
@@ -62,7 +82,7 @@ public class QbittorrentEngine {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("urls", torrentUrl);
         map.add("savepath", getDownloadDir(userName, element));
-        map.add("paused", "false");
+        map.add("paused", "true");
         map.add("contentLayout", "Original");
         map.add("autoTMM", "false");
         map.add("category", element.getType());
