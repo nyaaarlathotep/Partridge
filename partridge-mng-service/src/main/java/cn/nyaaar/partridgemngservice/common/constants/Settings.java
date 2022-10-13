@@ -256,7 +256,7 @@ public class Settings {
     private static final int DEFAULT_DOWNLOAD_DELAY = 0;
     private static final String KEY_REQUEST_NEWS = "request_news";
     private static final boolean DEFAULT_REQUEST_NEWS = true;
-    private static final String DEFAULT_DOWNLOAD_ROOT_PATH = "../test/mngDownload";
+    private static final String DEFAULT_DOWNLOAD_ROOT_PATH = "/test/mngDownload";
     private static final String DOWNLOAD_ROOT_PATH = "download_root_path";
 
     private static final int DEFAULT_PAGE_SIZE = 10;

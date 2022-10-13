@@ -74,6 +74,51 @@ public class QbittorrentEngine {
         return Collections.emptyList();
     }
 
+    public void setTorrentContentPriority(String torrentHash, Integer contentIndex, Integer priority) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.put(HttpHeaders.COOKIE, Collections.singletonList(sid()));
+        String partialUrl = "torrents/filePrio";
+
+        String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), partialUrl);
+        MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+        map.add("hash", torrentHash);
+        map.add("id", contentIndex);
+        map.add("priority", priority);
+        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(map, headers);
+        try {
+            ResponseEntity<String> res = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
+            if (res.getStatusCodeValue() != 200) {
+                log.error("torrent: {}, res: {}", torrentHash, res.getBody());
+                BusinessExceptionEnum.COMMON_BUSINESS_ERROR.assertFail("更改内容优先级失败");
+            }
+        } catch (Exception e) {
+            log.error("qbittorrent getTorrentContents error", e);
+            BusinessExceptionEnum.QBITTORRENT_ERROR.assertFail();
+        }
+    }
+
+    public void deleteTorrent(String torrentHash) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.put(HttpHeaders.COOKIE, Collections.singletonList(sid()));
+        String partialUrl = "torrents/delete";
+
+        String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), partialUrl);
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("hashes", torrentHash);
+        map.add("deleteFiles", "true");
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
+        try {
+            ResponseEntity<String> res = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
+            if (res.getStatusCodeValue() != 200) {
+                log.error("torrent: {}, res: {}", torrentHash, res.getBody());
+                BusinessExceptionEnum.COMMON_BUSINESS_ERROR.assertFail("更改内容优先级失败");
+            }
+        } catch (Exception e) {
+            log.error("qbittorrent getTorrentContents error", e);
+            BusinessExceptionEnum.QBITTORRENT_ERROR.assertFail();
+        }
+    }
+
 
     public void addTorrent(String torrentUrl, String userName, Element element) {
         String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), "torrents/add");
@@ -82,7 +127,7 @@ public class QbittorrentEngine {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("urls", torrentUrl);
         map.add("savepath", getDownloadDir(userName, element));
-        map.add("paused", "true");
+        map.add("paused", "false");
         map.add("contentLayout", "Original");
         map.add("autoTMM", "false");
         map.add("category", element.getType());
