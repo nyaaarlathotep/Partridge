@@ -30,10 +30,17 @@ public class DownloadingGallery {
 
     private String gtoken;
 
+    @Schema(title = "画廊标题")
+    private String title;
+
     private long eleId;
 
     @Schema(title = "画廊页数")
     private int pages;
+
+    private String folderPath;
+
+    private String userName;
 
     @Schema(title = "画廊下载最后期限")
     private Date deadline = DateUtil.date().offset(DateField.MINUTE, Settings.getDownloadQueueExpireTime());

@@ -11,20 +11,19 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
-
 /**
  * <p>
- * Mapper 接口
+ * ehentai 画廊 Mapper 接口
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-02
+ * @since 2022-09-26
  */
 public interface EhentaiGalleryMapper extends BaseMapper<EhentaiGallery> {
 
-    String querySql = "SELECT DISTINCT e.* FROM ehentai_gallery e ";
+    String querySql = "SELECT DISTINCT e.* FROM ehentai_gallery e, element ele ";
     String wrapperSql = "<script>SELECT * FROM (" +
-            querySql + RawSql.whereStart + RawSql.tagIdsSql + RawSql.whereEnd +
+            querySql + RawSql.whereStart + RawSql.elementQuery + RawSql.tagIdsSql + RawSql.whereEnd +
             ") as q  ${ew.customSqlSegment}</script>";
 
     @Select(wrapperSql)

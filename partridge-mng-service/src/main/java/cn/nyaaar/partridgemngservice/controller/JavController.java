@@ -1,15 +1,20 @@
 package cn.nyaaar.partridgemngservice.controller;
 
 import cn.nyaaar.partridgemngservice.common.annotation.LogAnnotation;
+import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.model.jav.JavBasicInfo;
 import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.jav.JavQuery;
+import cn.nyaaar.partridgemngservice.model.jav.JavUploadReq;
 import cn.nyaaar.partridgemngservice.model.response.R;
-import cn.nyaaar.partridgemngservice.service.jav.JavMngService;
+import cn.nyaaar.partridgemngservice.model.validate.FileCheck;
+import cn.nyaaar.partridgemngservice.service.video.jav.JavMngService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 
 @Tag(name = "jav", description = "jav 相关 Controller")
 @RestController
@@ -38,12 +43,12 @@ public class JavController {
         return new R<>(javMngService.getJavList(javQuery, pageIndex));
     }
 
-    @Operation(summary = "jav 基本信息列表", description = "获取保存在数据库的 jav 基本信息列表")
-    @GetMapping(value = "/list/{pageIndex}")
+
+    @Operation(summary = "上传 Jav", description = "上传 Jav，返回 check 的结果")
+    @PostMapping(value = "/upload")
     @LogAnnotation
-    public R<ListResp<JavBasicInfo>> getJavBasicInfoList(@PathVariable Integer pageIndex) {
+    public R<CheckResp> uploadJav(@RequestBody @Validated(FileCheck.class) JavUploadReq javUploadReq) {
 
-        return new R<>(javMngService.getJavList(pageIndex));
+        return new R<>(javMngService.uploadJav(javUploadReq));
     }
-
 }

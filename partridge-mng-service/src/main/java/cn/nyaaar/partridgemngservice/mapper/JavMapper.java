@@ -21,10 +21,9 @@ import java.util.List;
  */
 public interface JavMapper extends BaseMapper<Jav> {
 
-    String querySql = "SELECT DISTINCT e.* FROM jav e ";
-
+    String querySql = "SELECT DISTINCT e.* FROM jav e, element ele";
     String wrapperSql = "<script>SELECT * FROM (" +
-            querySql + RawSql.whereStart + RawSql.tagIdsSql + RawSql.actorIds + RawSql.organIds + RawSql.whereEnd +
+            querySql + RawSql.whereStart + RawSql.elementQuery + RawSql.tagIdsSql + RawSql.actorIds + RawSql.organIds + RawSql.whereEnd +
             ") as q  ${ew.customSqlSegment}</script>";
 
     @Select(wrapperSql)

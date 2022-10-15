@@ -1,7 +1,9 @@
 package cn.nyaaar.partridgemngservice.service.ehService.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
+import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
@@ -12,8 +14,11 @@ import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.ehService.EhService;
 import cn.nyaaar.partridgemngservice.service.ehService.ehBasic.EhDownload;
 import cn.nyaaar.partridgemngservice.service.ehService.ehBasic.EhEngine;
+import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
+import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.StringUtils;
+import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -39,19 +44,26 @@ public class EhServiceImpl implements EhService {
     private final EhentaiGalleryService ehentaiGalleryService;
     private final EleFileService eleFileService;
     private final ElementService elementService;
+    private final ElementMngService elementMngService;
+    final AppUserService appUserService;
+
     private final TagInfoService tagInfoService;
 
     public EhServiceImpl(EhEngine ehEngine,
                          EhentaiGalleryService ehentaiGalleryService,
                          EleFileService eleFileService,
                          ElementService elementService,
-                         TagInfoService tagInfoService, EhDownload ehDownload) {
+                         TagInfoService tagInfoService,
+                         EhDownload ehDownload,
+                         ElementMngService elementMngService, AppUserService appUserService) {
         this.ehEngine = ehEngine;
         this.ehentaiGalleryService = ehentaiGalleryService;
         this.eleFileService = eleFileService;
         this.elementService = elementService;
         this.tagInfoService = tagInfoService;
         this.ehDownload = ehDownload;
+        this.elementMngService = elementMngService;
+        this.appUserService = appUserService;
     }
 
     @Override
@@ -75,12 +87,13 @@ public class EhServiceImpl implements EhService {
                 .eq(EleFile::getEleId, eleId)
                 .in(EleFile::getPageNum, pageIndexes));
 
-        return eleFiles.stream().map(eleFileService::getGalleryPage).toList();
+        return eleFiles.stream().map(this::getGalleryPage).toList();
     }
 
     @Override
     public void downloadGallery(long gid, String gtoken) {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken, true);
+        BusinessExceptionEnum.SPACE_INSUFFICIENT.assertIsTrue(appUserService.checkUserSpaceLimit(ThreadLocalUtil.getCurrentUser()));
         ehDownload.downloadGalleryAsync(ehentaiGallery);
     }
 
@@ -96,15 +109,6 @@ public class EhServiceImpl implements EhService {
                 eq(EhentaiGallery::getEleId, eleId));
         BusinessExceptionEnum.GALLERY_NOT_FOUND.assertNotNull(ehentaiGallery);
         return getGalleryBasicInfo(ehentaiGallery);
-    }
-
-
-    @Override
-    public ListResp<GalleryBasicInfo> getGalleryList(int pageIndex) {
-        Page<EhentaiGallery> page = new Page<>(pageIndex, Settings.getPageSize());
-        ehentaiGalleryService.page(page, new LambdaQueryWrapper<EhentaiGallery>().orderByDesc(EhentaiGallery::getEleId));
-
-        return getGalleryBasicInfoListResp(page);
     }
 
     @Override
@@ -126,6 +130,83 @@ public class EhServiceImpl implements EhService {
                     .toList();
         }
         ehentaiGalleryService.pageWithTag(page, ehentaiGalleryLambdaQueryWrapper, tagInfoIds);
+    }
+
+    private ListResp<GalleryBasicInfo> getGalleryBasicInfoListResp(Page<EhentaiGallery> page) {
+        List<GalleryBasicInfo> galleryBasicInfos = page.getRecords()
+                .parallelStream()
+                .map(this::getGalleryBasicInfo)
+                .toList();
+
+        return new ListResp<GalleryBasicInfo>()
+                .setList(galleryBasicInfos)
+                .setPages(page.getPages())
+                .setCurrent(page.getCurrent());
+    }
+
+    @Override
+    public GalleryDetail getGalleryDetailByGid(long gid, String gtoken) {
+        GalleryDetail galleryDetail = ehEngine.getGalleryDetail(gid, gtoken);
+        EhentaiGallery ehentaiGallery = galleryDetail.transToEntity();
+        ehentaiGalleryService.saveOrUpdate(ehentaiGallery);
+        return galleryDetail;
+    }
+
+    @NotNull
+    private EhentaiGallery getEhGAndSavOrUpdEhg(long gid, String gtoken, boolean downloadThumb) {
+        GalleryDetail galleryDetail = ehEngine.getGalleryDetail(gid, gtoken);
+        EhentaiGallery ehentaiGallery = galleryDetail.transToEntity();
+
+        Long eleId = getOrInsertEleIdFromGid(gid);
+        tagInfoService.saveOrUpdateTagInfoWithRe(galleryDetail.getTags(), eleId);
+        if (downloadThumb) {
+            ehDownload.downloadGalleryThumb(gid, galleryDetail.thumb, eleId, ehentaiGallery.getTitle());
+        }
+        ehentaiGallery.setEleId(eleId);
+        ehentaiGalleryService.saveOrUpdate(ehentaiGallery);
+        return ehentaiGallery;
+    }
+
+
+    private Long getOrInsertEleIdFromGid(long gid) {
+        Long eleId;
+        EhentaiGallery ehentaiGalleryOld = ehentaiGalleryService.getOne(
+                new LambdaQueryWrapper<EhentaiGallery>().eq(EhentaiGallery::getGid, gid));
+        if (ehentaiGalleryOld == null) {
+            Element element = new Element();
+            element.setType(SourceEnum.Ehentai.getCode());
+            element.setAvailableFlag(PrConstant.VALIDATED);
+            elementService.save(element);
+            eleId = element.getId();
+        } else {
+            eleId = ehentaiGalleryOld.getEleId();
+        }
+        return eleId;
+    }
+
+
+    @NotNull
+    private GalleryBasicInfo getGalleryBasicInfo(EhentaiGallery ehentaiGallery) {
+        GalleryBasicInfo basicInfo = new GalleryBasicInfo();
+        BeanUtil.copyProperties(ehentaiGallery, basicInfo);
+        List<TagInfo> tagInfos = elementMngService.getTagInfos(basicInfo.getEleId());
+        basicInfo.setTags(tagInfos.stream().map(TagDto::new).toList());
+        return basicInfo;
+    }
+
+    @Override
+    public Map<Long, DownloadingGallery> getDownloadingQueue() {
+        return ehDownload.getDownloadingQueue();
+    }
+
+    private GalleryPage getGalleryPage(EleFile eleFile) {
+        return new GalleryPage()
+                .setPageIndex(eleFile.getPageNum())
+                .setPageBase64(FileUtil.getFileBase64(eleFile.getPath()))
+                .setFileSuffix(Objects.requireNonNullElse(
+                        FileTypeEnum.getTypeBySuffix(eleFile.getName()),
+                        FileTypeEnum.unknown
+                ).getSuffix());
     }
 
     private static LambdaQueryWrapper<EhentaiGallery> getQueryWrapper(GalleryQuery galleryQuery) {
@@ -193,71 +274,5 @@ public class EhServiceImpl implements EhService {
         }
 
         return ehentaiGalleryLambdaQueryWrapper;
-    }
-
-    private ListResp<GalleryBasicInfo> getGalleryBasicInfoListResp(Page<EhentaiGallery> page) {
-        List<GalleryBasicInfo> galleryBasicInfos = page.getRecords()
-                .parallelStream()
-                .map(this::getGalleryBasicInfo)
-                .toList();
-
-        return new ListResp<GalleryBasicInfo>()
-                .setList(galleryBasicInfos)
-                .setPages(page.getPages())
-                .setCurrent(page.getCurrent());
-    }
-
-    @Override
-    public GalleryDetail getGalleryDetailByGid(long gid, String gtoken) {
-        GalleryDetail galleryDetail = ehEngine.getGalleryDetail(gid, gtoken);
-        EhentaiGallery ehentaiGallery = galleryDetail.transToEntity();
-        ehentaiGalleryService.saveOrUpdate(ehentaiGallery);
-        return galleryDetail;
-    }
-
-    @NotNull
-    private EhentaiGallery getEhGAndSavOrUpdEhg(long gid, String gtoken, boolean downloadThumb) {
-        GalleryDetail galleryDetail = ehEngine.getGalleryDetail(gid, gtoken);
-        EhentaiGallery ehentaiGallery = galleryDetail.transToEntity();
-
-        Long eleId = getOrInsertEleIdFromGid(gid);
-        tagInfoService.saveOrUpdateTagInfoWithRe(galleryDetail.getTags(), eleId);
-        if (downloadThumb) {
-            ehDownload.downloadGalleryThumb(gid, galleryDetail.thumb, eleId);
-        }
-        ehentaiGallery.setEleId(eleId);
-        ehentaiGalleryService.saveOrUpdate(ehentaiGallery);
-        return ehentaiGallery;
-    }
-
-
-    private Long getOrInsertEleIdFromGid(long gid) {
-        Long eleId;
-        EhentaiGallery ehentaiGalleryOld = ehentaiGalleryService.getOne(
-                new LambdaQueryWrapper<EhentaiGallery>().eq(EhentaiGallery::getGid, gid));
-        if (ehentaiGalleryOld == null) {
-            Element element = new Element();
-            element.setType(SourceEnum.Ehentai.getCode());
-            elementService.add(element);
-            eleId = element.getId();
-        } else {
-            eleId = ehentaiGalleryOld.getEleId();
-        }
-        return eleId;
-    }
-
-
-    @NotNull
-    private GalleryBasicInfo getGalleryBasicInfo(EhentaiGallery ehentaiGallery) {
-        GalleryBasicInfo basicInfo = new GalleryBasicInfo();
-        BeanUtil.copyProperties(ehentaiGallery, basicInfo);
-        List<TagInfo> tagInfos = tagInfoService.getTagInfos(basicInfo.getEleId());
-        basicInfo.setTags(tagInfos.stream().map(TagDto::new).toList());
-        return basicInfo;
-    }
-
-    @Override
-    public Map<Long, DownloadingGallery> getDownloadingQueue() {
-        return ehDownload.getDownloadingQueue();
     }
 }

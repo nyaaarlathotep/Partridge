@@ -63,6 +63,7 @@ public class GalleryDetail extends GalleryInfo {
         ehentaiGallery.setToken(this.token);
         ehentaiGallery.setPosted(DateUtil.parse(this.posted));
         ehentaiGallery.setFavoriteCount(this.favoriteCount);
+        ehentaiGallery.setSize(this.size);
         return ehentaiGallery;
     }
 

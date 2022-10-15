@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-02
+ * @since 2022-10-08
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -29,7 +29,7 @@ public class EleFile extends Model<EleFile> {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "ID", type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     @TableField("ELE_ID")
     private Long eleId;
@@ -50,10 +50,16 @@ public class EleFile extends Model<EleFile> {
     private Integer pageNum;
 
     /**
+     * 完成标志(0-禁用;1-启用)，可以被删除
+     */
+    @TableField("COMPLETED_FLAG")
+    private Integer completedFlag;
+
+    /**
      * 启用标志(0-禁用;1-启用)
      */
-    @TableField("IS_AVAILABLE_FLAG")
-    private Integer isAvailableFlag;
+    @TableField("AVAILABLE_FLAG")
+    private Integer availableFlag;
 
     @TableField(value = "CREATED_TIME", fill = FieldFill.INSERT)
     private Date createdTime;

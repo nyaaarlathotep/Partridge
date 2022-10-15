@@ -10,14 +10,15 @@
         <result column="PASSWORD" property="password" />
         <result column="VALIDATED" property="validated" />
         <result column="LAST_LOGIN_TIME" property="lastLoginTime" />
-        <result column="LAST_LOGIN_IP" property="lastLoginIp" />
+        <result column="SPACE_QUOTA" property="spaceQuota" />
         <result column="CREATED_TIME" property="createdTime" />
         <result column="UPDATED_TIME" property="updatedTime" />
+        <result column="LAST_LOGIN_IP" property="lastLoginIp" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        ID, EMAIL, USER_NAME, PASSWORD, VALIDATED, LAST_LOGIN_TIME, LAST_LOGIN_IP, CREATED_TIME, UPDATED_TIME
+        ID, EMAIL, USER_NAME, PASSWORD, VALIDATED, LAST_LOGIN_TIME, SPACE_QUOTA, CREATED_TIME, UPDATED_TIME, LAST_LOGIN_IP
     </sql>
 
 </mapper>

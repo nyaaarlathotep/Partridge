@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 来源枚举类
+ * 来源枚举类，对应 element 的 type
  *
  * @author nyaaar
  * @Version $Id: SourceCodeEnum.java, v 0.1 2022-01 9:42 nyaaar Exp $$
  */
 public enum SourceEnum {
-    Unknown("","未录入"),
+    Unknown("-1", "未录入"),
     Jav("1", "Jav"),
     Ehentai("2", "ehentai"),
     ;

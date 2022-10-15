@@ -67,15 +67,6 @@ public interface TagInfoService extends IService<TagInfo> {
      */
     TagInfo findById(Integer id);
 
-
-    /**
-     * 获取 eleId 对应的所有 tagInfo
-     *
-     * @param eleId eleId
-     * @return List<TagInfo>
-     */
-    List<TagInfo> getTagInfos(long eleId);
-
     /**
      * 保存或更新 tagInfo，并新增对应的关系
      *

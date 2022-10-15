@@ -11,7 +11,7 @@ import java.util.Map;
  * @Version $Id: FileTypeEnum.java, v 0.1 2022-01 17:58 nyaaar Exp $$
  */
 public enum FileTypeEnum {
-    unknown("0", ".jpg"),
+    unknown("0", ".unknown"),
     jpg("1", ".jpg"),
     gif("2", ".gif"),
     mp4("3", ".mp4"),
@@ -38,7 +38,7 @@ public enum FileTypeEnum {
                 return e;
             }
         }
-        return jpg;
+        return unknown;
     }
 
     /**

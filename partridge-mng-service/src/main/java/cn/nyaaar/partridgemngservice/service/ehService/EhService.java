@@ -33,8 +33,8 @@ public interface EhService {
     /**
      * 下载画廊
      *
-     * @param gid    画廊id
-     * @param gtoken gtoken
+     * @param gid      画廊id
+     * @param gtoken   gtoken
      */
     void downloadGallery(long gid, String gtoken);
 
@@ -65,13 +65,6 @@ public interface EhService {
      */
     GalleryBasicInfo getGalleryBasicByGid(long eleId);
 
-    /**
-     * 浏览 gallery，返回一个 GalleryBasicInfo 的 list
-     *
-     * @param pageIndex pageIndex
-     * @return ListResp
-     */
-    ListResp<GalleryBasicInfo> getGalleryList(int pageIndex);
 
     /**
      * 搜索符合相关条件的 ehentai gallery

@@ -7,12 +7,11 @@
         <id column="ID" property="id" />
         <result column="ELE_ID" property="eleId" />
         <result column="ORG_ID" property="orgId" />
-        <result column="RE_TYPE" property="reType" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        ID, ELE_ID, ORG_ID, RE_TYPE
+        ID, ELE_ID, ORG_ID
     </sql>
 
 </mapper>

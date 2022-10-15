@@ -21,6 +21,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,6 +55,9 @@ public class EhEngine {
     private static void doThrowException(Call call, int code, @Nullable Headers headers,
                                          @Nullable String body, Exception e) throws Exception {
         if (call.isCanceled()) {
+            BusinessExceptionEnum.HTTP_REQUEST_FAILED.assertFail();
+        }
+        if (e instanceof SocketException){
             BusinessExceptionEnum.HTTP_REQUEST_FAILED.assertFail();
         }
 

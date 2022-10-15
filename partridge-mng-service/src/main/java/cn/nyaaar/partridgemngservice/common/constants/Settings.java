@@ -26,8 +26,8 @@ import java.util.Locale;
 import java.util.Map;
 
 @Slf4j
+@SuppressWarnings("unused")
 public class Settings {
-    // TODO proxy
 
     /********************
      ****** Eh
@@ -264,7 +264,22 @@ public class Settings {
     private static final int DEFAULT_DOWNLOAD_QUEUE_EXPIRE_TIME = 30;
     private static final String DOWNLOAD_QUEUE_EXPIRE_TIME = "download_queue_expire_time";
     //    private static Context sContext;
-    private static Map<String, Object> sSettingsPre = new HashMap<>();
+    private static final Integer DEFAULT_SHARD_SIZE = 5242880;
+    // please don't overflow int size...
+    private static final String SHARD_SIZE = "chuck_size";
+
+    private static final int DEFAULT_UPLOADING_FILE_MAX = 3;
+    private static final String UPLOADING_FILE_MAX = "uploading_file_max";
+    private static final int DEFAULT_USER_SPACE_QUOTA = 100;
+    private static final String USER_SPACE_QUOTA = "user_space_quota";
+    private static final String QBITTORRENT_URL = "qbittorrent_url";
+    private static final String DEFAULT_QBITTORRENT_URL = "http://localhost:8080/api/v2";
+    private static final String QBITTORRENT_USER = "qbittorrent_user";
+    private static final String DEFAULT_QBITTORRENT_USER = "admin";
+    private static final String QBITTORRENT_PASSWORD="qbittorrent_password";
+    private static final String DEFAULT_QBITTORRENT_PASSWORD="adminadmin";
+    
+    private static final Map<String, Object> sSettingsPre = new HashMap<>();
     private static EhConfig sEhConfig;
 
 //    public static void initialize(Context context) {
@@ -1179,8 +1194,31 @@ public class Settings {
     public static int getPageSize() {
         return getInt(PAGE_SIZE, DEFAULT_PAGE_SIZE);
     }
+
+    public static int getDownloadQueueExpireTime() {
+        return getInt(DOWNLOAD_QUEUE_EXPIRE_TIME, DEFAULT_DOWNLOAD_QUEUE_EXPIRE_TIME);
+    }
+
+    public static Integer getShardSize() {
+        return getInt(SHARD_SIZE, DEFAULT_SHARD_SIZE);
+    }
+
+    public static Integer getFileUploadingMax() {
+        return getInt(UPLOADING_FILE_MAX, DEFAULT_UPLOADING_FILE_MAX);
+    }
+
+    public static String getQbittorrentUrl() {
+        return getString(QBITTORRENT_URL, DEFAULT_QBITTORRENT_URL);
+    }
+
+    public static String getQbittorrentUser(){
+        return getString(QBITTORRENT_USER,DEFAULT_QBITTORRENT_USER);
+    }
     
-    public static int getDownloadQueueExpireTime(){
-        return getInt(DOWNLOAD_QUEUE_EXPIRE_TIME,DEFAULT_DOWNLOAD_QUEUE_EXPIRE_TIME);
+    public static String getQbittorrentPassword(){
+        return getString(QBITTORRENT_PASSWORD,DEFAULT_QBITTORRENT_PASSWORD);
+    }
+    public static int getUserSpaceQuota(){
+        return getInt(USER_SPACE_QUOTA,DEFAULT_USER_SPACE_QUOTA);
     }
 }

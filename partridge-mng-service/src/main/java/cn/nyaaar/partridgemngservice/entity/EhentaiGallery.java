@@ -14,11 +14,11 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 
+ * ehentai 画廊
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-02
+ * @since 2022-09-26
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -72,6 +72,12 @@ public class EhentaiGallery extends Model<EhentaiGallery> {
      */
     @TableField("PAGES")
     private Integer pages;
+
+    /**
+     * 画廊文件大小
+     */
+    @TableField("SIZE")
+    private String size;
 
     /**
      * 预览画廊对应页

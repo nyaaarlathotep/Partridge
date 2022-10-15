@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-07
+ * @since 2022-10-09
  */
 public interface EleOrgReMapper extends BaseMapper<EleOrgRe> {
 

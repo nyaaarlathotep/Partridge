@@ -18,17 +18,19 @@ public enum BusinessExceptionEnum implements BusinessExceptionAssert {
     JSON_PARSE_ERR(100007, "JSON转换错误"),
     DECRYPTION_ERR(100008, "请求数据错误，无法解密"),
     BAD_REQUEST(100009, "请求异常"),
-    VERIFY_SIGN_ERR(100010, "验签失败"),
+    VERIFY_MD5_ERR(100010, "md5校验失败"),
     FIELD_ERROR_CUSTOM(100011, "{0}"),
     SYSTEM_ERROR_CUSTOM(100012, "{0}"),
-    HTTP_REQUEST_FAILED(100013, "网络异常"),
+    HTTP_REQUEST_FAILED(100013, "网络异常，请检查您的网络情况"),
     SYSTEM_DATA_ERROR(100014, "{0}"),
     COMMON_BUSINESS_ERROR(100015, "{0}"),
     TIME_FORMAT_ERROR(100016, "时间格式异常{0}"),
     ENCRYPTION_ERROR(1000017, "发送数据错误，无法加密"),
-
+    FILE_IO_ERROR(100018, "文件 I/O 异常，请联系管理员"),
     // 特殊业务异常
-    
+
+    PERMISSION_DENY(200005, "用户权限不足"),
+    SPACE_INSUFFICIENT(200005, "用户空间配额不足"),
     USER_CUSTOM(200006, "{0}"),
     USER_EXIST(200009, "用户名已存在"),
     PARSE_ERROR(200010, "parse error, {0}"),
@@ -37,8 +39,10 @@ public enum BusinessExceptionEnum implements BusinessExceptionAssert {
     END_HERE(200012, "今回はここまで"),
     GALLERY_NOT_AVAILABLE(200013, "{0}"),
     ELEMENT_NOT_FOUND(200014, "没有找到对应元素"),
-    GALLERY_NOT_FOUND(200015, "没有找到对应画廊"),
-    PAGE_NOT_FOUND(200016, "没有找到对应页码"),
+    ELEMENT_FILE_NOT_FOUND(200015, "没有找到对应文件"),
+    GALLERY_NOT_FOUND(200016, "没有找到对应画廊"),
+    PAGE_NOT_FOUND(200017, "没有找到对应页码"),
+    QBITTORRENT_ERROR(200101, "qbittorrent 操作失败，请联系管理员"),
     ;
 
     final int code;

@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author nyaaar
- * @since 2022-09-16
+ * @since 2022-10-08
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -35,16 +35,40 @@ public class Element extends Model<Element> {
     private String type;
 
     /**
-     * (0-否;1-是)
+     * 关联文件所在目录
+     */
+    @TableField("FILE_DIR")
+    private String fileDir;
+
+    /**
+     * 关联文件总大小，单位为 B
+     */
+    @TableField("FILE_SIZE")
+    private Long fileSize;
+
+    /**
+     * 分享标志(0-否;1-是)
      */
     @TableField("SHARED_FLAG")
     private Integer sharedFlag;
+
+    /**
+     * 释放标志(0-否;1-是)，释放后上传者将不能删除元素
+     */
+    @TableField("PUBLISHED_FLAG")
+    private Integer publishedFlag;
 
     /**
      * 上传用户
      */
     @TableField("UPLOADER")
     private String uploader;
+
+    /**
+     * 启用标志(0-禁用;1-启用)
+     */
+    @TableField("AVAILABLE_FLAG")
+    private Integer availableFlag;
 
     @TableField(value = "CREATED_TIME", fill = FieldFill.INSERT)
     private Date createdTime;

@@ -59,17 +59,11 @@ public class EhentaiGalleryController {
         return new R<>(ehService.getGalleryDetailByGid(gid, gtoken));
     }
 
-    @Operation(summary = "gallery 基本信息列表", description = "获取保存在数据库的 gallery 基本信息列表")
-    @GetMapping(value = "/basic/list/{pageIndex}")
-    @LogAnnotation
-    public R<ListResp<GalleryBasicInfo>> getGalleryBasic(@PathVariable Integer pageIndex) {
-
-        return new R<>(ehService.getGalleryList(pageIndex));
-    }
-    @Operation(summary = "gallery 基本信息列表", description = "获取保存在数据库的 gallery 基本信息列表")
+    @Operation(summary = "gallery 下载队列", description = "获取保存在数据库的 gallery 基本信息列表")
     @GetMapping(value = "/download/queue")
     @LogAnnotation
     public R<Collection<DownloadingGallery>> getDownloadQueue() {
+        // TODO user, dto
 
         return new R<>(ehService.getDownloadingQueue().values());
     }

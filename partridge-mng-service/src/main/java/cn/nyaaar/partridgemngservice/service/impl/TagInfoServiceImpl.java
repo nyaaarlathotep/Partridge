@@ -13,7 +13,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import cn.nyaaar.partridgemngservice.model.QueryData;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -72,18 +71,6 @@ public class TagInfoServiceImpl extends ServiceImpl<TagInfoMapper, TagInfo> impl
     public TagInfo findById(Integer id) {
 
         return baseMapper.selectById(id);
-    }
-
-
-    @Override
-    public List<TagInfo> getTagInfos(long eleId) {
-        List<EleTagRe> eleTagRes = eleTagReService.list(
-                new LambdaQueryWrapper<EleTagRe>().eq(EleTagRe::getEleId, eleId));
-        if (eleTagRes.isEmpty()) {
-            return new ArrayList<>();
-        }
-        List<Integer> tagIds = eleTagRes.stream().map(EleTagRe::getTagId).toList();
-        return this.list(new LambdaQueryWrapper<TagInfo>().in(TagInfo::getId, tagIds));
     }
 
     @Override
