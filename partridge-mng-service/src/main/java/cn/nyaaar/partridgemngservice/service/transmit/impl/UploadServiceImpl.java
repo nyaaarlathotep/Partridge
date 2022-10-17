@@ -17,6 +17,7 @@ import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
@@ -97,9 +98,9 @@ public class UploadServiceImpl implements UploadService {
                     .setEleFileId(fileUploadInfo.getEleFileId())
                     .setUploaded(true);
         }
-        String fileDIr = FileUtil.getFileDir(fileUploadInfo.getPath());
+        String fileDir = FileUtil.getFileDir(fileUploadInfo.getPath());
         try {
-            return getCheckResp(fileUploadInfo, Path.of(fileDIr));
+            return getCheckResp(fileUploadInfo, Path.of(fileDir));
         } catch (IOException e) {
             log.error("file check error, ", e);
             BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
@@ -169,6 +170,43 @@ public class UploadServiceImpl implements UploadService {
         }
     }
 
+    @Override
+    public List<CheckResp> getUploadingFiles() {
+        String userName = ThreadLocalUtil.getCurrentUser();
+        List<FileUploadInfo> uploadingFiles = getUploadingFiles(userName);
+        return uploadingFiles.stream()
+                .map(fileUploadInfo -> {
+                    try {
+                        return this.getCheckResp(fileUploadInfo, Path.of(FileUtil.getFileDir(fileUploadInfo.getPath())));
+                    } catch (IOException e) {
+                        log.error("file check error, ", e);
+                        BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
+                        return new CheckResp();
+                    }
+                })
+                .toList();
+    }
+
+    @Override
+    @NotNull
+    public List<FileUploadInfo> getUploadingFiles(String userName) {
+        List<Long> elementIds = elementService
+                .list(Wrappers.lambdaQuery(Element.class)
+                        .eq(Element::getUploader, userName))
+                .stream()
+                .map(Element::getId)
+                .toList();
+        List<Long> eleFileIds = eleFileService
+                .list(Wrappers.lambdaQuery(EleFile.class)
+                        .in(EleFile::getEleId, elementIds))
+                .stream()
+                .map(EleFile::getId)
+                .toList();
+        return fileUploadInfoService
+                .list(Wrappers.lambdaQuery(FileUploadInfo.class)
+                        .in(FileUploadInfo::getEleFileId, eleFileIds)
+                        .eq(FileUploadInfo::getUploadFlag, PrConstant.UPLOADING));
+    }
 
     private static void checkShardMd5(String shardMd5, byte[] shardBytes) {
         BusinessExceptionEnum.VERIFY_MD5_ERR.assertIsTrue(shardMd5.equals(DigestUtils.md5DigestAsHex(shardBytes)));
@@ -188,7 +226,7 @@ public class UploadServiceImpl implements UploadService {
         if (currentFile.exists()) {
             return;
         }
-        List<Path> shardFiles;
+        java.util.List<Path> shardFiles;
         try (Stream<Path> paths = Files.walk(filePath.toPath())) {
             shardFiles = paths
                     .filter(Files::isRegularFile)

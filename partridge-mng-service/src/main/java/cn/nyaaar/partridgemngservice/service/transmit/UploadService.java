@@ -1,9 +1,11 @@
 package cn.nyaaar.partridgemngservice.service.transmit;
 
 import cn.nyaaar.partridgemngservice.entity.EleFile;
+import cn.nyaaar.partridgemngservice.entity.FileUploadInfo;
 import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author yuegenhua
@@ -17,7 +19,7 @@ public interface UploadService {
      * @param fileName     fileName
      * @param fileMd5      fileMd5
      * @param fileSize     fileSize
-     * @param eleFile    eleFile
+     * @param eleFile      eleFile
      * @param uploaderPath uploaderPath
      * @return 缺失分片序号
      * @throws IOException 文件操作异常
@@ -41,4 +43,19 @@ public interface UploadService {
      * @param shardBytes shardBytes
      */
     void upload(Integer shardIndex, String fileMd5, String shardMd5, byte[] shardBytes);
+
+    /**
+     * 返回当前用户正在上传的文件的 checkResp
+     *
+     * @return List<CheckResp>
+     */
+    List<CheckResp> getUploadingFiles();
+
+    /**
+     * 通过用户名找到对应正在上传的文件
+     *
+     * @param userName userName
+     * @return uploading fileUploadInfos
+     */
+    List<FileUploadInfo> getUploadingFiles(String userName);
 }

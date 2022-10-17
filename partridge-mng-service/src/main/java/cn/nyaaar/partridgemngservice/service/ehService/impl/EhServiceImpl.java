@@ -79,11 +79,11 @@ public class EhServiceImpl implements EhService {
     }
 
     @Override
-    public List<GalleryPage> getGalleryPage(long eleId, List<Integer> pageIndexes) {
+    public java.util.List<GalleryPage> getGalleryPage(long eleId, java.util.List<Integer> pageIndexes) {
         if (pageIndexes.isEmpty()) {
             return new ArrayList<>();
         }
-        List<EleFile> eleFiles = eleFileService.list(new LambdaQueryWrapper<EleFile>()
+        java.util.List<EleFile> eleFiles = eleFileService.list(new LambdaQueryWrapper<EleFile>()
                 .eq(EleFile::getEleId, eleId)
                 .in(EleFile::getPageNum, pageIndexes));
 
@@ -98,7 +98,7 @@ public class EhServiceImpl implements EhService {
     }
 
     @Override
-    public List<GalleryPage> downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes) {
+    public java.util.List<GalleryPage> downloadGalleryPages(long gid, String gtoken, java.util.List<Integer> pageIndexes) {
         EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken, false);
         return ehDownload.getGalleryPages(gid, gtoken, pageIndexes, ehentaiGallery);
     }

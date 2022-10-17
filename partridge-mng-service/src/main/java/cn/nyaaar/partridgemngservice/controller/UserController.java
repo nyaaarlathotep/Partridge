@@ -38,11 +38,11 @@ public class UserController {
     }
 
 
-    @Operation(summary = "test", description = "test")
-    @GetMapping(value = "/test")
+    @Operation(summary = "ping", description = "ping")
+    @GetMapping(value = "/ping")
     @LogAnnotation
-    public R<Boolean> test() {
-        log.info("test");
-        return new R<>();
+    public R<String> test() {
+        log.info("ping");
+        return new R<>("pong");
     }
 }

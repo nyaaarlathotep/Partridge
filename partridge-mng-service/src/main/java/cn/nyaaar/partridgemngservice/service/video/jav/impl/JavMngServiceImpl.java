@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -43,10 +42,9 @@ public class JavMngServiceImpl extends Video implements JavMngService {
                              ElementService elementService,
                              EleFileService eleFileService,
                              UploadService uploadService,
-                             FileUploadInfoService fileUploadInfoService,
                              AppUserService appUserService,
                              ElementMngService elementMngService) {
-        super(elementService, appUserService, eleFileService, fileUploadInfoService, uploadService);
+        super(elementService, appUserService, eleFileService, uploadService);
         this.javService = javService;
         this.organizationService = organizationService;
         this.actorService = actorService;
@@ -72,7 +70,6 @@ public class JavMngServiceImpl extends Video implements JavMngService {
 
     @Override
     public CheckResp uploadJav(JavUploadReq javUploadReq) {
-        checkQuota();
         EleFile eleFile = preUploadHandle(javUploadReq);
         // TODO rpc call pelican to crawl javInfo
         CheckResp checkResp = getCheckResp(javUploadReq, eleFile);
@@ -82,7 +79,7 @@ public class JavMngServiceImpl extends Video implements JavMngService {
 
 
     private void queryPage(JavQuery javQuery, Page<Jav> page, LambdaQueryWrapper<Jav> lambdaQueryWrapper) {
-        List<Integer> actorIds = null;
+        java.util.List<Integer> actorIds = null;
         if (Objects.nonNull(javQuery.getActors()) && !javQuery.getActors().isEmpty()) {
             actorIds = javQuery.getActors()
                     .parallelStream()
@@ -92,7 +89,7 @@ public class JavMngServiceImpl extends Video implements JavMngService {
                     .map(Actor::getId)
                     .toList();
         }
-        List<Integer> organIds = null;
+        java.util.List<Integer> organIds = null;
         if (Objects.nonNull(javQuery.getOrganizations()) && !javQuery.getOrganizations().isEmpty()) {
             organIds = javQuery.getOrganizations()
                     .parallelStream()
@@ -102,7 +99,7 @@ public class JavMngServiceImpl extends Video implements JavMngService {
                     .map(Organization::getId)
                     .toList();
         }
-        List<Integer> tagInfoIds = null;
+        java.util.List<Integer> tagInfoIds = null;
         if (Objects.nonNull(javQuery.getTagDtos()) && !javQuery.getTagDtos().isEmpty()) {
             tagInfoIds = javQuery.getTagDtos()
                     .parallelStream()
@@ -152,7 +149,7 @@ public class JavMngServiceImpl extends Video implements JavMngService {
 
     @NotNull
     private ListResp<JavBasicInfo> getJInfoListResp(Page<Jav> page) {
-        List<JavBasicInfo> javBasicInfos = page.getRecords()
+        java.util.List<JavBasicInfo> javBasicInfos = page.getRecords()
                 .parallelStream()
                 .map(this::getJavBasicInfo)
                 .toList();
