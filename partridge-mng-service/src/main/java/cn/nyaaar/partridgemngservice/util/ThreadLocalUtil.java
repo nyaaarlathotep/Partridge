@@ -24,7 +24,10 @@ public class ThreadLocalUtil {
      * 获取当前登录用户方法
      */
     public static String getCurrentUser() {
-        return userThreadLocal.get();
+        if (userThreadLocal.get() != null) {
+            return userThreadLocal.get();
+        }
+        return "test";
     }
 
 

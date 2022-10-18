@@ -180,6 +180,7 @@ public class EhDownload {
         long gid = downloadingGallery.getGid();
         Long elementBytes = FileUtil.getFolderSize(downloadingGallery.getFolderPath());
         downloadingGalleryQueue.remove(gid);
+        // TODO complete flag for element
         elementService.update(Wrappers.lambdaUpdate(Element.class)
                 .set(Element::getFileDir, downloadingGallery.getFolderPath())
                 .set(Element::getFileSize, elementBytes)
