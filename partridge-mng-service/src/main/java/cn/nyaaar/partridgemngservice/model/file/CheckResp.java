@@ -37,5 +37,5 @@ public class CheckResp {
     private Long eleFileId;
 
     @Schema(title = "是否上传完成")
-    private Boolean uploaded = false;
+    private Boolean uploaded = true;
 }

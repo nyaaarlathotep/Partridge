@@ -3,7 +3,6 @@ package cn.nyaaar.partridgemngservice.service.ehService;
 import cn.nyaaar.partridgemngservice.model.eh.*;
 import cn.nyaaar.partridgemngservice.model.ListResp;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,7 +27,7 @@ public interface EhService {
      * @param pageIndexes 画廊图片页码
      * @return base64图片
      */
-    List<GalleryPage> getGalleryPage(long eleId, List<Integer> pageIndexes);
+    java.util.List<GalleryPage> getGalleryPage(long eleId, java.util.List<Integer> pageIndexes);
 
     /**
      * 下载画廊
@@ -46,7 +45,7 @@ public interface EhService {
      * @param pageIndexes 画廊页数
      * @return GalleryPage List
      */
-    List<GalleryPage> downloadGalleryPages(long gid, String gtoken, List<Integer> pageIndexes);
+    java.util.List<GalleryPage> downloadGalleryPages(long gid, String gtoken, java.util.List<Integer> pageIndexes);
 
     /**
      * 返回当前画廊下载队列
