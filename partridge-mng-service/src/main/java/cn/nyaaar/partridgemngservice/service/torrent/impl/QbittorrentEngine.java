@@ -1,11 +1,9 @@
 package cn.nyaaar.partridgemngservice.service.torrent.impl;
 
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
-import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.qbittorrent.QBitTorrent;
-import cn.nyaaar.partridgemngservice.model.qbittorrent.QBitTorentContent;
-import cn.nyaaar.partridgemngservice.util.FileUtil;
+import cn.nyaaar.partridgemngservice.model.qbittorrent.QBitTorrentContent;
 import cn.nyaaar.partridgemngservice.util.StringUtils;
 import cn.nyaaar.partridgemngservice.util.urlUtil;
 import com.alibaba.fastjson.JSON;
@@ -19,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
 
@@ -36,17 +35,21 @@ public class QbittorrentEngine {
         this.restTemplate = restTemplate;
     }
 
-    public List<QBitTorrent> getUserTorrents(String userName) {
+    public List<QBitTorrent> getTorrents(String userName, String hash) {
         HttpHeaders headers = new HttpHeaders();
         headers.put(HttpHeaders.COOKIE, Collections.singletonList(sid()));
-        String partialUrl = "torrents/info";
+        String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), "torrents/info");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
         if (StringUtils.isNotEmpty(userName)) {
-            partialUrl = partialUrl + "?tag=" + "username:" + userName;
+            builder.queryParam("tag", "username:" + userName);
         }
-        String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), partialUrl);
+        if (StringUtils.isNotEmpty(hash)) {
+            builder.queryParam("hashes", hash);
+        }
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(null, headers);
         try {
-            ResponseEntity<String> res = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
+            ResponseEntity<String> res = restTemplate.exchange(builder.build().encode().toString(), 
+                    HttpMethod.GET, httpEntity, String.class);
             return JSON.parseObject(res.getBody(), new TypeReference<>() {
             });
         } catch (Exception e) {
@@ -56,41 +59,16 @@ public class QbittorrentEngine {
         return Collections.emptyList();
     }
 
-    public QBitTorrent getTorrent(String hash) {
-        if (StringUtils.isEmpty(hash)) {
-            return new QBitTorrent();
-        }
+    public List<QBitTorrentContent> getTorrentContents(String torrentHash) {
         HttpHeaders headers = new HttpHeaders();
         headers.put(HttpHeaders.COOKIE, Collections.singletonList(sid()));
-        String partialUrl = "torrents/info";
-        if (StringUtils.isNotEmpty(hash)) {
-            partialUrl = partialUrl + "?hashes=" + hash;
-        }
-        String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), partialUrl);
+        String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), "torrents/files");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
+        builder.queryParam("hash", torrentHash);
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(null, headers);
         try {
-            ResponseEntity<String> res = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
-            List<QBitTorrent> QBitTorrents = JSON.parseObject(res.getBody(), new TypeReference<>() {
-            });
-            if (QBitTorrents != null && QBitTorrents.size() > 0) {
-                return QBitTorrents.get(0);
-            }
-        } catch (Exception e) {
-            log.error("qbittorrent getTorrents error", e);
-            BusinessExceptionEnum.QBITTORRENT_ERROR.assertFail();
-        }
-        return new QBitTorrent();
-    }
-
-    public List<QBitTorentContent> getTorrentContents(String torrentHash) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.put(HttpHeaders.COOKIE, Collections.singletonList(sid()));
-        String partialUrl = "torrents/files?hash=" + torrentHash;
-
-        String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), partialUrl);
-        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(null, headers);
-        try {
-            ResponseEntity<String> res = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
+            ResponseEntity<String> res = restTemplate.exchange(builder.build().encode().toString(),
+                    HttpMethod.GET, httpEntity, String.class);
             return JSON.parseObject(res.getBody(), new TypeReference<>() {
             });
         } catch (Exception e) {
@@ -146,17 +124,17 @@ public class QbittorrentEngine {
     }
 
 
-    public void addTorrent(String torrentUrl, String userName, Element element) {
+    public void addTorrent(String torrentUrl, String userName, String savePath, String category) {
         String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), "torrents/add");
         HttpHeaders headers = new HttpHeaders();
         headers.put(HttpHeaders.COOKIE, Collections.singletonList(sid()));
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("urls", torrentUrl);
-        map.add("savepath", getDownloadDir(userName, element));
+        map.add("savepath", savePath);
         map.add("paused", "false");
         map.add("contentLayout", "Original");
         map.add("autoTMM", "false");
-        map.add("category", element.getType());
+        map.add("category", category);
         map.add("tags", "username:" + userName);
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
         try {
@@ -187,10 +165,5 @@ public class QbittorrentEngine {
             BusinessExceptionEnum.QBITTORRENT_ERROR.assertFail();
         }
         return sid;
-    }
-
-    private static String getDownloadDir(String userName, Element element) {
-        return FileUtil.simpleConcatPath(Settings.getDownloadRootPath(),
-                userName, element.getType(), String.valueOf(element.getId()));
     }
 }

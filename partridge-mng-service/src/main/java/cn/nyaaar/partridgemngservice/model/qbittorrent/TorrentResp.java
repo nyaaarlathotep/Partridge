@@ -15,8 +15,23 @@ import lombok.experimental.Accessors;
 @Schema(name = "Torrent 信息 DTO")
 public class TorrentResp {
 
-    @Schema(title = "已下载")
-    private Long downloaded;
+    @Schema(title = "Torrent name")
+    private String name;
+
+    @Schema(title = "已下载 bytes")
+    private Long completed;
+
+    @Schema(title = "Amount of data left to download (bytes)")
+    private Long amountLeft;
+
+    @Schema(title = "Total size (bytes) of all file in this torrent (including unselected ones)")
+    private Long size;
+
+    @Schema(title = "Torrent progress (percentage/100)")
+    private Double progress;
+
+    @Schema(title = "磁链分享比率")
+    private Double ratio;
 
     @Schema(title = "状态")
     private String state;
@@ -27,9 +42,14 @@ public class TorrentResp {
     public TorrentResp() {
     }
 
-    public TorrentResp(QBitTorrent qbittorrent) {
-        this.downloaded = qbittorrent.getDownloaded();
-        this.state = qbittorrent.getState().getCode();
-        this.stateDesc = qbittorrent.getState().getDesc();
+    public TorrentResp(QBitTorrent qBitTorrent) {
+        this.completed = qBitTorrent.getCompleted();
+        this.name = qBitTorrent.getName();
+        this.size = qBitTorrent.getSize();
+        this.amountLeft = qBitTorrent.getAmount_left();
+        this.ratio = qBitTorrent.getRatio();
+        this.progress = qBitTorrent.getProgress();
+        this.state = qBitTorrent.getState().getCode();
+        this.stateDesc = qBitTorrent.getState().getDesc();
     }
 }

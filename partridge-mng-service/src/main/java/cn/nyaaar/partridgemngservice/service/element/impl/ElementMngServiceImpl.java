@@ -70,7 +70,7 @@ public class ElementMngServiceImpl implements ElementMngService {
     @Override
     public void share(Long elementId) {
         Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, elementId));
-        BusinessExceptionEnum.ELEMENT_NOT_FOUND.assertNotNull(element);
+        BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
         checkEleFilesCompleted(elementId);
         elementService.update(Wrappers.lambdaUpdate(Element.class)
                 .set(Element::getSharedFlag, PrConstant.YES)

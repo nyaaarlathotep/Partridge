@@ -55,7 +55,7 @@ public class JavMngServiceImpl extends Video implements JavMngService {
     @Override
     public JavBasicInfo getJavBasicInfoByCode(String code) {
         Jav jav = javService.getOne(new LambdaQueryWrapper<Jav>().eq(Jav::getCode, code));
-        BusinessExceptionEnum.ELEMENT_NOT_FOUND.assertNotNull(jav);
+        BusinessExceptionEnum.NOT_FOUND.assertNotNull(jav, "jav");
 
         return getJavBasicInfo(jav);
     }
@@ -79,7 +79,7 @@ public class JavMngServiceImpl extends Video implements JavMngService {
 
     @Override
     public void downloadJavTorrent(String torrent, String code) {
-        
+
     }
 
     private void queryPage(JavQuery javQuery, Page<Jav> page, LambdaQueryWrapper<Jav> lambdaQueryWrapper) {

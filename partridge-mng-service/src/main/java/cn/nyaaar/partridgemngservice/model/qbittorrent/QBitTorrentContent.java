@@ -15,7 +15,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @Schema(name = "qbittorrent Torrent content")
-public class QBitTorentContent {
+public class QBitTorrentContent {
 
     @Schema(title = "integer	File index")
     private Long index;
