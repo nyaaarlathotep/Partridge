@@ -1,6 +1,9 @@
 package cn.nyaaar.partridgemngservice.service.torrent;
 
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
+import cn.nyaaar.partridgemngservice.model.qbittorrent.TorrentResp;
+
+import java.util.List;
 
 /**
  * @author yuegenhua
@@ -9,4 +12,6 @@ import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 public interface TorrentService {
 
     void addTorrent(String torrent, SourceEnum sourceEnum);
+    
+    List<TorrentResp> getDownloadingTorrents();
 }

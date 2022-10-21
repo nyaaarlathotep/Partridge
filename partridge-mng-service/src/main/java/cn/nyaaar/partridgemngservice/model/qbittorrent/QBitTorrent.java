@@ -14,7 +14,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @Schema(name = "qbittorrent Torrent downloading info")
-public class Torrent {
+public class QBitTorrent {
 
     @Schema(title = "Time (Unix Epoch) when the torrent was added to the client")
     private Long added_on;

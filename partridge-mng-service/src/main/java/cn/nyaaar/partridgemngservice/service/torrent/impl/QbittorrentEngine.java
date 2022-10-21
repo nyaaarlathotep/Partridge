@@ -3,8 +3,8 @@ package cn.nyaaar.partridgemngservice.service.torrent.impl;
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
 import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
-import cn.nyaaar.partridgemngservice.model.qbittorrent.Torrent;
-import cn.nyaaar.partridgemngservice.model.qbittorrent.TorrentContent;
+import cn.nyaaar.partridgemngservice.model.qbittorrent.QBitTorrent;
+import cn.nyaaar.partridgemngservice.model.qbittorrent.QBitTorentContent;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.StringUtils;
 import cn.nyaaar.partridgemngservice.util.urlUtil;
@@ -36,7 +36,7 @@ public class QbittorrentEngine {
         this.restTemplate = restTemplate;
     }
 
-    public List<Torrent> getTorrents(String userName) {
+    public List<QBitTorrent> getUserTorrents(String userName) {
         HttpHeaders headers = new HttpHeaders();
         headers.put(HttpHeaders.COOKIE, Collections.singletonList(sid()));
         String partialUrl = "torrents/info";
@@ -56,7 +56,33 @@ public class QbittorrentEngine {
         return Collections.emptyList();
     }
 
-    public List<TorrentContent> getTorrentContents(String torrentHash) {
+    public QBitTorrent getTorrent(String hash) {
+        if (StringUtils.isEmpty(hash)) {
+            return new QBitTorrent();
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.put(HttpHeaders.COOKIE, Collections.singletonList(sid()));
+        String partialUrl = "torrents/info";
+        if (StringUtils.isNotEmpty(hash)) {
+            partialUrl = partialUrl + "?hashes=" + hash;
+        }
+        String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), partialUrl);
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(null, headers);
+        try {
+            ResponseEntity<String> res = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
+            List<QBitTorrent> QBitTorrents = JSON.parseObject(res.getBody(), new TypeReference<>() {
+            });
+            if (QBitTorrents != null && QBitTorrents.size() > 0) {
+                return QBitTorrents.get(0);
+            }
+        } catch (Exception e) {
+            log.error("qbittorrent getTorrents error", e);
+            BusinessExceptionEnum.QBITTORRENT_ERROR.assertFail();
+        }
+        return new QBitTorrent();
+    }
+
+    public List<QBitTorentContent> getTorrentContents(String torrentHash) {
         HttpHeaders headers = new HttpHeaders();
         headers.put(HttpHeaders.COOKIE, Collections.singletonList(sid()));
         String partialUrl = "torrents/files?hash=" + torrentHash;

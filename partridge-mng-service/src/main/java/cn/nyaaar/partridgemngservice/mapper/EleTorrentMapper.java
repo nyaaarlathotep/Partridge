@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author nyaaar
- * @since 2022-10-18
+ * @since 2022-10-21
  */
 public interface EleTorrentMapper extends BaseMapper<EleTorrent> {
 

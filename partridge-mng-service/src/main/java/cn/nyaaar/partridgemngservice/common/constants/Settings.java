@@ -273,7 +273,7 @@ public class Settings {
     private static final int DEFAULT_USER_SPACE_QUOTA = 100;
     private static final String USER_SPACE_QUOTA = "user_space_quota";
     private static final String QBITTORRENT_URL = "qbittorrent_url";
-    private static final String DEFAULT_QBITTORRENT_URL = "http://192.168.1.4:8001/api/v2";
+    private static final String DEFAULT_QBITTORRENT_URL = "http://localhost:8080/api/v2";
     private static final String QBITTORRENT_USER = "qbittorrent_user";
     private static final String DEFAULT_QBITTORRENT_USER = "admin";
     private static final String QBITTORRENT_PASSWORD="qbittorrent_password";

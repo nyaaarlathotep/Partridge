@@ -4,6 +4,7 @@ import cn.nyaaar.partridgemngservice.PartridgeMngServiceApplication;
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.service.torrent.impl.QbittorrentEngine;
+import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @Slf4j
 @SpringBootTest(classes = PartridgeMngServiceApplication.class)
-public class QbittorrentServiceTest {
+public class QBitTorrentServiceTest {
 
     @Autowired
     private QbittorrentEngine qbittorrentService;
@@ -27,8 +28,13 @@ public class QbittorrentServiceTest {
 
     @Test
     public void torrentsTest() {
-        log.info(qbittorrentService.getTorrents("").toString());
-        log.info(qbittorrentService.getTorrents("test").toString());
+        log.info(qbittorrentService.getUserTorrents("").toString());
+        log.info(qbittorrentService.getUserTorrents("test").toString());
+    }
+
+    @Test
+    public void getHashTorrent() {
+        log.info(qbittorrentService.getTorrent("33316737bd9afec091f389d057ae5613c3aaf06e").toString());
     }
 
     @Test
@@ -44,7 +50,6 @@ public class QbittorrentServiceTest {
         log.info(qbittorrentService.getTorrentContents("33316737bd9afec091f389d057ae5613c3aaf06e").toString());
     }
 
-
     @Test
     public void setPri() {
         qbittorrentService.setTorrentContentPriority("33316737bd9afec091f389d057ae5613c3aaf06e", 0, 1);
@@ -59,5 +64,11 @@ public class QbittorrentServiceTest {
     @Test
     public void add() {
         torrentService.addTorrent("magnet:?xt=urn:btih:b34f507e1ba7f7877a159ff730a27c8401b926a8&tr=http%3a%2f%2ft.nyaatracker.com%2fannounce&tr=http%3a%2f%2ftracker.kamigami.org%3a2710%2fannounce&tr=http%3a%2f%2fshare.camoe.cn%3a8080%2fannounce&tr=http%3a%2f%2fopentracker.acgnx.se%2fannounce&tr=http%3a%2f%2fanidex.moe%3a6969%2fannounce&tr=http%3a%2f%2ft.acg.rip%3a6699%2fannounce&tr=https%3a%2f%2ftr.bangumi.moe%3a9696%2fannounce&tr=udp%3a%2f%2ftr.bangumi.moe%3a6969%2fannounce&tr=http%3a%2f%2fopen.acgtracker.com%3a1096%2fannounce&tr=udp%3a%2f%2ftracker.opentrackr.org%3a1337%2fannounce", SourceEnum.Jav);
+    }
+
+    @Test
+    public void getDownloadingTorrent() {
+        ThreadLocalUtil.addCurrentUser("test");
+        log.info(torrentService.getDownloadingTorrents().toString());
     }
 }

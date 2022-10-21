@@ -85,7 +85,7 @@ public class EhDownload {
                         ehentaiGallery.getTitle()));
         downloadingGalleryQueue.put(ehentaiGallery.getGid(), downloadingGallery);
         downloadQueueExecutor.submit(() -> {
-            log.info("[{}]gallery download complete!", ehentaiGallery.getGid());
+            log.info("[{}]gallery download begin...", ehentaiGallery.getGid());
             List<String> galleryTokens = ehEngine.getPTokens(ehentaiGallery.getGid(), ehentaiGallery.getToken());
             for (int i = 0; i < galleryTokens.size(); i++) {
                 if (!getPageDownloaded(ehentaiGallery.getEleId(), i + 1)) {

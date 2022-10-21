@@ -5,6 +5,8 @@ import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.entity.EleTorrent;
 import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
+import cn.nyaaar.partridgemngservice.model.qbittorrent.QBitTorrent;
+import cn.nyaaar.partridgemngservice.model.qbittorrent.TorrentResp;
 import cn.nyaaar.partridgemngservice.service.EleTorrentService;
 import cn.nyaaar.partridgemngservice.service.ElementService;
 import cn.nyaaar.partridgemngservice.service.torrent.TorrentService;
@@ -14,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * @author yuegenhua
@@ -49,9 +53,18 @@ public class TorrentServiceImpl implements TorrentService {
         elementService.save(element);
         qbittorrentEngine.addTorrent(torrent, userName, element);
         EleTorrent eleTorrent = new EleTorrent()
-                .setEleId(element.getId())
-                .setHash(hash);
+                .setHash(hash)
+                .setEleId(element.getId());
         eleTorrentService.save(eleTorrent);
+    }
+
+    @Override
+    public List<TorrentResp> getDownloadingTorrents() {
+        List<QBitTorrent> qBitTorrents = qbittorrentEngine.getUserTorrents(ThreadLocalUtil.getCurrentUser());
+        return qBitTorrents.stream()
+                .filter(qBitTorrent -> !qBitTorrent.getState().getFinished())
+                .map(TorrentResp::new)
+                .toList();
     }
 
     @NotNull
