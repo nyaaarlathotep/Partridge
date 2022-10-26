@@ -52,7 +52,7 @@ public class JavController {
     }
 
     @Operation(summary = "下载 Jav torrent", description = "下载 Jav torrent")
-    @PostMapping(value = "/upload")
+    @PostMapping(value = "/torrent")
     @LogAnnotation
     public R<String> downloadJavTorrent(@RequestBody String torrent, @RequestBody String code) {
         javMngService.downloadJavTorrent(torrent, code);
