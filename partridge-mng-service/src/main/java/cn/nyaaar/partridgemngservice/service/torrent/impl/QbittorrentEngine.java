@@ -2,8 +2,8 @@ package cn.nyaaar.partridgemngservice.service.torrent.impl;
 
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
-import cn.nyaaar.partridgemngservice.model.qbittorrent.QBitTorrent;
-import cn.nyaaar.partridgemngservice.model.qbittorrent.QBitTorrentContent;
+import cn.nyaaar.partridgemngservice.model.torrent.QBitTorrent;
+import cn.nyaaar.partridgemngservice.model.torrent.QBitTorrentContent;
 import cn.nyaaar.partridgemngservice.util.StringUtils;
 import cn.nyaaar.partridgemngservice.util.urlUtil;
 import com.alibaba.fastjson.JSON;

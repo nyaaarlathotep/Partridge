@@ -43,12 +43,19 @@ public class JavController {
         return new R<>(javMngService.getJavList(javQuery, pageIndex));
     }
 
-
     @Operation(summary = "上传 Jav", description = "上传 Jav，返回 check 的结果")
     @PostMapping(value = "/upload")
     @LogAnnotation
     public R<CheckResp> uploadJav(@RequestBody @Validated(FileCheck.class) JavUploadReq javUploadReq) {
 
         return new R<>(javMngService.uploadJav(javUploadReq));
+    }
+
+    @Operation(summary = "下载 Jav torrent", description = "下载 Jav torrent")
+    @PostMapping(value = "/upload")
+    @LogAnnotation
+    public R<String> downloadJavTorrent(@RequestBody String torrent, @RequestBody String code) {
+        javMngService.downloadJavTorrent(torrent, code);
+        return new R<>();
     }
 }

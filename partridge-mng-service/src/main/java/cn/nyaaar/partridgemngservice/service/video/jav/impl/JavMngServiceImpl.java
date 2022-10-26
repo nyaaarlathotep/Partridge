@@ -85,6 +85,7 @@ public class JavMngServiceImpl extends Video implements JavMngService {
     public void downloadJavTorrent(String torrent, String code) {
         checkQuota();
         Element element = getJavElement();
+        // TODO rpc call pelican to crawl javInfo
         torrentService.addTorrent(element, torrent);
     }
 

@@ -1,8 +1,8 @@
 package cn.nyaaar.partridgemngservice.service.torrent;
 
 import cn.nyaaar.partridgemngservice.entity.Element;
-import cn.nyaaar.partridgemngservice.model.qbittorrent.QBitTorrentContent;
-import cn.nyaaar.partridgemngservice.model.qbittorrent.TorrentResp;
+import cn.nyaaar.partridgemngservice.model.torrent.QBitTorrentContent;
+import cn.nyaaar.partridgemngservice.model.torrent.TorrentResp;
 
 import java.util.List;
 
@@ -44,17 +44,17 @@ public interface TorrentService {
     /**
      * 获取 eleId 对应磁链的所有内容
      *
-     * @param eleId eleId
+     * @param hash hash
      * @return List<QBitTorrentContent>
      */
-    List<QBitTorrentContent> getTorrentContent(Long eleId);
+    List<QBitTorrentContent> getTorrentContent(String hash);
 
     /**
      * 设置 eleId 对应磁链某个内容的下载优先级
      *
-     * @param eleId        eleId
+     * @param hash         hash
      * @param contentIndex contentIndex
      * @param priority     priority，0 为不下载，1 为正常下载，2更高，以此类推
      */
-    void setContentPriority(Long eleId, Integer contentIndex, Integer priority);
+    void setContentPriority(String hash, Integer contentIndex, Integer priority);
 }

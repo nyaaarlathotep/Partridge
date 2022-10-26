@@ -2,13 +2,6 @@ package cn.nyaaar.partridgemngservice.common.annotation;
 
 import java.lang.annotation.*;
 
-/**
- * LogAnnotation
- *
- * @author Tiger
- * @version V1.0
- * @date 2020年3月18日
- */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

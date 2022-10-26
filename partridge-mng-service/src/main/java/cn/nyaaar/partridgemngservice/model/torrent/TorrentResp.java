@@ -1,5 +1,6 @@
-package cn.nyaaar.partridgemngservice.model.qbittorrent;
+package cn.nyaaar.partridgemngservice.model.torrent;
 
+import cn.nyaaar.partridgemngservice.entity.EleTorrent;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,6 +16,8 @@ import lombok.experimental.Accessors;
 @Schema(name = "Torrent 信息 DTO")
 public class TorrentResp {
 
+    @Schema(title = "eleId")
+    private Long eleId;
     @Schema(title = "Torrent name")
     private String name;
 
@@ -22,9 +25,11 @@ public class TorrentResp {
     private Long completed;
 
     @Schema(title = "Amount of data left to download (bytes)")
+    private Long amount_left;
+    @Schema(title = "Amount of data left to download (bytes)")
     private Long amountLeft;
 
-    @Schema(title = "Total size (bytes) of all file in this torrent (including unselected ones)")
+    @Schema(title = "Total size (bytes) of files selected for download")
     private Long size;
 
     @Schema(title = "Torrent progress (percentage/100)")
@@ -42,8 +47,10 @@ public class TorrentResp {
     public TorrentResp() {
     }
 
-    public TorrentResp(QBitTorrent qBitTorrent) {
+    public TorrentResp(QBitTorrent qBitTorrent, EleTorrent eleTorrent) {
+        this.eleId = eleTorrent.getEleId();
         this.completed = qBitTorrent.getCompleted();
+        this.amountLeft = qBitTorrent.getAmount_left();
         this.name = qBitTorrent.getName();
         this.size = qBitTorrent.getSize();
         this.amountLeft = qBitTorrent.getAmount_left();

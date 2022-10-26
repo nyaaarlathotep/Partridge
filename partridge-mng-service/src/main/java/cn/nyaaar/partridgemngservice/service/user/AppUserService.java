@@ -43,4 +43,11 @@ public interface AppUserService {
      * @param spaceBytes bytes
      */
     void freeUserSpaceLimit(String userName, Long spaceBytes);
+
+    /**
+     * 返回此用户是否为 root 用户
+     * @param userName userName
+     * @return 是否为 root 用户
+     */
+    boolean isRoot(String userName);
 }

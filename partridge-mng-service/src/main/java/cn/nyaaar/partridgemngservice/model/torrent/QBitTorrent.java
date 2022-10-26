@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.model.qbittorrent;
+package cn.nyaaar.partridgemngservice.model.torrent;
 
 import cn.nyaaar.partridgemngservice.common.enums.QbittorrentStateEnum;
 import cn.nyaaar.partridgemngservice.entity.EleTorrent;
@@ -158,7 +158,6 @@ public class QBitTorrent {
         return Objects.equals(this.getName(), eleTorrent.getName())
                 && Objects.equals(this.getSize(), eleTorrent.getSize())
                 && Objects.equals(this.getState().toString(), eleTorrent.getState());
-
     }
 
 }

@@ -53,7 +53,7 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
         }
         // TODO user roles
         PrivilegeEnum privilegeEnum;
-        if (username.equals("root")) {
+        if (isRoot(username)) {
             privilegeEnum = PrivilegeEnum.ROOT;
         } else {
             privilegeEnum = PrivilegeEnum.USER;
@@ -151,5 +151,10 @@ public class AppUserServiceImpl implements UserDetailsService, AppUserService {
         prUserService.update(Wrappers.lambdaUpdate(PrUser.class)
                 .set(PrUser::getSpaceQuota, prUser.getSpaceQuota() + spaceBytes)
                 .eq(PrUser::getUserName, userName));
+    }
+
+    @Override
+    public boolean isRoot(String userName) {
+        return "root".equals(userName);
     }
 }
