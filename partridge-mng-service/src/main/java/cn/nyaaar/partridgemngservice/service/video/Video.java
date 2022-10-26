@@ -53,13 +53,7 @@ public abstract class Video {
 
     public EleFile preUploadHandle(FileReq fileReq) {
         checkQuota();
-        Element element = new Element()
-                .setType(SourceEnum.Jav.getCode())
-                .setUploader(ThreadLocalUtil.getCurrentUser())
-                .setFileSize(0L)
-                .setAvailableFlag(PrConstant.VALIDATED)
-                .setSharedFlag(PrConstant.NO);
-        elementService.save(element);
+        Element element = getJavElement();
         EleFile eleFile = new EleFile()
                 .setEleId(element.getId())
                 .setType(FileTypeEnum.getTypeBySuffix(fileReq.getFileName()).getSuffix())
@@ -67,6 +61,17 @@ public abstract class Video {
                 .setName(FileUtil.legalizeFileName(fileReq.getFileName()));
         eleFileService.save(eleFile);
         return eleFile;
+    }
+
+    public Element getJavElement() {
+        Element element = new Element()
+                .setType(SourceEnum.Jav.getCode())
+                .setUploader(ThreadLocalUtil.getCurrentUser())
+                .setFileSize(0L)
+                .setAvailableFlag(PrConstant.VALIDATED)
+                .setSharedFlag(PrConstant.NO);
+        elementService.save(element);
+        return element;
     }
 
     public void postUploadHandle() {

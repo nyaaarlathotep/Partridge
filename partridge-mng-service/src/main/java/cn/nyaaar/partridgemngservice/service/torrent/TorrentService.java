@@ -1,6 +1,5 @@
 package cn.nyaaar.partridgemngservice.service.torrent;
 
-import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.model.qbittorrent.QBitTorrentContent;
 import cn.nyaaar.partridgemngservice.model.qbittorrent.TorrentResp;
@@ -16,19 +15,17 @@ public interface TorrentService {
     /**
      * 添加磁链
      *
-     * @param torrent    torrent
-     * @param sourceEnum sourceEnum
+     * @param torrent torrent
      */
-    void addTorrent(String torrent, SourceEnum sourceEnum);
+    void addTorrent(String torrent);
 
     /**
      * 添加磁链
      *
-     * @param torrent    torrent
-     * @param element    element
-     * @param sourceEnum sourceEnum
+     * @param element element
+     * @param torrent torrent
      */
-    void addTorrent(Element element, String torrent, SourceEnum sourceEnum);
+    void addTorrent(Element element, String torrent);
 
     /**
      * 获取当前用户正在下载的磁链，不包含已经完成下载的

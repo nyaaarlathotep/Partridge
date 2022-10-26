@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author yuegenhua
@@ -44,12 +46,12 @@ public class TorrentServiceImpl implements TorrentService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addTorrent(String torrent, SourceEnum sourceEnum) {
+    public void addTorrent(String torrent) {
         String hash = parseHashFromTorrent(torrent);
         log.info("[{}] torrent download begin...", hash);
         String userName = ThreadLocalUtil.getCurrentUser();
         Element element = new Element()
-                .setType(sourceEnum.getCode())
+                .setType(SourceEnum.Unknown.getCode())
                 .setUploader(userName)
                 .setFileSize(0L)
                 .setAvailableFlag(PrConstant.VALIDATED)
@@ -63,7 +65,7 @@ public class TorrentServiceImpl implements TorrentService {
     }
 
     @Override
-    public void addTorrent(Element element, String torrent, SourceEnum sourceEnum) {
+    public void addTorrent(Element element, String torrent) {
         String hash = parseHashFromTorrent(torrent);
         log.info("[{}] torrent download begin...", hash);
         String userName = ThreadLocalUtil.getCurrentUser();
@@ -77,15 +79,18 @@ public class TorrentServiceImpl implements TorrentService {
     @Override
     public List<TorrentResp> getDownloadingTorrents() {
         List<QBitTorrent> qBitTorrents = qbittorrentEngine.getTorrents(ThreadLocalUtil.getCurrentUser(), "");
+        updateEleTorrents(qBitTorrents);
         return qBitTorrents.stream()
                 .filter(qBitTorrent -> !qBitTorrent.getState().getFinished())
                 .map(TorrentResp::new)
                 .toList();
     }
 
+
     @Override
     public List<TorrentResp> getTorrents() {
         List<QBitTorrent> qBitTorrents = qbittorrentEngine.getTorrents(ThreadLocalUtil.getCurrentUser(), "");
+        updateEleTorrents(qBitTorrents);
         return qBitTorrents.stream()
                 .map(TorrentResp::new)
                 .toList();
@@ -119,6 +124,28 @@ public class TorrentServiceImpl implements TorrentService {
             BusinessExceptionEnum.FIELD_ERROR.assertFail("磁力链接解析错误");
         }
         return hash;
+    }
+
+    private void updateEleTorrents(List<QBitTorrent> qBitTorrents) {
+        eleTorrentService.updateBatchById(eleTorrentService.list(Wrappers.lambdaQuery(EleTorrent.class)
+                        .in(EleTorrent::getHash, qBitTorrents.stream().map(QBitTorrent::getHash).toList()))
+                .parallelStream()
+                .map(eleTorrent -> {
+                    Optional<QBitTorrent> qBitTorrentOptional = qBitTorrents.stream()
+                            .filter(qBitTorrent -> qBitTorrent.getHash().equals(eleTorrent.getHash()))
+                            .findFirst();
+                    if (qBitTorrentOptional.isPresent() &&
+                            !qBitTorrentOptional.get().equalElementTorrent(eleTorrent)) {
+                        eleTorrent.setSize(qBitTorrentOptional.get().getSize());
+                        eleTorrent.setName(qBitTorrentOptional.get().getName());
+                        eleTorrent.setState(qBitTorrentOptional.get().getState().getCode());
+                        log.error("[{}] torrent info update!", eleTorrent.getHash());
+                        return eleTorrent;
+                    }
+                    log.error("[{}] torrent not found!", eleTorrent.getHash());
+                    return null;
+                }).filter(Objects::nonNull)
+                .toList());
     }
 
     private static String getDownloadDir(String userName, Element element) {

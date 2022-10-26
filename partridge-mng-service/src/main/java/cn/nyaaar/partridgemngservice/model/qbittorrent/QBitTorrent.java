@@ -1,10 +1,13 @@
 package cn.nyaaar.partridgemngservice.model.qbittorrent;
 
 import cn.nyaaar.partridgemngservice.common.enums.QbittorrentStateEnum;
+import cn.nyaaar.partridgemngservice.entity.EleTorrent;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.util.Objects;
 
 /**
  * @author yuegenhua
@@ -150,6 +153,12 @@ public class QBitTorrent {
 
     @Schema(title = "Time (Unix Epoch) when the torrent was added to the client")
     private Long upspeed;
-   
+
+    public boolean equalElementTorrent(EleTorrent eleTorrent) {
+        return Objects.equals(this.getName(), eleTorrent.getName())
+                && Objects.equals(this.getSize(), eleTorrent.getSize())
+                && Objects.equals(this.getState().toString(), eleTorrent.getState());
+
+    }
 
 }

@@ -12,6 +12,7 @@ import cn.nyaaar.partridgemngservice.model.jav.JavQuery;
 import cn.nyaaar.partridgemngservice.model.jav.JavUploadReq;
 import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
+import cn.nyaaar.partridgemngservice.service.torrent.TorrentService;
 import cn.nyaaar.partridgemngservice.service.transmit.UploadService;
 import cn.nyaaar.partridgemngservice.service.video.jav.JavMngService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
@@ -34,6 +35,7 @@ public class JavMngServiceImpl extends Video implements JavMngService {
     private final ActorService actorService;
     private final TagInfoService tagInfoService;
     private final ElementMngService elementMngService;
+    private final TorrentService torrentService;
 
     public JavMngServiceImpl(JavService javService,
                              OrganizationService organizationService,
@@ -43,13 +45,15 @@ public class JavMngServiceImpl extends Video implements JavMngService {
                              EleFileService eleFileService,
                              UploadService uploadService,
                              AppUserService appUserService,
-                             ElementMngService elementMngService) {
+                             ElementMngService elementMngService,
+                             TorrentService torrentService) {
         super(elementService, appUserService, eleFileService, uploadService);
         this.javService = javService;
         this.organizationService = organizationService;
         this.actorService = actorService;
         this.tagInfoService = tagInfoService;
         this.elementMngService = elementMngService;
+        this.torrentService = torrentService;
     }
 
     @Override
@@ -79,7 +83,9 @@ public class JavMngServiceImpl extends Video implements JavMngService {
 
     @Override
     public void downloadJavTorrent(String torrent, String code) {
-
+        checkQuota();
+        Element element = getJavElement();
+        torrentService.addTorrent(element, torrent);
     }
 
     private void queryPage(JavQuery javQuery, Page<Jav> page, LambdaQueryWrapper<Jav> lambdaQueryWrapper) {

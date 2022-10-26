@@ -114,6 +114,7 @@ public class ElementMngServiceImpl implements ElementMngService {
     public void publish(Long eleId) {
         Element element = elementService.getById(eleId);
         BusinessExceptionEnum.ELEMENT_FILE_NOT_FOUND.assertNotNull(element);
+        checkWritePermission(element.getId());
         checkEleFilesCompleted(eleId);
         elementService.update(Wrappers.lambdaUpdate(Element.class)
                 .set(Element::getPublishedFlag, PrConstant.YES)
