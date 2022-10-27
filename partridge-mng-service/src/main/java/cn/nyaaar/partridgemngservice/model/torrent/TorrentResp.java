@@ -25,8 +25,6 @@ public class TorrentResp {
     private Long completed;
 
     @Schema(title = "Amount of data left to download (bytes)")
-    private Long amount_left;
-    @Schema(title = "Amount of data left to download (bytes)")
     private Long amountLeft;
 
     @Schema(title = "Total size (bytes) of files selected for download")

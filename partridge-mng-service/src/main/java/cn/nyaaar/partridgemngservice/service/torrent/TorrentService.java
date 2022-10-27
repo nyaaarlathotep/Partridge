@@ -57,4 +57,20 @@ public interface TorrentService {
      * @param priority     priority，0 为不下载，1 为正常下载，2更高，以此类推
      */
     void setContentPriority(String hash, Integer contentIndex, Integer priority);
+
+    /**
+     * 删除 torrent 某个内容
+     *
+     * @param hash         hash
+     * @param contentIndex contentIndex
+     */
+    void deleteTorrentContent(String hash, Integer contentIndex);
+
+
+    /**
+     * 删除 torrent 
+     *
+     * @param hash         hash
+     */
+    void deleteTorrentContent(String hash);
 }

@@ -48,7 +48,7 @@ public class QbittorrentEngine {
         }
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(null, headers);
         try {
-            ResponseEntity<String> res = restTemplate.exchange(builder.build().encode().toString(), 
+            ResponseEntity<String> res = restTemplate.exchange(builder.build().encode().toString(),
                     HttpMethod.GET, httpEntity, String.class);
             return JSON.parseObject(res.getBody(), new TypeReference<>() {
             });
@@ -101,7 +101,7 @@ public class QbittorrentEngine {
         }
     }
 
-    public void deleteTorrent(String torrentHash) {
+    public void deleteTorrent(String torrentHash, boolean deleteFiles) {
         HttpHeaders headers = new HttpHeaders();
         headers.put(HttpHeaders.COOKIE, Collections.singletonList(sid()));
         String partialUrl = "torrents/delete";
@@ -109,7 +109,7 @@ public class QbittorrentEngine {
         String url = urlUtil.simpleConcatUrl(Settings.getQbittorrentUrl(), partialUrl);
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("hashes", torrentHash);
-        map.add("deleteFiles", "true");
+        map.add("deleteFiles", String.valueOf(deleteFiles));
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
         try {
             ResponseEntity<String> res = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);

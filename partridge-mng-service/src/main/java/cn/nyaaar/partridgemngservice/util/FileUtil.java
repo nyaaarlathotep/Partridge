@@ -391,6 +391,13 @@ public class FileUtil {
         }
     }
 
+    public static boolean delete(String path) {
+        File file = new File(path);
+        if (file.exists()) {
+            return file.delete();
+        }
+        return false;
+    }
 
     /**
      * 通过 eleFilePath 获得 eleFile 的 base64

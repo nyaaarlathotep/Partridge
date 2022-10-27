@@ -132,6 +132,39 @@ public class TorrentServiceImpl implements TorrentService {
         qbittorrentEngine.setTorrentContentPriority(eleTorrent.getHash(), contentIndex, priority);
     }
 
+    @Override
+    public void deleteTorrentContent(String hash, Integer contentIndex) {
+        EleTorrent eleTorrent = eleTorrentService.getById(hash);
+        BusinessExceptionEnum.NOT_FOUND.assertNotNull(eleTorrent, "磁链");
+        List<QBitTorrentContent> qBitTorrentContents = qbittorrentEngine.getTorrentContents(hash);
+        qbittorrentEngine.setTorrentContentPriority(eleTorrent.getHash(), contentIndex, 0);
+        List<QBitTorrent> qBitTorrents = qbittorrentEngine.getTorrents("", hash);
+        Optional<QBitTorrentContent> qBitTorrentContent = qBitTorrentContents.stream()
+                .filter(qBitTorrentContentFilter -> qBitTorrentContentFilter.getIndex().equals(Long.valueOf(contentIndex)))
+                .findFirst();
+        if (qBitTorrentContent.isPresent()) {
+            String path = FileUtil.simpleConcatPath(qBitTorrents.get(0).getSave_path(), qBitTorrentContent.get().getName());
+            boolean deleteSuccess = FileUtil.delete(path);
+            if (!deleteSuccess) {
+                log.warn("[{}], contentIndex: [{}], delete error!", hash, contentIndex);
+            } else {
+                log.info("[{}], contentIndex: [{}], delete success", hash, contentIndex);
+            }
+        } else {
+            BusinessExceptionEnum.NOT_FOUND.assertFail("磁链内容");
+        }
+    }
+
+    @Override
+    public void deleteTorrentContent(String hash) {
+        EleTorrent eleTorrent = eleTorrentService.getById(hash);
+        BusinessExceptionEnum.NOT_FOUND.assertNotNull(eleTorrent, "磁链");
+        qbittorrentEngine.deleteTorrent(hash, true);
+        elementService.update(Wrappers.lambdaUpdate(Element.class)
+                .set(Element::getAvailableFlag, PrConstant.INVALIDATED)
+                .eq(Element::getId, eleTorrent.getEleId()));
+    }
+
     @NotNull
     private static String parseHashFromTorrent(String torrent) {
         String hash = "";
