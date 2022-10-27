@@ -10,6 +10,7 @@ import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
 import cn.nyaaar.partridgemngservice.service.transmit.UploadService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
+import cn.nyaaar.partridgemngservice.util.StringUtils;
 import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -81,15 +82,18 @@ public class ElementMngServiceImpl implements ElementMngService {
     @Override
     public void delete(Long eleId) {
         Element element = elementService.getById(eleId);
-        BusinessExceptionEnum.ELEMENT_FILE_NOT_FOUND.assertNotNull(element);
+        BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
         checkDeletePermission(eleId, element);
         try {
             String dir = FileUtil.getFileDir(element.getFileDir());
-            File dirFile = new File(dir);
-            log.info("[{}] 删除开始", dir);
-            Integer deleteNum = 0;
-            FileUtil.deleteDir(dirFile, deleteNum);
-            log.info("[{}] 删除成功，共删除文件数量：{}", dir, deleteNum);
+            if (StringUtils.isNotEmpty(dir)) {
+                File dirFile = new File(dir);
+                log.info("[{}],[{}] 删除开始", eleId, dir);
+                Integer deleteNum = 0;
+                FileUtil.deleteDir(dirFile, deleteNum);
+                log.info("[{}],[{}] 删除成功，共删除文件数量：{}", eleId, dir, deleteNum);
+            }
+
         } catch (IOException e) {
             log.error("file delete error, ", e);
             BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
@@ -113,7 +117,7 @@ public class ElementMngServiceImpl implements ElementMngService {
     @Transactional(rollbackFor = Exception.class)
     public void publish(Long eleId) {
         Element element = elementService.getById(eleId);
-        BusinessExceptionEnum.ELEMENT_FILE_NOT_FOUND.assertNotNull(element);
+        BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
         checkWritePermission(element.getId());
         checkEleFilesCompleted(eleId);
         elementService.update(Wrappers.lambdaUpdate(Element.class)
@@ -171,14 +175,14 @@ public class ElementMngServiceImpl implements ElementMngService {
                 .eq(EleFile::getEleId, eleId));
         for (EleFile eleFile : eleFiles) {
             if (!Objects.equals(eleFile.getCompletedFlag(), PrConstant.YES)) {
-                BusinessExceptionEnum.COMMON_BUSINESS_ERROR.assertFail("存在文件未上传完成，无法操作");
+                BusinessExceptionEnum.COMMON_BUSINESS_ERROR.assertFail("元素未完成，无法操作");
             }
         }
     }
 
     @Override
     public boolean checkReadPermission(Long elementId) {
-        if ("root".equals(ThreadLocalUtil.getCurrentUser())) {
+        if (appUserService.isRoot(ThreadLocalUtil.getCurrentUser())) {
             return true;
         }
         Element element = elementService.getById(elementId);
@@ -187,7 +191,7 @@ public class ElementMngServiceImpl implements ElementMngService {
 
     @Override
     public boolean checkWritePermission(Long elementId) {
-        if ("root".equals(ThreadLocalUtil.getCurrentUser())) {
+        if (appUserService.isRoot(ThreadLocalUtil.getCurrentUser())) {
             return true;
         }
         Element element = elementService.getById(elementId);
