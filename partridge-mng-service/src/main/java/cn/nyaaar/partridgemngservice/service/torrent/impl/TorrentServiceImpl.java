@@ -2,7 +2,9 @@ package cn.nyaaar.partridgemngservice.service.torrent.impl;
 
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
+import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
+import cn.nyaaar.partridgemngservice.entity.EleFile;
 import cn.nyaaar.partridgemngservice.entity.EleTorrent;
 import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
@@ -22,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -120,22 +123,19 @@ public class TorrentServiceImpl implements TorrentService {
 
     @Override
     public List<QBitTorrentContent> getTorrentContent(String hash) {
-        EleTorrent eleTorrent = eleTorrentService.getById(hash);
-        BusinessExceptionEnum.NOT_FOUND.assertNotNull(eleTorrent, "磁链");
+        EleTorrent eleTorrent = getEleTorrent(hash);
         return qbittorrentEngine.getTorrentContents(eleTorrent.getHash());
     }
 
     @Override
     public void setContentPriority(String hash, Integer contentIndex, Integer priority) {
-        EleTorrent eleTorrent = eleTorrentService.getById(hash);
-        BusinessExceptionEnum.NOT_FOUND.assertNotNull(eleTorrent, "磁链");
+        EleTorrent eleTorrent = getEleTorrent(hash);
         qbittorrentEngine.setTorrentContentPriority(eleTorrent.getHash(), contentIndex, priority);
     }
 
     @Override
     public void deleteTorrentContent(String hash, Integer contentIndex) {
-        EleTorrent eleTorrent = eleTorrentService.getById(hash);
-        BusinessExceptionEnum.NOT_FOUND.assertNotNull(eleTorrent, "磁链");
+        EleTorrent eleTorrent = getEleTorrent(hash);
         List<QBitTorrentContent> qBitTorrentContents = qbittorrentEngine.getTorrentContents(hash);
         qbittorrentEngine.setTorrentContentPriority(eleTorrent.getHash(), contentIndex, 0);
         List<QBitTorrent> qBitTorrents = qbittorrentEngine.getTorrents("", hash);
@@ -156,13 +156,47 @@ public class TorrentServiceImpl implements TorrentService {
     }
 
     @Override
-    public void deleteTorrentContent(String hash) {
-        EleTorrent eleTorrent = eleTorrentService.getById(hash);
-        BusinessExceptionEnum.NOT_FOUND.assertNotNull(eleTorrent, "磁链");
+    public void deleteTorrent(String hash) {
+        EleTorrent eleTorrent = getEleTorrent(hash);
         qbittorrentEngine.deleteTorrent(hash, true);
         elementService.update(Wrappers.lambdaUpdate(Element.class)
                 .set(Element::getAvailableFlag, PrConstant.INVALIDATED)
                 .eq(Element::getId, eleTorrent.getEleId()));
+    }
+
+    @Override
+    public void callBack(String hash) {
+        log.info("[{}] torrent download complete!", hash);
+        EleTorrent eleTorrent = getEleTorrent(hash);
+        QBitTorrent qBitTorrent = getQBitTorrentByHash(hash);
+        updateEleTorrents(Collections.singletonList(qBitTorrent), Collections.singletonList(eleTorrent));
+        List<QBitTorrentContent> contents = getTorrentContent(hash);
+        for (QBitTorrentContent content : contents) {
+            String fileName = FileUtil.getFileNameFromPath(content.getName());
+            FileTypeEnum fileTypeEnum = FileTypeEnum.getTypeBySuffix(fileName);
+            EleFile eleFile = new EleFile();
+            eleFile.setEleId(eleTorrent.getEleId());
+            eleFile.setName(fileName);
+            // TODO path convert
+            eleFile.setPath(FileUtil.simpleConcatPath(qBitTorrent.getSave_path(), content.getName()));
+            eleFile.setAvailableFlag(PrConstant.VALIDATED);
+            eleFile.setCompletedFlag(PrConstant.YES);
+            eleFile.setType(fileTypeEnum.getCode());
+        }
+    }
+
+    private QBitTorrent getQBitTorrentByHash(String hash) {
+        List<QBitTorrent> qBitTorrents = qbittorrentEngine.getTorrents("", hash);
+        if (qBitTorrents.size() < 1) {
+            BusinessExceptionEnum.NOT_FOUND.assertFail("qbittorrent 未找到对应磁链，请联系管理员");
+        }
+        return qBitTorrents.get(0);
+    }
+
+    private EleTorrent getEleTorrent(String hash) {
+        EleTorrent eleTorrent = eleTorrentService.getById(hash);
+        BusinessExceptionEnum.NOT_FOUND.assertNotNull(eleTorrent, "磁链");
+        return eleTorrent;
     }
 
     @NotNull

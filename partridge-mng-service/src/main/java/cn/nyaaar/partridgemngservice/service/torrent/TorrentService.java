@@ -68,9 +68,16 @@ public interface TorrentService {
 
 
     /**
-     * 删除 torrent 
+     * 删除 torrent
      *
-     * @param hash         hash
+     * @param hash hash
      */
-    void deleteTorrentContent(String hash);
+    void deleteTorrent(String hash);
+
+    /**
+     * qBitTorrent 下载完成回调
+     *
+     * @param hash hash
+     */
+    void callBack(String hash);
 }
