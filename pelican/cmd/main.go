@@ -112,10 +112,6 @@ func getEleFileType(name string) string {
 }
 
 func updateOrInsertEle(jav *request.JavInfo, path string, update bool) int64 {
-	javQ := queries.Jav
-	eleQ := queries.Element
-
-	var newJav *dao.Jav
 
 	tags := getTags(jav)
 	actors := getActors(jav)
@@ -132,6 +128,14 @@ func updateOrInsertEle(jav *request.JavInfo, path string, update bool) int64 {
 		Organization: organs,
 		TagInfo:      tags,
 	}
+	insertJav(jav, newEle, update)
+	return newEle.ID
+}
+
+func insertJav(jav *request.JavInfo, newEle *dao.Element, update bool) {
+	var newJav *dao.Jav
+	javQ := queries.Jav
+	eleQ := queries.Element
 	err, length := util.GetNumFromString(jav.Length)
 	if err != nil {
 		log.Printf("parse jav length error: %v", err)
@@ -173,8 +177,6 @@ func updateOrInsertEle(jav *request.JavInfo, path string, update bool) int64 {
 			log.Fatalf("save jav error: %v", err)
 		}
 	}
-
-	return newEle.ID
 }
 
 func getEleFile(path string) *dao.EleFile {
@@ -182,10 +184,10 @@ func getEleFile(path string) *dao.EleFile {
 	eleFileType := getEleFileType(name)
 	log.Printf("file name: [%v]", name)
 	return &dao.EleFile{
-		NAME:            name,
-		TYPE:            eleFileType,
-		PATH:            path,
-		ISAVAILABLEFLAG: 1,
+		NAME:          name,
+		TYPE:          eleFileType,
+		PATH:          path,
+		AVAILABLEFLAG: 1,
 	}
 }
 

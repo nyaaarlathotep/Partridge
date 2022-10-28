@@ -27,13 +27,14 @@ func newEleFile(db *gorm.DB) eleFile {
 
 	tableName := _eleFile.eleFileDo.TableName()
 	_eleFile.ALL = field.NewAsterisk(tableName)
-	_eleFile.ID = field.NewInt32(tableName, "ID")
+	_eleFile.ID = field.NewInt64(tableName, "ID")
 	_eleFile.ELEID = field.NewInt64(tableName, "ELE_ID")
 	_eleFile.NAME = field.NewString(tableName, "NAME")
 	_eleFile.TYPE = field.NewString(tableName, "TYPE")
 	_eleFile.PATH = field.NewString(tableName, "PATH")
 	_eleFile.PAGENUM = field.NewInt32(tableName, "PAGE_NUM")
-	_eleFile.ISAVAILABLEFLAG = field.NewInt32(tableName, "IS_AVAILABLE_FLAG")
+	_eleFile.COMPLETEDFLAG = field.NewInt32(tableName, "COMPLETED_FLAG")
+	_eleFile.AVAILABLEFLAG = field.NewInt32(tableName, "AVAILABLE_FLAG")
 	_eleFile.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
 	_eleFile.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
 
@@ -45,16 +46,17 @@ func newEleFile(db *gorm.DB) eleFile {
 type eleFile struct {
 	eleFileDo
 
-	ALL             field.Asterisk
-	ID              field.Int32
-	ELEID           field.Int64
-	NAME            field.String
-	TYPE            field.String
-	PATH            field.String
-	PAGENUM         field.Int32 // ehentai_gallery 对应画廊文件页码
-	ISAVAILABLEFLAG field.Int32 // 启用标志(0-禁用;1-启用)
-	CreatedAt       field.Time
-	UpdatedAt       field.Time
+	ALL           field.Asterisk
+	ID            field.Int64
+	ELEID         field.Int64
+	NAME          field.String
+	TYPE          field.String
+	PATH          field.String
+	PAGENUM       field.Int32 // ehentai_gallery 对应画廊文件页码
+	COMPLETEDFLAG field.Int32 // 完成标志(0-禁用;1-启用)，可以被删除
+	AVAILABLEFLAG field.Int32 // 启用标志(0-禁用;1-启用)
+	CreatedAt     field.Time
+	UpdatedAt     field.Time
 
 	fieldMap map[string]field.Expr
 }
@@ -71,13 +73,14 @@ func (e eleFile) As(alias string) *eleFile {
 
 func (e *eleFile) updateTableName(table string) *eleFile {
 	e.ALL = field.NewAsterisk(table)
-	e.ID = field.NewInt32(table, "ID")
+	e.ID = field.NewInt64(table, "ID")
 	e.ELEID = field.NewInt64(table, "ELE_ID")
 	e.NAME = field.NewString(table, "NAME")
 	e.TYPE = field.NewString(table, "TYPE")
 	e.PATH = field.NewString(table, "PATH")
 	e.PAGENUM = field.NewInt32(table, "PAGE_NUM")
-	e.ISAVAILABLEFLAG = field.NewInt32(table, "IS_AVAILABLE_FLAG")
+	e.COMPLETEDFLAG = field.NewInt32(table, "COMPLETED_FLAG")
+	e.AVAILABLEFLAG = field.NewInt32(table, "AVAILABLE_FLAG")
 	e.CreatedAt = field.NewTime(table, "CREATED_TIME")
 	e.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
@@ -96,14 +99,15 @@ func (e *eleFile) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (e *eleFile) fillFieldMap() {
-	e.fieldMap = make(map[string]field.Expr, 9)
+	e.fieldMap = make(map[string]field.Expr, 10)
 	e.fieldMap["ID"] = e.ID
 	e.fieldMap["ELE_ID"] = e.ELEID
 	e.fieldMap["NAME"] = e.NAME
 	e.fieldMap["TYPE"] = e.TYPE
 	e.fieldMap["PATH"] = e.PATH
 	e.fieldMap["PAGE_NUM"] = e.PAGENUM
-	e.fieldMap["IS_AVAILABLE_FLAG"] = e.ISAVAILABLEFLAG
+	e.fieldMap["COMPLETED_FLAG"] = e.COMPLETEDFLAG
+	e.fieldMap["AVAILABLE_FLAG"] = e.AVAILABLEFLAG
 	e.fieldMap["CREATED_TIME"] = e.CreatedAt
 	e.fieldMap["UPDATED_TIME"] = e.UpdatedAt
 }

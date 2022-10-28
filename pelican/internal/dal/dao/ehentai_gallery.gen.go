@@ -21,6 +21,7 @@ type EhentaiGallery struct {
 	RATING        float64   `gorm:"column:RATING;type:double" json:"RATING"`                // 评分
 	RATINGCOUNT   int32     `gorm:"column:RATING_COUNT;type:int" json:"RATING_COUNT"`       // 评分人数
 	PAGES         int32     `gorm:"column:PAGES;type:int" json:"PAGES"`                     // 总页数
+	SIZE          string    `gorm:"column:SIZE;type:varchar(64)" json:"SIZE"`               // 画廊文件大小
 	PREVIEWPAGE   int32     `gorm:"column:PREVIEW_PAGE;type:int" json:"PREVIEW_PAGE"`       // 预览画廊对应页
 	TOKEN         string    `gorm:"column:TOKEN;type:varchar(64)" json:"TOKEN"`             // gtoken
 	POSTED        time.Time `gorm:"column:POSTED;type:datetime" json:"POSTED"`              // 上传时间

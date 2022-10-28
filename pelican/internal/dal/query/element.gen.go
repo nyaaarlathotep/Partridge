@@ -29,8 +29,12 @@ func newElement(db *gorm.DB) element {
 	_element.ALL = field.NewAsterisk(tableName)
 	_element.ID = field.NewInt64(tableName, "ID")
 	_element.TYPE = field.NewString(tableName, "TYPE")
+	_element.FILEDIR = field.NewString(tableName, "FILE_DIR")
+	_element.FILESIZE = field.NewInt64(tableName, "FILE_SIZE")
 	_element.SHAREDFLAG = field.NewInt32(tableName, "SHARED_FLAG")
+	_element.PUBLISHEDFLAG = field.NewInt32(tableName, "PUBLISHED_FLAG")
 	_element.UPLOADER = field.NewString(tableName, "UPLOADER")
+	_element.AVAILABLEFLAG = field.NewInt32(tableName, "AVAILABLE_FLAG")
 	_element.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
 	_element.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
 	_element.EleFile = elementHasManyEleFile{
@@ -71,14 +75,18 @@ func newElement(db *gorm.DB) element {
 type element struct {
 	elementDo
 
-	ALL        field.Asterisk
-	ID         field.Int64
-	TYPE       field.String
-	SHAREDFLAG field.Int32  // (0-否;1-是)
-	UPLOADER   field.String // 上传用户
-	CreatedAt  field.Time
-	UpdatedAt  field.Time
-	EleFile    elementHasManyEleFile
+	ALL           field.Asterisk
+	ID            field.Int64
+	TYPE          field.String
+	FILEDIR       field.String // 关联文件所在目录
+	FILESIZE      field.Int64  // 关联文件总大小，单位为 B
+	SHAREDFLAG    field.Int32  // 分享标志(0-否;1-是)
+	PUBLISHEDFLAG field.Int32  // 释放标志(0-否;1-是)，释放后上传者将不能删除元素
+	UPLOADER      field.String // 上传用户
+	AVAILABLEFLAG field.Int32  // 启用标志(0-禁用;1-启用)
+	CreatedAt     field.Time
+	UpdatedAt     field.Time
+	EleFile       elementHasManyEleFile
 
 	Actor elementManyToManyActor
 
@@ -105,8 +113,12 @@ func (e *element) updateTableName(table string) *element {
 	e.ALL = field.NewAsterisk(table)
 	e.ID = field.NewInt64(table, "ID")
 	e.TYPE = field.NewString(table, "TYPE")
+	e.FILEDIR = field.NewString(table, "FILE_DIR")
+	e.FILESIZE = field.NewInt64(table, "FILE_SIZE")
 	e.SHAREDFLAG = field.NewInt32(table, "SHARED_FLAG")
+	e.PUBLISHEDFLAG = field.NewInt32(table, "PUBLISHED_FLAG")
 	e.UPLOADER = field.NewString(table, "UPLOADER")
+	e.AVAILABLEFLAG = field.NewInt32(table, "AVAILABLE_FLAG")
 	e.CreatedAt = field.NewTime(table, "CREATED_TIME")
 	e.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
@@ -125,11 +137,15 @@ func (e *element) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (e *element) fillFieldMap() {
-	e.fieldMap = make(map[string]field.Expr, 11)
+	e.fieldMap = make(map[string]field.Expr, 15)
 	e.fieldMap["ID"] = e.ID
 	e.fieldMap["TYPE"] = e.TYPE
+	e.fieldMap["FILE_DIR"] = e.FILEDIR
+	e.fieldMap["FILE_SIZE"] = e.FILESIZE
 	e.fieldMap["SHARED_FLAG"] = e.SHAREDFLAG
+	e.fieldMap["PUBLISHED_FLAG"] = e.PUBLISHEDFLAG
 	e.fieldMap["UPLOADER"] = e.UPLOADER
+	e.fieldMap["AVAILABLE_FLAG"] = e.AVAILABLEFLAG
 	e.fieldMap["CREATED_TIME"] = e.CreatedAt
 	e.fieldMap["UPDATED_TIME"] = e.UpdatedAt
 

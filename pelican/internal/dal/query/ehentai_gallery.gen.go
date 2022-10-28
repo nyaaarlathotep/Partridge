@@ -36,6 +36,7 @@ func newEhentaiGallery(db *gorm.DB) ehentaiGallery {
 	_ehentaiGallery.RATING = field.NewFloat64(tableName, "RATING")
 	_ehentaiGallery.RATINGCOUNT = field.NewInt32(tableName, "RATING_COUNT")
 	_ehentaiGallery.PAGES = field.NewInt32(tableName, "PAGES")
+	_ehentaiGallery.SIZE = field.NewString(tableName, "SIZE")
 	_ehentaiGallery.PREVIEWPAGE = field.NewInt32(tableName, "PREVIEW_PAGE")
 	_ehentaiGallery.TOKEN = field.NewString(tableName, "TOKEN")
 	_ehentaiGallery.POSTED = field.NewTime(tableName, "POSTED")
@@ -63,6 +64,7 @@ type ehentaiGallery struct {
 	RATING        field.Float64 // 评分
 	RATINGCOUNT   field.Int32   // 评分人数
 	PAGES         field.Int32   // 总页数
+	SIZE          field.String  // 画廊文件大小
 	PREVIEWPAGE   field.Int32   // 预览画廊对应页
 	TOKEN         field.String  // gtoken
 	POSTED        field.Time    // 上传时间
@@ -96,6 +98,7 @@ func (e *ehentaiGallery) updateTableName(table string) *ehentaiGallery {
 	e.RATING = field.NewFloat64(table, "RATING")
 	e.RATINGCOUNT = field.NewInt32(table, "RATING_COUNT")
 	e.PAGES = field.NewInt32(table, "PAGES")
+	e.SIZE = field.NewString(table, "SIZE")
 	e.PREVIEWPAGE = field.NewInt32(table, "PREVIEW_PAGE")
 	e.TOKEN = field.NewString(table, "TOKEN")
 	e.POSTED = field.NewTime(table, "POSTED")
@@ -120,7 +123,7 @@ func (e *ehentaiGallery) GetFieldByName(fieldName string) (field.OrderExpr, bool
 }
 
 func (e *ehentaiGallery) fillFieldMap() {
-	e.fieldMap = make(map[string]field.Expr, 17)
+	e.fieldMap = make(map[string]field.Expr, 18)
 	e.fieldMap["GID"] = e.GID
 	e.fieldMap["ELE_ID"] = e.ELEID
 	e.fieldMap["TITLE"] = e.TITLE
@@ -130,6 +133,7 @@ func (e *ehentaiGallery) fillFieldMap() {
 	e.fieldMap["RATING"] = e.RATING
 	e.fieldMap["RATING_COUNT"] = e.RATINGCOUNT
 	e.fieldMap["PAGES"] = e.PAGES
+	e.fieldMap["SIZE"] = e.SIZE
 	e.fieldMap["PREVIEW_PAGE"] = e.PREVIEWPAGE
 	e.fieldMap["TOKEN"] = e.TOKEN
 	e.fieldMap["POSTED"] = e.POSTED
