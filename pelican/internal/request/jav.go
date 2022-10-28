@@ -1,6 +1,7 @@
 package request
 
 import (
+	"fmt"
 	"github.com/antchfx/htmlquery"
 	"log"
 	"regexp"
@@ -13,12 +14,13 @@ const urlPrefix = "https://www.javbus.com/"
 
 var spaceReg = regexp.MustCompile("\\s+")
 
-func GetJavInfo(code string) *JavInfo {
+func GetJavInfo(code string) (*JavInfo, error) {
 
 	doc, err := htmlquery.LoadURL(urlPrefix + code)
 	if err != nil {
 		log.Printf("parse failed, err:%v\n", err)
-		log.Fatal("parse error, please check your network")
+		return nil, fmt.Errorf("parse error, please check your network")
+
 	}
 	content := htmlquery.InnerText(doc)
 	jav := JavInfo{}
@@ -27,7 +29,7 @@ func GetJavInfo(code string) *JavInfo {
 		jav.Code = code
 		jav.Tags = []string{"unknown"}
 		jav.PublishDate = time.Now()
-		return &jav
+		return &jav, nil
 	}
 	jav.Title = htmlquery.InnerText(htmlquery.FindOne(doc, "/html/body/div[5]/h3"))
 	p := htmlquery.FindOne(doc, "/html/body/div[5]/div[1]/div[2]")
@@ -94,7 +96,7 @@ func GetJavInfo(code string) *JavInfo {
 			break
 		}
 	}
-	return &jav
+	return &jav, nil
 }
 
 func removeSpace(c string) string {
