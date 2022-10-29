@@ -3,7 +3,7 @@ import {ElMessage} from 'element-plus';
 
 const service = axios.create({
     baseURL: 'http://223.166.241.224:51320/',
-    withCredentials: true, // 异步请求携带cookie
+    withCredentials: true, // 异步请求携带cookies
     headers: {
         // 设置后端需要的传参类型
         'Content-Type': 'application/json',
@@ -28,11 +28,8 @@ service.interceptors.request.use(
 // 添加响应拦截器
 service.interceptors.response.use(
     function (response) {
-        // 这个地方响应了数据该做点什么 做想做的事情
         // dataAxios 是 axios 返回数据中的 data
         const dataAxios = response.data
-        // 这个状态码是和后端约定的
-        // const code = dataAxios.reset
         return dataAxios
     },
     function (error) {
