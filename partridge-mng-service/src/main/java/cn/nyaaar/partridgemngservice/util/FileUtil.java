@@ -391,6 +391,13 @@ public class FileUtil {
         }
     }
 
+    public static boolean delete(String path) {
+        File file = new File(path);
+        if (file.exists()) {
+            return file.delete();
+        }
+        return false;
+    }
 
     /**
      * 通过 eleFilePath 获得 eleFile 的 base64
@@ -440,7 +447,7 @@ public class FileUtil {
             }
 
             // 移除起始的分隔符
-            if (path.startsWith(File.separator)) {
+            if (i != 0 && path.startsWith(File.separator)) {
                 path = path.substring(1);
             }
 
@@ -455,5 +462,13 @@ public class FileUtil {
         }
 
         return finalUrl.toString();
+    }
+
+    public static String getFileNameFromPath(String path) {
+        if (StringUtils.isEmpty(path)) {
+            return "";
+        }
+        return path.substring(path.lastIndexOf(File.separator) + 1);
+
     }
 }

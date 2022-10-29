@@ -10,12 +10,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Base64;
+import java.util.List;
 
 /**
  * 上传文件 Controller
@@ -50,5 +48,11 @@ public class UploadController {
         return new R<>();
     }
 
+    @Operation(summary = "上传文件分片", description = "上传文件分片")
+    @GetMapping(value = "/allCheck")
+    @LogAnnotation
+    public R<List<CheckResp>> allCheck() {
+        return new R<>(uploadService.getUploadingFiles());
+    }
 
 }

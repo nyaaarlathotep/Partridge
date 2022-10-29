@@ -33,9 +33,10 @@ func newPrUser(db *gorm.DB) prUser {
 	_prUser.PASSWORD = field.NewString(tableName, "PASSWORD")
 	_prUser.VALIDATED = field.NewInt32(tableName, "VALIDATED")
 	_prUser.LASTLOGINTIME = field.NewTime(tableName, "LAST_LOGIN_TIME")
-	_prUser.LASTLOGINIP = field.NewString(tableName, "LAST_LOGIN_IP")
+	_prUser.SPACEQUOTA = field.NewInt64(tableName, "SPACE_QUOTA")
 	_prUser.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
 	_prUser.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
+	_prUser.LASTLOGINIP = field.NewString(tableName, "LAST_LOGIN_IP")
 
 	_prUser.fillFieldMap()
 
@@ -50,11 +51,12 @@ type prUser struct {
 	EMAIL         field.String
 	USERNAME      field.String
 	PASSWORD      field.String
-	VALIDATED     field.Int32  // (0-否;1-是) 是否为有效账户
-	LASTLOGINTIME field.Time   // 上次登陆时间
-	LASTLOGINIP   field.String // 上次登陆ip
+	VALIDATED     field.Int32 // (0-否;1-是) 是否为有效账户
+	LASTLOGINTIME field.Time  // 上次登陆时间
+	SPACEQUOTA    field.Int64 // 用户空间配额
 	CreatedAt     field.Time
 	UpdatedAt     field.Time
+	LASTLOGINIP   field.String // 上次登陆ip
 
 	fieldMap map[string]field.Expr
 }
@@ -77,9 +79,10 @@ func (p *prUser) updateTableName(table string) *prUser {
 	p.PASSWORD = field.NewString(table, "PASSWORD")
 	p.VALIDATED = field.NewInt32(table, "VALIDATED")
 	p.LASTLOGINTIME = field.NewTime(table, "LAST_LOGIN_TIME")
-	p.LASTLOGINIP = field.NewString(table, "LAST_LOGIN_IP")
+	p.SPACEQUOTA = field.NewInt64(table, "SPACE_QUOTA")
 	p.CreatedAt = field.NewTime(table, "CREATED_TIME")
 	p.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
+	p.LASTLOGINIP = field.NewString(table, "LAST_LOGIN_IP")
 
 	p.fillFieldMap()
 
@@ -96,16 +99,17 @@ func (p *prUser) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (p *prUser) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 9)
+	p.fieldMap = make(map[string]field.Expr, 10)
 	p.fieldMap["ID"] = p.ID
 	p.fieldMap["EMAIL"] = p.EMAIL
 	p.fieldMap["USER_NAME"] = p.USERNAME
 	p.fieldMap["PASSWORD"] = p.PASSWORD
 	p.fieldMap["VALIDATED"] = p.VALIDATED
 	p.fieldMap["LAST_LOGIN_TIME"] = p.LASTLOGINTIME
-	p.fieldMap["LAST_LOGIN_IP"] = p.LASTLOGINIP
+	p.fieldMap["SPACE_QUOTA"] = p.SPACEQUOTA
 	p.fieldMap["CREATED_TIME"] = p.CreatedAt
 	p.fieldMap["UPDATED_TIME"] = p.UpdatedAt
+	p.fieldMap["LAST_LOGIN_IP"] = p.LASTLOGINIP
 }
 
 func (p prUser) clone(db *gorm.DB) prUser {

@@ -38,7 +38,7 @@ public enum BusinessExceptionEnum implements BusinessExceptionAssert {
     SAD_PANDA_WITHOUT(200011, "Sad Panda(without panda)"),
     END_HERE(200012, "今回はここまで"),
     GALLERY_NOT_AVAILABLE(200013, "{0}"),
-    ELEMENT_NOT_FOUND(200014, "没有找到对应元素"),
+    NOT_FOUND(200014, "没有找到对应{}"),
     ELEMENT_FILE_NOT_FOUND(200015, "没有找到对应文件"),
     GALLERY_NOT_FOUND(200016, "没有找到对应画廊"),
     PAGE_NOT_FOUND(200017, "没有找到对应页码"),

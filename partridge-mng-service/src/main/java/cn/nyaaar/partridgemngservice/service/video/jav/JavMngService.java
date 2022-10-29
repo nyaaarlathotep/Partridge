@@ -33,4 +33,12 @@ public interface JavMngService {
      */
     CheckResp uploadJav(JavUploadReq javUploadReq);
 
+    /**
+     * 通过磁链下载 jav
+     *
+     * @param torrent torrent
+     * @param code    code
+     */
+    void downloadJavTorrent(String torrent, String code);
+
 }

@@ -256,7 +256,7 @@ public class Settings {
     private static final int DEFAULT_DOWNLOAD_DELAY = 0;
     private static final String KEY_REQUEST_NEWS = "request_news";
     private static final boolean DEFAULT_REQUEST_NEWS = true;
-    private static final String DEFAULT_DOWNLOAD_ROOT_PATH = "../test/mngDownload";
+    private static final String DEFAULT_DOWNLOAD_ROOT_PATH = "/test/mngDownload";
     private static final String DOWNLOAD_ROOT_PATH = "download_root_path";
 
     private static final int DEFAULT_PAGE_SIZE = 10;
@@ -270,15 +270,19 @@ public class Settings {
 
     private static final int DEFAULT_UPLOADING_FILE_MAX = 3;
     private static final String UPLOADING_FILE_MAX = "uploading_file_max";
+
+
+    private static final int DEFAULT_TORRENT_DOWNLOADING_MAX = 4;
+    private static final String TORRENT_DOWNLOADING_MAX = "torrent_downloading_max";
     private static final int DEFAULT_USER_SPACE_QUOTA = 100;
     private static final String USER_SPACE_QUOTA = "user_space_quota";
     private static final String QBITTORRENT_URL = "qbittorrent_url";
     private static final String DEFAULT_QBITTORRENT_URL = "http://localhost:8080/api/v2";
     private static final String QBITTORRENT_USER = "qbittorrent_user";
     private static final String DEFAULT_QBITTORRENT_USER = "admin";
-    private static final String QBITTORRENT_PASSWORD="qbittorrent_password";
-    private static final String DEFAULT_QBITTORRENT_PASSWORD="adminadmin";
-    
+    private static final String QBITTORRENT_PASSWORD = "qbittorrent_password";
+    private static final String DEFAULT_QBITTORRENT_PASSWORD = "adminadmin";
+
     private static final Map<String, Object> sSettingsPre = new HashMap<>();
     private static EhConfig sEhConfig;
 
@@ -1207,18 +1211,23 @@ public class Settings {
         return getInt(UPLOADING_FILE_MAX, DEFAULT_UPLOADING_FILE_MAX);
     }
 
+    public static Integer getTorrentMax() {
+        return getInt(TORRENT_DOWNLOADING_MAX, DEFAULT_TORRENT_DOWNLOADING_MAX);
+    }
+
     public static String getQbittorrentUrl() {
         return getString(QBITTORRENT_URL, DEFAULT_QBITTORRENT_URL);
     }
 
-    public static String getQbittorrentUser(){
-        return getString(QBITTORRENT_USER,DEFAULT_QBITTORRENT_USER);
+    public static String getQbittorrentUser() {
+        return getString(QBITTORRENT_USER, DEFAULT_QBITTORRENT_USER);
     }
-    
-    public static String getQbittorrentPassword(){
-        return getString(QBITTORRENT_PASSWORD,DEFAULT_QBITTORRENT_PASSWORD);
+
+    public static String getQbittorrentPassword() {
+        return getString(QBITTORRENT_PASSWORD, DEFAULT_QBITTORRENT_PASSWORD);
     }
-    public static int getUserSpaceQuota(){
-        return getInt(USER_SPACE_QUOTA,DEFAULT_USER_SPACE_QUOTA);
+
+    public static int getUserSpaceQuota() {
+        return getInt(USER_SPACE_QUOTA, DEFAULT_USER_SPACE_QUOTA);
     }
 }

@@ -41,7 +41,7 @@ public class ElementController {
     @LogAnnotation
     public R<ElementDto> getElementById(@RequestParam Long elementId) {
         Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, elementId));
-        BusinessExceptionEnum.ELEMENT_NOT_FOUND.assertNotNull(element);
+        BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
         ElementDto elementDto = new ElementDto()
                 .setId(elementId)
                 .setType(element.getType());

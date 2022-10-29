@@ -12,17 +12,14 @@ import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.model.file.FileReq;
 import cn.nyaaar.partridgemngservice.service.EleFileService;
 import cn.nyaaar.partridgemngservice.service.ElementService;
-import cn.nyaaar.partridgemngservice.service.FileUploadInfoService;
 import cn.nyaaar.partridgemngservice.service.transmit.UploadService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
 import cn.nyaaar.partridgemngservice.util.FileUtil;
 import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author yuegenhua
@@ -33,33 +30,20 @@ public abstract class Video {
     private final ElementService elementService;
     private final AppUserService appUserService;
     private final EleFileService eleFileService;
-    private final FileUploadInfoService fileUploadInfoService;
     private final UploadService uploadService;
 
     protected Video(ElementService elementService,
                     AppUserService appUserService,
                     EleFileService eleFileService,
-                    FileUploadInfoService fileUploadInfoService,
                     UploadService uploadService) {
         this.elementService = elementService;
         this.appUserService = appUserService;
         this.eleFileService = eleFileService;
-        this.fileUploadInfoService = fileUploadInfoService;
         this.uploadService = uploadService;
     }
 
     public void checkQuota() {
-        String userName = ThreadLocalUtil.getCurrentUser();
-        List<FileUploadInfo> uploadingFiles = elementService
-                .list(Wrappers.lambdaQuery(Element.class)
-                        .eq(Element::getUploader, userName))
-                .stream()
-                .map(element -> eleFileService.getOne(Wrappers.lambdaQuery(EleFile.class)
-                        .eq(EleFile::getEleId, element.getId()))).filter(Objects::nonNull)
-                .map(eleFile -> fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
-                        .eq(FileUploadInfo::getEleFileId, eleFile.getId())
-                        .eq(FileUploadInfo::getUploadFlag, PrConstant.UPLOADING))).filter(Objects::nonNull)
-                .toList();
+        List<FileUploadInfo> uploadingFiles = uploadService.getUploadingFiles(ThreadLocalUtil.getCurrentUser());
         if (uploadingFiles.size() >= Settings.getFileUploadingMax()) {
             BusinessExceptionEnum.USER_CUSTOM.assertFail("已存在 " + uploadingFiles.size() + " 个正在上传的文件，请先上传完成。");
         }
@@ -68,13 +52,8 @@ public abstract class Video {
 
 
     public EleFile preUploadHandle(FileReq fileReq) {
-        Element element = new Element()
-                .setType(SourceEnum.Jav.getCode())
-                .setUploader(ThreadLocalUtil.getCurrentUser())
-                .setFileSize(0L)
-                .setAvailableFlag(PrConstant.VALIDATED)
-                .setSharedFlag(PrConstant.NO);
-        elementService.save(element);
+        checkQuota();
+        Element element = getJavElement();
         EleFile eleFile = new EleFile()
                 .setEleId(element.getId())
                 .setType(FileTypeEnum.getTypeBySuffix(fileReq.getFileName()).getSuffix())
@@ -84,8 +63,19 @@ public abstract class Video {
         return eleFile;
     }
 
+    public Element getJavElement() {
+        Element element = new Element()
+                .setType(SourceEnum.Jav.getCode())
+                .setUploader(ThreadLocalUtil.getCurrentUser())
+                .setFileSize(0L)
+                .setAvailableFlag(PrConstant.VALIDATED)
+                .setSharedFlag(PrConstant.NO);
+        elementService.save(element);
+        return element;
+    }
+
     public void postUploadHandle() {
-       
+
     }
 
     public CheckResp getCheckResp(FileReq fileReq, EleFile eleFile) {

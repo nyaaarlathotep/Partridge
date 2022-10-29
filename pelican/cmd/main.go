@@ -35,9 +35,17 @@ func startServer() {
 	r := gin.Default()
 	err := r.SetTrustedProxies([]string{"127.0.0.1"})
 	if err != nil {
-		log.Fatalf("trustProxy error:%v", err)
+		log.Fatalf("trustProxy error: %v", err)
 		return
 	}
+	log.Printf("----------proxy info----------")
+	environ := os.Environ()
+	for _, s := range environ {
+		if strings.Contains(s, "proxy") {
+			log.Println(s)
+		}
+	}
+	log.Printf("------------------------------")
 	r.GET("/ping", func(c *gin.Context) {
 		log.Printf("RemoteIP: %v", c.RemoteIP())
 		c.JSON(200, gin.H{
@@ -73,7 +81,7 @@ func startServer() {
 		err = service.UploadFile(c)
 		if err != nil {
 			c.JSON(400, gin.H{
-				"message": fmt.Errorf(err.Error()),
+				"message": fmt.Sprintf(err.Error()),
 			})
 		} else {
 			c.JSON(200, gin.H{
@@ -81,7 +89,25 @@ func startServer() {
 			})
 		}
 	})
-
+	r.POST("/jav/add", func(c *gin.Context) {
+		var form addJavForm
+		if c.ShouldBind(&form) == nil {
+			log.Printf("%+v", form)
+			err = addJav(int64(form.EleId), form.Code)
+			if err != nil {
+				c.JSON(400, gin.H{
+					"message": fmt.Sprintf(err.Error()),
+				})
+			}
+			c.JSON(200, gin.H{
+				"message": "SUCCESS",
+			})
+		} else {
+			c.JSON(400, gin.H{
+				"message": "form error",
+			})
+		}
+	})
 	err = r.Run(":8090")
 }
 
@@ -91,12 +117,21 @@ func scanJavDir(scanDir string) int {
 	count := 0
 	for code := range codeFPathMap {
 		log.Printf("[%s] path: %v", code, codeFPathMap[code])
-		jav := request.GetJavInfo(code)
+		jav, _ := request.GetJavInfo(code)
 		log.Printf("%+v", *jav)
 		count++
 		updateOrInsertEle(jav, codeFPathMap[code], false)
 	}
 	return count
+}
+
+func addJav(eleId int64, code string) error {
+	jav, err := request.GetJavInfo(code)
+	if err != nil {
+		return err
+	}
+	log.Printf("%+v", *jav)
+	return updateJav(jav, eleId)
 }
 
 func getEleFileType(name string) string {
@@ -115,8 +150,6 @@ func updateOrInsertEle(jav *request.JavInfo, path string, update bool) int64 {
 	javQ := queries.Jav
 	eleQ := queries.Element
 
-	var newJav *dao.Jav
-
 	tags := getTags(jav)
 	actors := getActors(jav)
 	organs := getOrgans(jav)
@@ -132,6 +165,49 @@ func updateOrInsertEle(jav *request.JavInfo, path string, update bool) int64 {
 		Organization: organs,
 		TagInfo:      tags,
 	}
+	oldJavs, err := javQ.Where(javQ.CODE.Eq(jav.Code)).Find()
+	if err != nil {
+		log.Printf("db exec failed, %v", err)
+	}
+	if len(oldJavs) == 0 {
+		log.Printf("create: [%v]", jav.Code)
+		err = eleQ.Create(newEle)
+		if err != nil {
+			log.Fatalf("create ele error: %v", err)
+		}
+	}
+	insertJav(jav, newEle, update)
+	return newEle.ID
+}
+
+func updateJav(jav *request.JavInfo, eleId int64) error {
+	eleQ := queries.Element
+	element, err := eleQ.Where(eleQ.ID.Eq(eleId)).First()
+	if err != nil || element == nil {
+		log.Printf("no element found, eleId: %v, err: %v", eleId, err)
+		return fmt.Errorf("no element found, eleId: %v, err: %v", eleId, err)
+
+	}
+	tags := getTags(jav)
+	actors := getActors(jav)
+	organs := getOrgans(jav)
+
+	element.Actor = actors
+	element.TagInfo = tags
+	element.Organization = organs
+	err = eleQ.Save(element)
+	if err != nil {
+		log.Printf("element save error, eleId: %v, err: %v", eleId, err)
+		return fmt.Errorf("element save error, eleId: %v, err: %v", eleId, err)
+	}
+	insertJav(jav, element, true)
+	return nil
+}
+
+func insertJav(jav *request.JavInfo, newEle *dao.Element, update bool) {
+	var newJav *dao.Jav
+	javQ := queries.Jav
+	eleQ := queries.Element
 	err, length := util.GetNumFromString(jav.Length)
 	if err != nil {
 		log.Printf("parse jav length error: %v", err)
@@ -145,12 +221,25 @@ func updateOrInsertEle(jav *request.JavInfo, path string, update bool) int64 {
 		DIRECTOR:    jav.Director,
 		SERIES:      jav.Series,
 	}
-	oldJavs, err := javQ.Where(javQ.CODE.Eq(jav.Code)).Find()
-	if err != nil {
-		log.Printf("db exec failed, %v", err)
-	}
-	if len(oldJavs) == 0 {
-		log.Printf("create: [%v]", jav.Code)
+
+	if update {
+		oldJav, err := javQ.Where(javQ.CODE.Eq(jav.Code)).First()
+		if err != nil {
+			log.Printf("db exec failed, %v", err)
+		}
+		log.Printf("[%v]: update", jav.Code)
+		newJav.ELEID = oldJav.ELEID
+		newEle.ID = oldJav.ELEID
+		err = eleQ.Save(newEle)
+		if err != nil {
+			log.Fatalf("save ele error: %v", err)
+		}
+		err = javQ.Save(newJav)
+		if err != nil {
+			log.Fatalf("save jav error: %v", err)
+		}
+	} else {
+		log.Printf("[%v]: create", jav.Code)
 		err = eleQ.Create(newEle)
 		if err != nil {
 			log.Fatalf("create ele error: %v", err)
@@ -160,21 +249,7 @@ func updateOrInsertEle(jav *request.JavInfo, path string, update bool) int64 {
 		if err != nil {
 			log.Fatalf("create jav error: %v", err)
 		}
-	} else if update {
-		log.Printf("update: [%v]", jav.Code)
-		newJav.ELEID = oldJavs[0].ELEID
-		newEle.ID = oldJavs[0].ELEID
-		err = eleQ.Save(newEle)
-		if err != nil {
-			log.Fatalf("save ele error: %v", err)
-		}
-		err = javQ.Save(newJav)
-		if err != nil {
-			log.Fatalf("save jav error: %v", err)
-		}
 	}
-
-	return newEle.ID
 }
 
 func getEleFile(path string) *dao.EleFile {
@@ -182,10 +257,10 @@ func getEleFile(path string) *dao.EleFile {
 	eleFileType := getEleFileType(name)
 	log.Printf("file name: [%v]", name)
 	return &dao.EleFile{
-		NAME:            name,
-		TYPE:            eleFileType,
-		PATH:            path,
-		ISAVAILABLEFLAG: 1,
+		NAME:          name,
+		TYPE:          eleFileType,
+		PATH:          path,
+		AVAILABLEFLAG: 1,
 	}
 }
 
@@ -260,4 +335,9 @@ func init() {
 
 type scanDirForm struct {
 	Dir string `form:"dir" binding:"required"`
+}
+
+type addJavForm struct {
+	Code  string `form:"code" binding:"required"`
+	EleId int    `form:"eleId" binding:"required"`
 }

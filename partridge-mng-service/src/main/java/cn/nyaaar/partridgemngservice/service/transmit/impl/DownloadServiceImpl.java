@@ -20,6 +20,7 @@ import java.util.Objects;
 @Service
 @Slf4j
 public class DownloadServiceImpl implements DownloadService {
+    // TODO change to WebClient
     private final OkHttpClient okHttpClient;
 
     private final ThreadPoolTaskExecutor downloadExecutor;

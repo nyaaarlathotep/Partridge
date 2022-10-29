@@ -12,6 +12,7 @@ import cn.nyaaar.partridgemngservice.model.jav.JavQuery;
 import cn.nyaaar.partridgemngservice.model.jav.JavUploadReq;
 import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
+import cn.nyaaar.partridgemngservice.service.torrent.TorrentService;
 import cn.nyaaar.partridgemngservice.service.transmit.UploadService;
 import cn.nyaaar.partridgemngservice.service.video.jav.JavMngService;
 import cn.nyaaar.partridgemngservice.service.user.AppUserService;
@@ -23,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -35,6 +35,7 @@ public class JavMngServiceImpl extends Video implements JavMngService {
     private final ActorService actorService;
     private final TagInfoService tagInfoService;
     private final ElementMngService elementMngService;
+    private final TorrentService torrentService;
 
     public JavMngServiceImpl(JavService javService,
                              OrganizationService organizationService,
@@ -43,21 +44,22 @@ public class JavMngServiceImpl extends Video implements JavMngService {
                              ElementService elementService,
                              EleFileService eleFileService,
                              UploadService uploadService,
-                             FileUploadInfoService fileUploadInfoService,
                              AppUserService appUserService,
-                             ElementMngService elementMngService) {
-        super(elementService, appUserService, eleFileService, fileUploadInfoService, uploadService);
+                             ElementMngService elementMngService,
+                             TorrentService torrentService) {
+        super(elementService, appUserService, eleFileService, uploadService);
         this.javService = javService;
         this.organizationService = organizationService;
         this.actorService = actorService;
         this.tagInfoService = tagInfoService;
         this.elementMngService = elementMngService;
+        this.torrentService = torrentService;
     }
 
     @Override
     public JavBasicInfo getJavBasicInfoByCode(String code) {
         Jav jav = javService.getOne(new LambdaQueryWrapper<Jav>().eq(Jav::getCode, code));
-        BusinessExceptionEnum.ELEMENT_NOT_FOUND.assertNotNull(jav);
+        BusinessExceptionEnum.NOT_FOUND.assertNotNull(jav, "jav");
 
         return getJavBasicInfo(jav);
     }
@@ -72,7 +74,6 @@ public class JavMngServiceImpl extends Video implements JavMngService {
 
     @Override
     public CheckResp uploadJav(JavUploadReq javUploadReq) {
-        checkQuota();
         EleFile eleFile = preUploadHandle(javUploadReq);
         // TODO rpc call pelican to crawl javInfo
         CheckResp checkResp = getCheckResp(javUploadReq, eleFile);
@@ -80,9 +81,16 @@ public class JavMngServiceImpl extends Video implements JavMngService {
         return checkResp;
     }
 
+    @Override
+    public void downloadJavTorrent(String torrent, String code) {
+        checkQuota();
+        Element element = getJavElement();
+        // TODO rpc call pelican to crawl javInfo
+        torrentService.addTorrent(element, torrent);
+    }
 
     private void queryPage(JavQuery javQuery, Page<Jav> page, LambdaQueryWrapper<Jav> lambdaQueryWrapper) {
-        List<Integer> actorIds = null;
+        java.util.List<Integer> actorIds = null;
         if (Objects.nonNull(javQuery.getActors()) && !javQuery.getActors().isEmpty()) {
             actorIds = javQuery.getActors()
                     .parallelStream()
@@ -92,7 +100,7 @@ public class JavMngServiceImpl extends Video implements JavMngService {
                     .map(Actor::getId)
                     .toList();
         }
-        List<Integer> organIds = null;
+        java.util.List<Integer> organIds = null;
         if (Objects.nonNull(javQuery.getOrganizations()) && !javQuery.getOrganizations().isEmpty()) {
             organIds = javQuery.getOrganizations()
                     .parallelStream()
@@ -102,7 +110,7 @@ public class JavMngServiceImpl extends Video implements JavMngService {
                     .map(Organization::getId)
                     .toList();
         }
-        List<Integer> tagInfoIds = null;
+        java.util.List<Integer> tagInfoIds = null;
         if (Objects.nonNull(javQuery.getTagDtos()) && !javQuery.getTagDtos().isEmpty()) {
             tagInfoIds = javQuery.getTagDtos()
                     .parallelStream()
@@ -152,7 +160,7 @@ public class JavMngServiceImpl extends Video implements JavMngService {
 
     @NotNull
     private ListResp<JavBasicInfo> getJInfoListResp(Page<Jav> page) {
-        List<JavBasicInfo> javBasicInfos = page.getRecords()
+        java.util.List<JavBasicInfo> javBasicInfos = page.getRecords()
                 .parallelStream()
                 .map(this::getJavBasicInfo)
                 .toList();

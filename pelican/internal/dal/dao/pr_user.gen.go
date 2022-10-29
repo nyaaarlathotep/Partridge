@@ -18,9 +18,10 @@ type PrUser struct {
 	PASSWORD      string    `gorm:"column:PASSWORD;type:varchar(255)" json:"PASSWORD"`
 	VALIDATED     int32     `gorm:"column:VALIDATED;type:tinyint" json:"VALIDATED"`              // (0-否;1-是) 是否为有效账户
 	LASTLOGINTIME time.Time `gorm:"column:LAST_LOGIN_TIME;type:datetime" json:"LAST_LOGIN_TIME"` // 上次登陆时间
-	LASTLOGINIP   string    `gorm:"column:LAST_LOGIN_IP;type:varchar(255)" json:"LAST_LOGIN_IP"` // 上次登陆ip
+	SPACEQUOTA    int64     `gorm:"column:SPACE_QUOTA;type:bigint" json:"SPACE_QUOTA"`           // 用户空间配额
 	CreatedAt     time.Time `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`
 	UpdatedAt     time.Time `gorm:"column:UPDATED_TIME;type:datetime" json:"UPDATED_TIME"`
+	LASTLOGINIP   string    `gorm:"column:LAST_LOGIN_IP;type:varchar(255)" json:"LAST_LOGIN_IP"` // 上次登陆ip
 }
 
 // TableName PrUser's table name
