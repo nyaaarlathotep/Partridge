@@ -5,6 +5,7 @@ import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.model.jav.JavBasicInfo;
 import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.jav.JavQuery;
+import cn.nyaaar.partridgemngservice.model.jav.JavTorrentReq;
 import cn.nyaaar.partridgemngservice.model.jav.JavUploadReq;
 import cn.nyaaar.partridgemngservice.model.response.R;
 import cn.nyaaar.partridgemngservice.model.validate.FileCheck;
@@ -54,8 +55,8 @@ public class JavController {
     @Operation(summary = "下载 Jav torrent", description = "下载 Jav torrent")
     @PostMapping(value = "/torrent")
     @LogAnnotation
-    public R<String> downloadJavTorrent(@RequestBody String torrent, @RequestBody String code) {
-        javMngService.downloadJavTorrent(torrent, code);
+    public R<String> downloadJavTorrent(@RequestBody JavTorrentReq javTorrentReq) {
+        javMngService.downloadJavTorrent(javTorrentReq.getMagnetLink(), javTorrentReq.getCode());
         return new R<>();
     }
 }

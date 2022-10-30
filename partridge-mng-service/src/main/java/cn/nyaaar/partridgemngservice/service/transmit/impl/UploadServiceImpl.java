@@ -196,6 +196,9 @@ public class UploadServiceImpl implements UploadService {
                 .stream()
                 .map(Element::getId)
                 .toList();
+        if (elementIds.size() == 0) {
+            return new ArrayList<>();
+        }
         List<Long> eleFileIds = eleFileService
                 .list(Wrappers.lambdaQuery(EleFile.class)
                         .in(EleFile::getEleId, elementIds))

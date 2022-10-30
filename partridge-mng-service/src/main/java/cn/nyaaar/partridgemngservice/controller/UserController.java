@@ -41,8 +41,8 @@ public class UserController {
     @Operation(summary = "ping", description = "ping")
     @GetMapping(value = "/ping")
     @LogAnnotation
-    public R<String> test() {
-        log.info("ping");
+    public R<String> test(@RequestParam String testString) {
+        log.info("ping: " + testString);
         return new R<>("pong");
     }
 }
