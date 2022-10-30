@@ -21,6 +21,9 @@ public class TorrentResp {
     @Schema(title = "Torrent name")
     private String name;
 
+    @Schema(title = "Torrent hash")
+    private String hash;
+
     @Schema(title = "已下载 bytes")
     private Long completed;
 
@@ -42,14 +45,13 @@ public class TorrentResp {
     @Schema(title = "状态描述")
     private String stateDesc;
 
-    public TorrentResp() {
-    }
 
     public TorrentResp(QBitTorrent qBitTorrent, EleTorrent eleTorrent) {
         this.eleId = eleTorrent.getEleId();
         this.completed = qBitTorrent.getCompleted();
         this.amountLeft = qBitTorrent.getAmount_left();
         this.name = qBitTorrent.getName();
+        this.hash = qBitTorrent.getHash();
         this.size = qBitTorrent.getSize();
         this.amountLeft = qBitTorrent.getAmount_left();
         this.ratio = qBitTorrent.getRatio();

@@ -43,6 +43,6 @@ public class UserController {
     @LogAnnotation
     public R<String> test(@RequestParam String testString) {
         log.info("ping: " + testString);
-        return new R<>("pong");
+        return new R<>("pong" + testString);
     }
 }
