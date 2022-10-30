@@ -33,7 +33,7 @@ public class QBitTorrentServiceTest {
 
     @Test
     public void getHashTorrent() {
-        log.info(qbittorrentService.getTorrents("", "f666815eda76bf931aa1ab69451af1c1071f5cba").toString());
+        log.info(qbittorrentService.getTorrents("", "1344969b4eab18ec888d532acc4d79f1b74a664d").toString());
     }
 
     @Test
@@ -44,7 +44,7 @@ public class QBitTorrentServiceTest {
 
     @Test
     public void getTorrentContents() {
-        log.info(qbittorrentService.getTorrentContents("f666815eda76bf931aa1ab69451af1c1071f5cba").toString());
+        log.info(qbittorrentService.getTorrentContents("1344969b4eab18ec888d532acc4d79f1b74a664d").toString());
     }
 
     @Test
@@ -78,5 +78,10 @@ public class QBitTorrentServiceTest {
     public void getDownloadingTorrent() {
         ThreadLocalUtil.addCurrentUser("test");
         log.info(torrentService.getDownloadingTorrents().toString());
+    }
+
+    @Test
+    public void deleteContent() {
+        torrentService.deleteTorrentContent("1344969b4eab18ec888d532acc4d79f1b74a664d", 0);
     }
 }

@@ -138,17 +138,19 @@ public class TorrentServiceImpl implements TorrentService {
         EleTorrent eleTorrent = getEleTorrent(hash);
         List<QBitTorrentContent> qBitTorrentContents = qbittorrentEngine.getTorrentContents(hash);
         qbittorrentEngine.setTorrentContentPriority(eleTorrent.getHash(), contentIndex, 0);
-        List<QBitTorrent> qBitTorrents = qbittorrentEngine.getTorrents("", hash);
+        QBitTorrent qBitTorrent = getQBitTorrentByHash(hash);
         Optional<QBitTorrentContent> qBitTorrentContent = qBitTorrentContents.stream()
                 .filter(qBitTorrentContentFilter -> qBitTorrentContentFilter.getIndex().equals(Long.valueOf(contentIndex)))
                 .findFirst();
         if (qBitTorrentContent.isPresent()) {
-            String path = FileUtil.simpleConcatPath(qBitTorrents.get(0).getSave_path(), qBitTorrentContent.get().getName());
+
+            String path = FileUtil.simpleConcatPath(qBitTorrent.getSave_path().replace(Settings.getQbittorrentPath(),
+                    Settings.getQbittorrentHostPath()), qBitTorrentContent.get().getName());
             boolean deleteSuccess = FileUtil.delete(path);
             if (!deleteSuccess) {
-                log.warn("[{}], contentIndex: [{}], delete error!", hash, contentIndex);
+                log.warn("[{}], contentIndex: [{}], path: [{}], delete error!", hash, contentIndex, path);
             } else {
-                log.info("[{}], contentIndex: [{}], delete success", hash, contentIndex);
+                log.info("[{}], contentIndex: [{}], path: [{}], delete success", hash, contentIndex, path);
             }
         } else {
             BusinessExceptionEnum.NOT_FOUND.assertFail("磁链内容");
@@ -235,7 +237,7 @@ public class TorrentServiceImpl implements TorrentService {
     }
 
     private static String getDownloadDir(String userName, Element element) {
-        return FileUtil.simpleConcatPath(Settings.getDownloadRootPath(),
+        return FileUtil.simpleConcatPath(Settings.getQbittorrentPath(),
                 userName, element.getType(), String.valueOf(element.getId()));
     }
 
