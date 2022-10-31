@@ -31,8 +31,8 @@ public class UserEleLike extends Model<UserEleLike> {
     @TableId(value = "ID", type = IdType.AUTO)
     private Integer id;
 
-    @TableField("USER_ID")
-    private Integer userId;
+    @TableField("USER_NAME")
+    private String userName;
 
     @TableField("ELE_ID")
     private Long eleId;

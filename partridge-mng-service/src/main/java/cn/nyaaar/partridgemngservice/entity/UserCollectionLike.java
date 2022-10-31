@@ -31,8 +31,8 @@ public class UserCollectionLike extends Model<UserCollectionLike> {
     @TableId(value = "ID", type = IdType.AUTO)
     private Integer id;
 
-    @TableField("USER_ID")
-    private Integer userId;
+    @TableField("USER_NAME")
+    private String userName;
 
     @TableField("COLLECTION_ID")
     private Integer collectionId;

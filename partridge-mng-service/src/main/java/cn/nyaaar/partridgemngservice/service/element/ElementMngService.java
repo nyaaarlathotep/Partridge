@@ -30,7 +30,19 @@ public interface ElementMngService {
      */
     void delete(Long eleId);
 
+    /**
+     * 当前用户喜爱对应的元素
+     *
+     * @param elementId elementId
+     */
     void like(Long elementId);
+
+    /**
+     * 当前用户取消喜爱对应的元素
+     *
+     * @param elementId elementId
+     */
+    void unlike(Long elementId);
 
     /**
      * 公开 element，上传者释放对应存储空间，但将无法删除此 element

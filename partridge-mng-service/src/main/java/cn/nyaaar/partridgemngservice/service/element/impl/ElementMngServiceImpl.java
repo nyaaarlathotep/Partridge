@@ -44,6 +44,7 @@ public class ElementMngServiceImpl implements ElementMngService {
     private final EleActorReService eleActorReService;
     private final TagInfoService tagInfoService;
     private final EleTagReService eleTagReService;
+    private final UserEleLikeService userEleLikeService;
 
     public ElementMngServiceImpl(ElementService elementService,
                                  AppUserService appUserService,
@@ -55,7 +56,8 @@ public class ElementMngServiceImpl implements ElementMngService {
                                  ActorService actorService,
                                  EleActorReService eleActorReService,
                                  TagInfoService tagInfoService,
-                                 EleTagReService eleTagReService) {
+                                 EleTagReService eleTagReService,
+                                 UserEleLikeService userEleLikeService) {
         this.elementService = elementService;
         this.appUserService = appUserService;
         this.eleFileService = eleFileService;
@@ -67,23 +69,23 @@ public class ElementMngServiceImpl implements ElementMngService {
         this.eleActorReService = eleActorReService;
         this.tagInfoService = tagInfoService;
         this.eleTagReService = eleTagReService;
+        this.userEleLikeService = userEleLikeService;
     }
 
     @Override
-    public void share(Long elementId) {
-        Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, elementId));
+    public void share(Long eleId) {
+        Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, eleId));
         BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
-        checkEleFilesCompleted(elementId);
+        checkEleFilesCompleted(eleId);
         elementService.update(Wrappers.lambdaUpdate(Element.class)
                 .set(Element::getSharedFlag, PrConstant.YES)
-                .eq(Element::getId, elementId));
+                .eq(Element::getId, eleId));
     }
 
 
     @Override
     public void delete(Long eleId) {
-        Element element = elementService.getById(eleId);
-        BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
+        Element element = getElement(eleId);
         checkDeletePermission(eleId, element);
         try {
             String dir = FileUtil.getFileDir(element.getFileDir());
@@ -110,15 +112,39 @@ public class ElementMngServiceImpl implements ElementMngService {
     }
 
     @Override
-    public void like(Long elementId) {
+    public void like(Long eleId) {
+        getElement(eleId);
+        UserEleLike userEleLike = userEleLikeService.getOne(Wrappers.lambdaQuery(UserEleLike.class)
+                .eq(UserEleLike::getEleId, eleId)
+                .eq(UserEleLike::getUserName, ThreadLocalUtil.getCurrentUser()));
+        if (userEleLike == null) {
+            userEleLike = new UserEleLike()
+                    .setEleId(eleId)
+                    .setUserName(ThreadLocalUtil.getCurrentUser())
+                    .setAvailableFlag(PrConstant.VALIDATED);
+            userEleLikeService.save(userEleLike);
+        } else {
+            userEleLike.setAvailableFlag(PrConstant.VALIDATED);
+            userEleLikeService.updateById(userEleLike);
+        }
+    }
 
+    @Override
+    public void unlike(Long eleId) {
+        getElement(eleId);
+        UserEleLike userEleLike = userEleLikeService.getOne(Wrappers.lambdaQuery(UserEleLike.class)
+                .eq(UserEleLike::getEleId, eleId)
+                .eq(UserEleLike::getUserName, ThreadLocalUtil.getCurrentUser()));
+        if (userEleLike != null) {
+            userEleLike.setAvailableFlag(PrConstant.INVALIDATED);
+            userEleLikeService.updateById(userEleLike);
+        }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void publish(Long eleId) {
-        Element element = elementService.getById(eleId);
-        BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
+        Element element = getElement(eleId);
         checkWritePermission(element.getId());
         checkEleFilesCompleted(eleId);
         elementService.update(Wrappers.lambdaUpdate(Element.class)
@@ -146,9 +172,9 @@ public class ElementMngServiceImpl implements ElementMngService {
     }
 
     @Override
-    public Optional<Organization> getEleOrgan(Long elementId, EleOrgReTypeEnum eleOrgReTypeEnum) {
+    public Optional<Organization> getEleOrgan(Long eleId, EleOrgReTypeEnum eleOrgReTypeEnum) {
         List<EleOrgRe> eleOrgRes = eleOrgReService.list(new LambdaQueryWrapper<EleOrgRe>().
-                eq(EleOrgRe::getEleId, elementId));
+                eq(EleOrgRe::getEleId, eleId));
         List<Organization> organs = organizationService.list(Wrappers.lambdaQuery(Organization.class)
                 .in(Organization::getId,
                         eleOrgRes.stream().map(EleOrgRe::getOrgId).toList()));
@@ -156,9 +182,9 @@ public class ElementMngServiceImpl implements ElementMngService {
     }
 
     @Override
-    public List<Actor> getEleActors(Long elementId) {
+    public List<Actor> getEleActors(Long eleId) {
         List<EleActorRe> eleActorRes = eleActorReService.list(new LambdaQueryWrapper<EleActorRe>().
-                eq(EleActorRe::getEleId, elementId));
+                eq(EleActorRe::getEleId, eleId));
         return actorService.list(new LambdaQueryWrapper<Actor>()
                 .in(Actor::getId, eleActorRes.stream().map(EleActorRe::getActorId).toList()));
     }
@@ -182,20 +208,26 @@ public class ElementMngServiceImpl implements ElementMngService {
     }
 
     @Override
-    public boolean checkReadPermission(Long elementId) {
+    public boolean checkReadPermission(Long eleId) {
         if (appUserService.isRoot(ThreadLocalUtil.getCurrentUser())) {
             return true;
         }
-        Element element = elementService.getById(elementId);
+        Element element = elementService.getById(eleId);
         return Objects.equals(PrConstant.YES, element.getSharedFlag());
     }
 
     @Override
-    public boolean checkWritePermission(Long elementId) {
+    public boolean checkWritePermission(Long eleId) {
         if (appUserService.isRoot(ThreadLocalUtil.getCurrentUser())) {
             return true;
         }
-        Element element = elementService.getById(elementId);
+        Element element = elementService.getById(eleId);
         return Objects.equals(ThreadLocalUtil.getCurrentUser(), element.getUploader());
+    }
+
+    private Element getElement(Long eleId) {
+        Element element = elementService.getById(eleId);
+        BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
+        return element;
     }
 }

@@ -27,6 +27,10 @@ import java.util.List;
 @RequestMapping("/element")
 @Slf4j
 public class ElementController {
+    // TODO getUserCollection
+    // TODO crud element to collection
+    // TODO get user like elements
+    // TODO get user like collection
     private final ElementService elementService;
     private final ElementMngService elementMngService;
 
@@ -72,10 +76,27 @@ public class ElementController {
         return new R<>();
     }
 
+    @Operation(summary = "喜爱对应的元素")
+    @GetMapping(value = "/like")
+    @LogAnnotation
+    public R<String> like(@RequestParam Long eleId) {
+        elementMngService.like(eleId);
+        return new R<>();
+    }
+
+    @Operation(summary = "取消喜爱对应的元素")
+    @GetMapping(value = "/unlike")
+    @LogAnnotation
+    public R<CheckResp> unlike(@RequestParam Long eleId) {
+        elementMngService.unlike(eleId);
+        return new R<>();
+    }
+
     @Operation(summary = "获取未上传完成的 elements 的 checkResp", description = "返回 check 的结果列表")
     @GetMapping(value = "/uploading")
     @LogAnnotation
-    public R<List<CheckResp>> getUploadingJavs() {
+    public R<List<CheckResp>> getUploadingElements() {
         return new R<>(elementMngService.getUploadingElements());
     }
+    
 }
