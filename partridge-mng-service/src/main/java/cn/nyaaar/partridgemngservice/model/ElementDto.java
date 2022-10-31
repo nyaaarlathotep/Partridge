@@ -21,4 +21,7 @@ public class ElementDto {
     @Schema(title = "element类型")
     private String type;
 
+    @Schema(title = "收到喜爱的数量")
+    private Integer likes;
+
 }

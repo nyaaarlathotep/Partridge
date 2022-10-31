@@ -4,6 +4,7 @@ import cn.nyaaar.partridgemngservice.common.enums.EleOrgReTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.Actor;
 import cn.nyaaar.partridgemngservice.entity.Organization;
 import cn.nyaaar.partridgemngservice.entity.TagInfo;
+import cn.nyaaar.partridgemngservice.model.ElementDto;
 import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 
 import java.util.List;
@@ -29,6 +30,13 @@ public interface ElementMngService {
      * @param eleId eleId
      */
     void delete(Long eleId);
+
+    /**
+     * 通过主键id获取element基本信息
+     * @param eleId eleId
+     * @return ElementDto
+     */
+    ElementDto getEle(Long eleId);
 
     /**
      * 当前用户喜爱对应的元素

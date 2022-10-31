@@ -1,14 +1,11 @@
 package cn.nyaaar.partridgemngservice.controller;
 
 import cn.nyaaar.partridgemngservice.common.annotation.LogAnnotation;
-import cn.nyaaar.partridgemngservice.entity.Element;
-import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
 import cn.nyaaar.partridgemngservice.model.ElementDto;
 import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.model.response.R;
 import cn.nyaaar.partridgemngservice.service.ElementService;
 import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +28,9 @@ public class ElementController {
     // TODO crud element to collection
     // TODO get user like elements
     // TODO get user like collection
-    private final ElementService elementService;
     private final ElementMngService elementMngService;
 
-    public ElementController(ElementService elementService,
-                             ElementMngService elementMngService) {
-        this.elementService = elementService;
+    public ElementController(ElementMngService elementMngService) {
         this.elementMngService = elementMngService;
     }
 
@@ -44,12 +38,8 @@ public class ElementController {
     @GetMapping(value = "/element")
     @LogAnnotation
     public R<ElementDto> getElementById(@RequestParam Long elementId) {
-        Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, elementId));
-        BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
-        ElementDto elementDto = new ElementDto()
-                .setId(elementId)
-                .setType(element.getType());
-        return new R<>(elementDto);
+
+        return new R<>(elementMngService.getEle(elementId));
     }
 
     @Operation(summary = "分享 element", description = "通过主键id 分享 element")
@@ -96,7 +86,8 @@ public class ElementController {
     @GetMapping(value = "/uploading")
     @LogAnnotation
     public R<List<CheckResp>> getUploadingElements() {
+
         return new R<>(elementMngService.getUploadingElements());
     }
-    
+
 }

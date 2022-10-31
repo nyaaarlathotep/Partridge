@@ -5,6 +5,7 @@ import cn.nyaaar.partridgemngservice.common.enums.CompleteFlagEnum;
 import cn.nyaaar.partridgemngservice.common.enums.EleOrgReTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
+import cn.nyaaar.partridgemngservice.model.ElementDto;
 import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
@@ -82,6 +83,18 @@ public class ElementMngServiceImpl implements ElementMngService {
                 .eq(Element::getId, eleId));
     }
 
+    @Override
+    public ElementDto getEle(Long eleId) {
+        Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, eleId));
+        BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
+        List<UserEleLike> likes = userEleLikeService.list(Wrappers.lambdaQuery(UserEleLike.class)
+                .eq(UserEleLike::getEleId, eleId)
+                .eq(UserEleLike::getAvailableFlag, PrConstant.VALIDATED));
+        return new ElementDto()
+                .setId(eleId)
+                .setType(element.getType())
+                .setLikes(likes.size());
+    }
 
     @Override
     public void delete(Long eleId) {
