@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.nyaaar.partridgemngservice.mapper.UserEleLikeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.nyaaar.partridgemngservice.entity.UserEleLike">
+        <id column="ID" property="id" />
+        <result column="USER_ID" property="userId" />
+        <result column="ELE_ID" property="eleId" />
+        <result column="AVAILABLE_FLAG" property="availableFlag" />
+        <result column="CREATED_TIME" property="createdTime" />
+        <result column="UPDATED_TIME" property="updatedTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ID, USER_ID, ELE_ID, AVAILABLE_FLAG, CREATED_TIME, UPDATED_TIME
+    </sql>
+
+</mapper>

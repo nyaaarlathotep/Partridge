@@ -214,7 +214,8 @@ public class TorrentServiceImpl implements TorrentService {
         try {
             hash = torrent.substring(torrent.indexOf("btih:"));
             hash = hash.substring(hash.indexOf(":") + 1, hash.indexOf("&"));
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.error("hash parse error: ", e);
         }
         if (StringUtils.isEmpty(hash)) {
             BusinessExceptionEnum.FIELD_ERROR.assertFail("磁力链接解析错误");

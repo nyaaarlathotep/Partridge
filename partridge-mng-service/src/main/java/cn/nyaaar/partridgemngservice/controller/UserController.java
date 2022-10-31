@@ -16,6 +16,10 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class UserController {
 
+    // TODO getUserCollection
+    // TODO crud element to collection
+    // TODO get user like elements
+    // TODO get user like collection
     private final AppUserService appUserService;
 
     public UserController(AppUserService appUserService) {
