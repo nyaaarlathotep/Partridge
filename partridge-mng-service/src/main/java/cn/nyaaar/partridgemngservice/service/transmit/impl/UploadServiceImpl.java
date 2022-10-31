@@ -2,6 +2,7 @@ package cn.nyaaar.partridgemngservice.service.transmit.impl;
 
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
+import cn.nyaaar.partridgemngservice.common.enums.CompleteFlagEnum;
 import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.EleFile;
 import cn.nyaaar.partridgemngservice.entity.Element;
@@ -80,7 +81,7 @@ public class UploadServiceImpl implements UploadService {
                     .setSuffix(FileTypeEnum.getTypeBySuffix(fileName).getSuffix())
                     .setShardTotal(shardTotal)
                     .setSize(fileSize)
-                    .setUploadFlag(PrConstant.UPLOADING);
+                    .setUploadFlag(PrConstant.NO);
             fileUploadInfoService.save(fileUploadInfo);
         }
         return getCheckResp(fileUploadInfo, fileDir.toPath());
@@ -93,7 +94,7 @@ public class UploadServiceImpl implements UploadService {
         FileUploadInfo fileUploadInfo = fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
                 .eq(FileUploadInfo::getEleFileId, eleFile.getId()));
         BusinessExceptionEnum.NOT_EXISTS.assertNotNull(fileUploadInfo, "fileUploadInfo");
-        if (Objects.equals(fileUploadInfo.getUploadFlag(), PrConstant.UPLOADED)) {
+        if (Objects.equals(fileUploadInfo.getUploadFlag(), PrConstant.YES)) {
             return new CheckResp()
                     .setEleFileId(fileUploadInfo.getEleFileId())
                     .setUploaded(true);
@@ -141,7 +142,8 @@ public class UploadServiceImpl implements UploadService {
                 .setShardSize(fileUploadInfo.getShardSize())
                 .setEleFileId(fileUploadInfo.getEleFileId())
                 .setUploaderPath(fileUploadInfo.getUploaderPath())
-                .setSize(fileUploadInfo.getSize());
+                .setSize(fileUploadInfo.getSize())
+                .setUploaded(totalShards.isEmpty());
     }
 
     public void upload(Integer shardIndex, String fileMd5, String shardMd5, byte[] shardBytes) {
@@ -208,7 +210,7 @@ public class UploadServiceImpl implements UploadService {
         return fileUploadInfoService
                 .list(Wrappers.lambdaQuery(FileUploadInfo.class)
                         .in(FileUploadInfo::getEleFileId, eleFileIds)
-                        .eq(FileUploadInfo::getUploadFlag, PrConstant.UPLOADING));
+                        .eq(FileUploadInfo::getUploadFlag, PrConstant.NO));
     }
 
     private static void checkShardMd5(String shardMd5, byte[] shardBytes) {
@@ -250,11 +252,11 @@ public class UploadServiceImpl implements UploadService {
 
     private void mergePostHandle(FileUploadInfo fileUploadInfo, Element element, EleFile eleFile) {
         fileUploadInfoService.update(Wrappers.lambdaUpdate(FileUploadInfo.class)
-                .set(FileUploadInfo::getUploadFlag, PrConstant.UPLOADED)
+                .set(FileUploadInfo::getUploadFlag, PrConstant.YES)
                 .eq(FileUploadInfo::getId, fileUploadInfo.getId()));
         eleFileService.update(Wrappers.lambdaUpdate(EleFile.class)
                 .set(EleFile::getPath, fileUploadInfo.getPath())
-                .set(EleFile::getCompletedFlag, PrConstant.YES)
+                .set(EleFile::getCompletedFlag, CompleteFlagEnum.UPLOADED)
                 .eq(EleFile::getId, eleFile.getId()));
         Long elementBytes = FileUtil.getFolderSize(fileUploadInfo.getPath());
         elementService.update(Wrappers.lambdaUpdate(Element.class)

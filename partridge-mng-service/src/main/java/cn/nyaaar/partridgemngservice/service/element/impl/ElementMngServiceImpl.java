@@ -1,6 +1,7 @@
 package cn.nyaaar.partridgemngservice.service.element.impl;
 
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
+import cn.nyaaar.partridgemngservice.common.enums.CompleteFlagEnum;
 import cn.nyaaar.partridgemngservice.common.enums.EleOrgReTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
@@ -139,7 +140,7 @@ public class ElementMngServiceImpl implements ElementMngService {
                         .eq(EleFile::getAvailableFlag, PrConstant.VALIDATED))).filter(Objects::nonNull)
                 .map(eleFile -> fileUploadInfoService.getOne(Wrappers.lambdaQuery(FileUploadInfo.class)
                         .eq(FileUploadInfo::getEleFileId, eleFile.getId())
-                        .eq(FileUploadInfo::getUploadFlag, PrConstant.UPLOADING))).filter(Objects::nonNull)
+                        .eq(FileUploadInfo::getUploadFlag, PrConstant.NO))).filter(Objects::nonNull)
                 .map(fileUploadInfo -> uploadService.check(fileUploadInfo.getEleFileId())).filter(Objects::nonNull)
                 .toList();
     }
@@ -174,7 +175,7 @@ public class ElementMngServiceImpl implements ElementMngService {
         List<EleFile> eleFiles = eleFileService.list(Wrappers.lambdaQuery(EleFile.class)
                 .eq(EleFile::getEleId, eleId));
         for (EleFile eleFile : eleFiles) {
-            if (!Objects.equals(eleFile.getCompletedFlag(), PrConstant.YES)) {
+            if (!CompleteFlagEnum.completed(eleFile.getCompletedFlag())) {
                 BusinessExceptionEnum.COMMON_BUSINESS_ERROR.assertFail("元素未完成，无法操作");
             }
         }

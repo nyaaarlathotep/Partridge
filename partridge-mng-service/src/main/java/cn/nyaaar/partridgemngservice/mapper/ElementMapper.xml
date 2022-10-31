@@ -12,13 +12,14 @@
         <result column="PUBLISHED_FLAG" property="publishedFlag" />
         <result column="UPLOADER" property="uploader" />
         <result column="AVAILABLE_FLAG" property="availableFlag" />
+        <result column="COMPLETED_FLAG" property="completedFlag" />
         <result column="CREATED_TIME" property="createdTime" />
         <result column="UPDATED_TIME" property="updatedTime" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        ID, TYPE, FILE_DIR, FILE_SIZE, SHARED_FLAG, PUBLISHED_FLAG, UPLOADER, AVAILABLE_FLAG, CREATED_TIME, UPDATED_TIME
+        ID, TYPE, FILE_DIR, FILE_SIZE, SHARED_FLAG, PUBLISHED_FLAG, UPLOADER, AVAILABLE_FLAG, COMPLETED_FLAG, CREATED_TIME, UPDATED_TIME
     </sql>
 
 </mapper>

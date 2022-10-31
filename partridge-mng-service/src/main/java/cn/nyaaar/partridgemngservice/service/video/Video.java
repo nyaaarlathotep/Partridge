@@ -2,6 +2,7 @@ package cn.nyaaar.partridgemngservice.service.video;
 
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
+import cn.nyaaar.partridgemngservice.common.enums.CompleteFlagEnum;
 import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.entity.EleFile;
@@ -57,6 +58,7 @@ public abstract class Video {
         EleFile eleFile = new EleFile()
                 .setEleId(element.getId())
                 .setType(FileTypeEnum.getTypeBySuffix(fileReq.getFileName()).getSuffix())
+                .setCompletedFlag(CompleteFlagEnum.UPLOADING.getCode())
                 .setAvailableFlag(PrConstant.VALIDATED)
                 .setName(FileUtil.legalizeFileName(fileReq.getFileName()));
         eleFileService.save(eleFile);
@@ -68,6 +70,7 @@ public abstract class Video {
                 .setType(SourceEnum.Jav.getCode())
                 .setUploader(ThreadLocalUtil.getCurrentUser())
                 .setFileSize(0L)
+                .setCompletedFlag(CompleteFlagEnum.UPLOADING.getCode())
                 .setAvailableFlag(PrConstant.VALIDATED)
                 .setSharedFlag(PrConstant.NO);
         elementService.save(element);

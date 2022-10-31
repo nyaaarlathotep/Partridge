@@ -75,16 +75,12 @@ public class DownloadServiceImpl implements DownloadService {
         Request request = new EhRequestBuilder(url, null).build();
         String urlBase64 = "";
         try {
-            Response response = okHttpClient.newCall(request).execute();
-            urlBase64 = FileUtil.bytes2Base64(Objects.requireNonNull(response.body()).bytes());
+            try (Response response = okHttpClient.newCall(request).execute()) {
+                urlBase64 = FileUtil.bytes2Base64(Objects.requireNonNull(response.body()).bytes());
+            }
         } catch (IOException e) {
             BusinessExceptionEnum.HTTP_REQUEST_FAILED.assertFail();
         }
         return urlBase64;
-    }
-
-    @Override
-    public void addTorrentJob() {
-        
     }
 }

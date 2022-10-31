@@ -3,6 +3,7 @@ package cn.nyaaar.partridgemngservice.service.ehService.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
+import cn.nyaaar.partridgemngservice.common.enums.CompleteFlagEnum;
 import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
@@ -175,6 +176,7 @@ public class EhServiceImpl implements EhService {
         if (ehentaiGalleryOld == null) {
             Element element = new Element();
             element.setType(SourceEnum.Ehentai.getCode());
+            element.setCompletedFlag(CompleteFlagEnum.INFO_ONLY.getCode());
             element.setAvailableFlag(PrConstant.VALIDATED);
             elementService.save(element);
             eleId = element.getId();

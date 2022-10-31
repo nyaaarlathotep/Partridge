@@ -13,11 +13,11 @@ import java.util.List;
 
 /**
  * <p>
- * 基本元素表 服务实现类
+ * 基本元素表，包含相关控制信息 服务实现类
  * </p>
  *
  * @author nyaaar
- * @since 2022-10-08
+ * @since 2022-10-31
  */
 @Service
 public class ElementServiceImpl extends ServiceImpl<ElementMapper, Element> implements ElementService {

@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.nyaaar.partridgemngservice.common.constants.EhUrl;
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
+import cn.nyaaar.partridgemngservice.common.enums.CompleteFlagEnum;
 import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
@@ -160,7 +161,7 @@ public class EhDownload {
         eleFile.setPath(FileUtil.simpleConcatPath(folder, eleFile.getName()));
         eleFile.setPageNum(pageIndex);
         eleFile.setAvailableFlag(PrConstant.VALIDATED);
-        eleFile.setCompletedFlag(PrConstant.YES);
+        eleFile.setCompletedFlag(CompleteFlagEnum.DOWNLOADED.getCode());
         eleFile.setType(fileTypeEnum.getCode());
         return eleFile;
     }
@@ -180,15 +181,15 @@ public class EhDownload {
         long gid = downloadingGallery.getGid();
         Long elementBytes = FileUtil.getFolderSize(downloadingGallery.getFolderPath());
         downloadingGalleryQueue.remove(gid);
-        // TODO complete flag for element
         elementService.update(Wrappers.lambdaUpdate(Element.class)
                 .set(Element::getFileDir, downloadingGallery.getFolderPath())
                 .set(Element::getFileSize, elementBytes)
+                .set(Element::getCompletedFlag, CompleteFlagEnum.DOWNLOADED)
                 .eq(Element::getId, downloadingGallery.getEleId()));
         appUserService.minusUserSpaceLimit(ThreadLocalUtil.getCurrentUser(), elementBytes);
         ehentaiGalleryService.update(Wrappers.lambdaUpdate(EhentaiGallery.class)
                 .eq(EhentaiGallery::getGid, gid)
-                .set(EhentaiGallery::getDownloadFlag, PrConstant.DOWNLOADED));
+                .set(EhentaiGallery::getDownloadFlag, PrConstant.YES));
         log.info("[{}]gallery download complete!", gid);
     }
 
@@ -239,7 +240,7 @@ public class EhDownload {
             for (Long gid : deadGalleries) {
                 downloadingGalleryQueue.remove(gid);
                 ehentaiGalleryService.update(Wrappers.lambdaUpdate(EhentaiGallery.class)
-                        .set(EhentaiGallery::getDownloadFlag, PrConstant.UN_DOWNLOADED)
+                        .set(EhentaiGallery::getDownloadFlag, PrConstant.NO)
                         .eq(EhentaiGallery::getGid, gid));
             }
         }

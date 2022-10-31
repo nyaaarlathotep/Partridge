@@ -14,11 +14,11 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 基本元素表
+ * 基本元素表，包含相关控制信息
  * </p>
  *
  * @author nyaaar
- * @since 2022-10-08
+ * @since 2022-10-31
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -69,6 +69,12 @@ public class Element extends Model<Element> {
      */
     @TableField("AVAILABLE_FLAG")
     private Integer availableFlag;
+
+    /**
+     * 完成标志(0-禁用;1-启用)
+     */
+    @TableField("COMPLETED_FLAG")
+    private Integer completedFlag;
 
     @TableField(value = "CREATED_TIME", fill = FieldFill.INSERT)
     private Date createdTime;

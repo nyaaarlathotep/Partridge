@@ -10,6 +10,4 @@ public interface DownloadService {
     void downloadUrlToDest(String url, String dest, String fileName, Runnable successHandle, Runnable failHandle, boolean reDownload);
 
     String downloadUrlToBase64(String url);
-
-    void addTorrentJob();
 }
