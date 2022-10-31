@@ -195,8 +195,21 @@ public class EhServiceImpl implements EhService {
     }
 
     @Override
-    public Map<Long, DownloadingGallery> getDownloadingQueue() {
-        return ehDownload.getDownloadingQueue();
+    public Collection<DownloadingGallery> getDownloadingQueue() {
+        String userName = ThreadLocalUtil.getCurrentUser();
+        if (appUserService.isRoot(userName)) {
+            return ehDownload.getDownloadingQueue().values();
+        }
+        Map<Long, DownloadingGallery> downloadingGalleryMap = ehDownload.getDownloadingQueue();
+        Collection<DownloadingGallery> downloadingGalleries = new ArrayList<>();
+        Iterator<DownloadingGallery> iterator = downloadingGalleryMap.values().iterator();
+        if (iterator.hasNext()) {
+            DownloadingGallery downloadingGallery = iterator.next();
+            if (downloadingGallery.getUserName().equals(userName)) {
+                downloadingGalleries.add(downloadingGallery);
+            }
+        }
+        return downloadingGalleries;
     }
 
     private GalleryPage getGalleryPage(EleFile eleFile) {

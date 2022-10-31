@@ -158,8 +158,8 @@ public class ElementMngServiceImpl implements ElementMngService {
     public List<Actor> getEleActors(Long elementId) {
         List<EleActorRe> eleActorRes = eleActorReService.list(new LambdaQueryWrapper<EleActorRe>().
                 eq(EleActorRe::getEleId, elementId));
-        return actorService.list(new LambdaQueryWrapper<Actor>().in(Actor::getId,
-                eleActorRes.stream().map(EleActorRe::getActorId).toList()));
+        return actorService.list(new LambdaQueryWrapper<Actor>()
+                .in(Actor::getId, eleActorRes.stream().map(EleActorRe::getActorId).toList()));
     }
 
     @Override

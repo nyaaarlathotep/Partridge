@@ -3,7 +3,7 @@ package cn.nyaaar.partridgemngservice.service.ehService;
 import cn.nyaaar.partridgemngservice.model.eh.*;
 import cn.nyaaar.partridgemngservice.model.ListResp;
 
-import java.util.Map;
+import java.util.Collection;
 
 /**
  * @author nyaaar
@@ -54,7 +54,7 @@ public interface EhService {
      *
      * @return queue
      */
-    Map<Long, DownloadingGallery> getDownloadingQueue();
+    Collection<DownloadingGallery> getDownloadingQueue();
 
     /**
      * eleId->GalleryBasicInfo

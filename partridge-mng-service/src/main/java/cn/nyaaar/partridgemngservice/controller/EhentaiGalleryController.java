@@ -63,9 +63,7 @@ public class EhentaiGalleryController {
     @GetMapping(value = "/download/queue")
     @LogAnnotation
     public R<Collection<DownloadingGallery>> getDownloadQueue() {
-        // TODO user, dto
-
-        return new R<>(ehService.getDownloadingQueue().values());
+        return new R<>(ehService.getDownloadingQueue());
     }
 
     @Operation(summary = "gallery 基本信息列表", description = "通过高级搜索获得 gallery 基本信息列表，不存在的 tag 等信息不会加入搜索条件")
