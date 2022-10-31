@@ -98,10 +98,11 @@ func startServer() {
 				c.JSON(400, gin.H{
 					"message": fmt.Sprintf(err.Error()),
 				})
+			} else {
+				c.JSON(200, gin.H{
+					"message": "SUCCESS",
+				})
 			}
-			c.JSON(200, gin.H{
-				"message": "SUCCESS",
-			})
 		} else {
 			c.JSON(400, gin.H{
 				"message": "form error",
