@@ -1,14 +1,18 @@
 package cn.nyaaar.partridgemngservice.controller;
 
 import cn.nyaaar.partridgemngservice.common.annotation.LogAnnotation;
-import cn.nyaaar.partridgemngservice.model.ElementDto;
+import cn.nyaaar.partridgemngservice.model.element.CollectionDto;
+import cn.nyaaar.partridgemngservice.model.element.CollectionEleDto;
+import cn.nyaaar.partridgemngservice.model.element.ElementDto;
 import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.model.response.R;
-import cn.nyaaar.partridgemngservice.service.ElementService;
+import cn.nyaaar.partridgemngservice.model.validate.Add;
+import cn.nyaaar.partridgemngservice.model.validate.Delete;
 import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -77,8 +81,48 @@ public class ElementController {
     @Operation(summary = "取消喜爱对应的元素")
     @GetMapping(value = "/unlike")
     @LogAnnotation
-    public R<CheckResp> unlike(@RequestParam Long eleId) {
+    public R<String> unlike(@RequestParam Long eleId) {
         elementMngService.unlike(eleId);
+        return new R<>();
+    }
+
+    @Operation(summary = "新增合集", description = "新增合集，返回新增集合的 id")
+    @PostMapping(value = "/collection/add")
+    @LogAnnotation
+    public R<Integer> addCollection(@RequestBody @Validated(Add.class) CollectionDto collectionDto) {
+
+        return new R<>(elementMngService.addCollection(collectionDto));
+    }
+
+    @Operation(summary = "获取用户对应集合")
+    @GetMapping(value = "/collection/get")
+    @LogAnnotation
+    public R<List<CollectionDto>> getCollection(@RequestParam String userName) {
+
+        return new R<>(elementMngService.getCollections(userName));
+    }
+
+    @Operation(summary = "合集新增元素")
+    @PostMapping(value = "/collection/add/element")
+    @LogAnnotation
+    public R<String> collectionAddElement(@RequestBody CollectionEleDto collectionEleDto) {
+        elementMngService.collectionAddElement(collectionEleDto);
+        return new R<>();
+    }
+
+    @Operation(summary = "合集删除元素")
+    @PostMapping(value = "/collection/delete/element")
+    @LogAnnotation
+    public R<String> collectionDeleteElement(@RequestBody CollectionEleDto collectionEleDto) {
+        elementMngService.collectionDeleteElement(collectionEleDto);
+        return new R<>();
+    }
+
+    @Operation(summary = "删除合集")
+    @PostMapping(value = "/collection/delete")
+    @LogAnnotation
+    public R<String> deleteCollection(@RequestBody @Validated(Delete.class) CollectionDto collectionDto) {
+        elementMngService.deleteCollection(collectionDto);
         return new R<>();
     }
 

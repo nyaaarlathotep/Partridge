@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.model;
+package cn.nyaaar.partridgemngservice.model.element;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

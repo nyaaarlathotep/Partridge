@@ -4,7 +4,9 @@ import cn.nyaaar.partridgemngservice.common.enums.EleOrgReTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.Actor;
 import cn.nyaaar.partridgemngservice.entity.Organization;
 import cn.nyaaar.partridgemngservice.entity.TagInfo;
-import cn.nyaaar.partridgemngservice.model.ElementDto;
+import cn.nyaaar.partridgemngservice.model.element.CollectionDto;
+import cn.nyaaar.partridgemngservice.model.element.CollectionEleDto;
+import cn.nyaaar.partridgemngservice.model.element.ElementDto;
 import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 
 import java.util.List;
@@ -33,6 +35,7 @@ public interface ElementMngService {
 
     /**
      * 通过主键id获取element基本信息
+     *
      * @param eleId eleId
      * @return ElementDto
      */
@@ -58,6 +61,43 @@ public interface ElementMngService {
      * @param elementId elementId
      */
     void publish(Long elementId);
+
+    /**
+     * 新增 collection，返回新增的合集的 id
+     *
+     * @param collectionDto collectionDto
+     * @return collection id
+     */
+    Integer addCollection(CollectionDto collectionDto);
+
+    /**
+     * 合集增添元素
+     *
+     * @param collectionEleDto collectionEleDto
+     */
+    void collectionAddElement(CollectionEleDto collectionEleDto);
+
+    /**
+     * 合集增添元素
+     *
+     * @param collectionEleDto collectionEleDto
+     */
+    void collectionDeleteElement(CollectionEleDto collectionEleDto);
+   
+    /**
+     * 新增 collection，返回新增的合集的 id
+     *
+     * @param collectionDto collectionDto
+     */
+    void deleteCollection(CollectionDto collectionDto);
+
+    /**
+     * 获取 collections，如果 userName 为空，则返回当前用户的合集
+     *
+     * @param userName userName
+     * @return List<CollectionDto>
+     */
+    List<CollectionDto> getCollections(String userName);
 
     /**
      * 检查当前登录用户对于 element 是否有读权限

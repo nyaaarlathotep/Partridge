@@ -5,10 +5,11 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="cn.nyaaar.partridgemngservice.entity.PrCollection">
         <id column="ID" property="id" />
-        <result column="USER_ID" property="userId" />
+        <result column="USER_NAME" property="userName" />
         <result column="C_NAME" property="cName" />
         <result column="C_DESC" property="cDesc" />
         <result column="ELE_ID_GROUP" property="eleIdGroup" />
+        <result column="SHARED_FLAG" property="sharedFlag" />
         <result column="AVAILABLE_FLAG" property="availableFlag" />
         <result column="CREATED_TIME" property="createdTime" />
         <result column="UPDATED_TIME" property="updatedTime" />
@@ -16,7 +17,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        ID, USER_ID, C_NAME, C_DESC, ELE_ID_GROUP, AVAILABLE_FLAG, CREATED_TIME, UPDATED_TIME
+        ID, USER_NAME, C_NAME, C_DESC, ELE_ID_GROUP, SHARED_FLAG, AVAILABLE_FLAG, CREATED_TIME, UPDATED_TIME
     </sql>
 
 </mapper>

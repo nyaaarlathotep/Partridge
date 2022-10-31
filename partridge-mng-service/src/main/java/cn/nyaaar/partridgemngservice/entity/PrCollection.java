@@ -31,8 +31,8 @@ public class PrCollection extends Model<PrCollection> {
     @TableId(value = "ID", type = IdType.AUTO)
     private Integer id;
 
-    @TableField("USER_ID")
-    private Integer userId;
+    @TableField("USER_NAME")
+    private String userName;
 
     /**
      * 合集名称
@@ -51,6 +51,12 @@ public class PrCollection extends Model<PrCollection> {
      */
     @TableField("ELE_ID_GROUP")
     private String eleIdGroup;
+
+    /**
+     * 分享标志(0-否;1-是)
+     */
+    @TableField("SHARED_FLAG")
+    private Integer sharedFlag;
 
     /**
      * 启用标志(0-禁用;1-启用)

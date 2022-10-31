@@ -5,7 +5,9 @@ import cn.nyaaar.partridgemngservice.common.enums.CompleteFlagEnum;
 import cn.nyaaar.partridgemngservice.common.enums.EleOrgReTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
-import cn.nyaaar.partridgemngservice.model.ElementDto;
+import cn.nyaaar.partridgemngservice.model.element.CollectionDto;
+import cn.nyaaar.partridgemngservice.model.element.CollectionEleDto;
+import cn.nyaaar.partridgemngservice.model.element.ElementDto;
 import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.service.*;
 import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
@@ -17,14 +19,13 @@ import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author yuegenhua
@@ -46,6 +47,8 @@ public class ElementMngServiceImpl implements ElementMngService {
     private final TagInfoService tagInfoService;
     private final EleTagReService eleTagReService;
     private final UserEleLikeService userEleLikeService;
+    private final PrCollectionService prcs;
+    private final UserCollectionLikeService ucls;
 
     public ElementMngServiceImpl(ElementService elementService,
                                  AppUserService appUserService,
@@ -58,7 +61,7 @@ public class ElementMngServiceImpl implements ElementMngService {
                                  EleActorReService eleActorReService,
                                  TagInfoService tagInfoService,
                                  EleTagReService eleTagReService,
-                                 UserEleLikeService userEleLikeService) {
+                                 UserEleLikeService userEleLikeService, PrCollectionService prcs, UserCollectionLikeService ucls) {
         this.elementService = elementService;
         this.appUserService = appUserService;
         this.eleFileService = eleFileService;
@@ -71,6 +74,8 @@ public class ElementMngServiceImpl implements ElementMngService {
         this.tagInfoService = tagInfoService;
         this.eleTagReService = eleTagReService;
         this.userEleLikeService = userEleLikeService;
+        this.prcs = prcs;
+        this.ucls = ucls;
     }
 
     @Override
@@ -167,6 +172,75 @@ public class ElementMngServiceImpl implements ElementMngService {
     }
 
     @Override
+    public Integer addCollection(CollectionDto collectionDto) {
+        PrCollection prCollection = new PrCollection()
+                .setAvailableFlag(PrConstant.VALIDATED)
+                .setUserName(ThreadLocalUtil.getCurrentUser())
+                .setCName(collectionDto.getName())
+                .setCDesc(collectionDto.getDesc())
+                .setSharedFlag(PrConstant.NO);
+        prcs.save(prCollection);
+        return prCollection.getId();
+    }
+
+    @Override
+    public void collectionAddElement(CollectionEleDto collectionEleDto) {
+
+    }
+
+    @Override
+    public void collectionDeleteElement(CollectionEleDto collectionEleDto) {
+
+    }
+
+    @Override
+    public void deleteCollection(CollectionDto collectionDto) {
+        getPrCollection(collectionDto);
+        prcs.update(Wrappers.lambdaUpdate(PrCollection.class)
+                .set(PrCollection::getAvailableFlag, PrConstant.INVALIDATED)
+                .eq(PrCollection::getId, collectionDto.getId()));
+    }
+
+
+    @Override
+    public List<CollectionDto> getCollections(String userName) {
+        if (StringUtils.isEmpty(userName)) {
+            userName = ThreadLocalUtil.getCurrentUser();
+        }
+        List<PrCollection> prCollections = prcs.list(Wrappers.lambdaQuery(PrCollection.class)
+                .eq(PrCollection::getUserName, userName));
+
+        return getCollectionDtos(prCollections);
+    }
+
+    @NotNull
+    private List<CollectionDto> getCollectionDtos(List<PrCollection> prCollections) {
+        if (prCollections.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<UserCollectionLike> likes = ucls.list(Wrappers.lambdaQuery(UserCollectionLike.class)
+                .in(UserCollectionLike::getCollectionId, prCollections.stream().map(PrCollection::getId).toList()));
+
+        return prCollections.parallelStream()
+                .map(prCollection -> new CollectionDto()
+                        .setId(prCollection.getId())
+                        .setName(prCollection.getCName())
+                        .setDesc(prCollection.getCDesc())
+                        .setLikes((int) likes.stream()
+                                .filter(like -> like.getCollectionId().equals(prCollection.getId()))
+                                .count())
+                        .setEleIds(getCollectionEleIds(prCollection)))
+                .toList();
+    }
+
+    @NotNull
+    private static List<Long> getCollectionEleIds(PrCollection prCollection) {
+        return Arrays.stream(prCollection.getEleIdGroup().split(","))
+                .map(Long::parseLong)
+                .toList();
+    }
+
+    @Override
     public List<CheckResp> getUploadingElements() {
         String userName = ThreadLocalUtil.getCurrentUser();
         return elementService
@@ -242,5 +316,11 @@ public class ElementMngServiceImpl implements ElementMngService {
         Element element = elementService.getById(eleId);
         BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
         return element;
+    }
+
+    private PrCollection getPrCollection(CollectionDto collectionDto) {
+        PrCollection prCollection = prcs.getById(collectionDto.getId());
+        BusinessExceptionEnum.NOT_FOUND.assertNotNull(prCollection, "集合");
+        return prCollection;
     }
 }
