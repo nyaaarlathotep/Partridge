@@ -4,6 +4,7 @@ import cn.nyaaar.partridgemngservice.common.enums.EleOrgReTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.Actor;
 import cn.nyaaar.partridgemngservice.entity.Organization;
 import cn.nyaaar.partridgemngservice.entity.TagInfo;
+import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.element.CollectionDto;
 import cn.nyaaar.partridgemngservice.model.element.CollectionEleDto;
 import cn.nyaaar.partridgemngservice.model.element.ElementDto;
@@ -40,6 +41,14 @@ public interface ElementMngService {
      * @return ElementDto
      */
     ElementDto getEle(Long eleId);
+
+    /**
+     * 通过主键id获取element基本信息
+     *
+     * @param elementIds elementIds
+     * @return ElementDto
+     */
+    List<ElementDto> getElements(List<Long> elementIds);
 
     /**
      * 当前用户喜爱对应的元素
@@ -83,7 +92,7 @@ public interface ElementMngService {
      * @param collectionEleDto collectionEleDto
      */
     void collectionDeleteElement(CollectionEleDto collectionEleDto);
-   
+
     /**
      * 新增 collection，返回新增的合集的 id
      *
@@ -94,10 +103,11 @@ public interface ElementMngService {
     /**
      * 获取 collections，如果 userName 为空，则返回当前用户的合集
      *
-     * @param userName userName
+     * @param userName  userName
+     * @param pageIndex pageIndex
      * @return List<CollectionDto>
      */
-    List<CollectionDto> getCollections(String userName);
+    ListResp<CollectionDto> getCollections(String userName, Integer pageIndex);
 
     /**
      * 检查当前登录用户对于 element 是否有读权限

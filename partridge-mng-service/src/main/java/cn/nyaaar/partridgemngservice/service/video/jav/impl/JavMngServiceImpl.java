@@ -66,6 +66,7 @@ public class JavMngServiceImpl extends Video implements JavMngService {
 
     @Override
     public ListResp<JavBasicInfo> getJavList(JavQuery javQuery, int pageIndex) {
+        // TODO pageSize settings
         Page<Jav> page = new Page<>(pageIndex, 10);
         LambdaQueryWrapper<Jav> lambdaQueryWrapper = getJavLambdaQueryWrapper(javQuery);
         queryPage(javQuery, page, lambdaQueryWrapper);

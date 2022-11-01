@@ -71,7 +71,7 @@ public class Element extends Model<Element> {
     private Integer availableFlag;
 
     /**
-     * 完成标志(0-禁用;1-启用)
+     * 完成标志
      */
     @TableField("COMPLETED_FLAG")
     private Integer completedFlag;

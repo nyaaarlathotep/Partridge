@@ -24,4 +24,10 @@ public class ElementDto {
     @Schema(title = "收到喜爱的数量")
     private Integer likes;
 
+    @Schema(title = "是否可用，已被上传者删除或其他原因")
+    private Boolean available;
+
+    @Schema(title = "是否完成")
+    private Boolean completed;
+
 }

@@ -1,6 +1,7 @@
 package cn.nyaaar.partridgemngservice.controller;
 
 import cn.nyaaar.partridgemngservice.common.annotation.LogAnnotation;
+import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.element.CollectionDto;
 import cn.nyaaar.partridgemngservice.model.element.CollectionEleDto;
 import cn.nyaaar.partridgemngservice.model.element.ElementDto;
@@ -38,12 +39,20 @@ public class ElementController {
         this.elementMngService = elementMngService;
     }
 
-    @Operation(summary = "element基本信息", description = "通过主键id获取element基本信息")
+    @Operation(summary = "获取 element 基本信息", description = "通过主键 id 获取 element 基本信息")
     @GetMapping(value = "/element")
     @LogAnnotation
     public R<ElementDto> getElementById(@RequestParam Long elementId) {
 
         return new R<>(elementMngService.getEle(elementId));
+    }
+
+    @Operation(summary = "获取 elements 基本信息", description = "通过主键 id 获取 element 基本信息")
+    @GetMapping(value = "/elements")
+    @LogAnnotation
+    public R<List<ElementDto>> getElementById(@RequestParam List<Long> elementIds) {
+
+        return new R<>(elementMngService.getElements(elementIds));
     }
 
     @Operation(summary = "分享 element", description = "通过主键id 分享 element")
@@ -95,11 +104,11 @@ public class ElementController {
     }
 
     @Operation(summary = "获取用户对应集合")
-    @GetMapping(value = "/collection/get")
+    @GetMapping(value = "/collection/get/{pageIndex}")
     @LogAnnotation
-    public R<List<CollectionDto>> getCollection(@RequestParam String userName) {
+    public R<ListResp<CollectionDto>> getCollection(@RequestParam String userName, @PathVariable Integer pageIndex) {
 
-        return new R<>(elementMngService.getCollections(userName));
+        return new R<>(elementMngService.getCollections(userName, pageIndex));
     }
 
     @Operation(summary = "合集新增元素")

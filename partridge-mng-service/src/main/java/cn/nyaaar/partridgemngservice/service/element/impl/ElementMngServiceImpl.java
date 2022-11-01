@@ -5,6 +5,7 @@ import cn.nyaaar.partridgemngservice.common.enums.CompleteFlagEnum;
 import cn.nyaaar.partridgemngservice.common.enums.EleOrgReTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
+import cn.nyaaar.partridgemngservice.model.ListResp;
 import cn.nyaaar.partridgemngservice.model.element.CollectionDto;
 import cn.nyaaar.partridgemngservice.model.element.CollectionEleDto;
 import cn.nyaaar.partridgemngservice.model.element.ElementDto;
@@ -18,6 +19,7 @@ import cn.nyaaar.partridgemngservice.util.StringUtils;
 import cn.nyaaar.partridgemngservice.util.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -93,13 +95,19 @@ public class ElementMngServiceImpl implements ElementMngService {
     public ElementDto getEle(Long eleId) {
         Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, eleId));
         BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
-        List<UserEleLike> likes = userEleLikeService.list(Wrappers.lambdaQuery(UserEleLike.class)
-                .eq(UserEleLike::getEleId, eleId)
-                .eq(UserEleLike::getAvailableFlag, PrConstant.VALIDATED));
-        return new ElementDto()
-                .setId(eleId)
-                .setType(element.getType())
-                .setLikes(likes.size());
+        return getElementDto(element);
+    }
+
+    @Override
+    public List<ElementDto> getElements(List<Long> elementIds) {
+        if (elementIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return elementService.list(Wrappers.lambdaQuery(Element.class)
+                        .in(Element::getId, elementIds)).stream()
+                .map(this::getElementDto)
+                .sorted(Comparator.comparing(ElementDto::getId))
+                .toList();
     }
 
     @Override
@@ -213,14 +221,18 @@ public class ElementMngServiceImpl implements ElementMngService {
     }
 
     @Override
-    public List<CollectionDto> getCollections(String userName) {
+    public ListResp<CollectionDto> getCollections(String userName, Integer pageIndex) {
         if (StringUtils.isEmpty(userName)) {
             userName = ThreadLocalUtil.getCurrentUser();
         }
-        List<PrCollection> prCollections = prcs.list(Wrappers.lambdaQuery(PrCollection.class)
-                .eq(PrCollection::getUserName, userName));
-
-        return getCollectionDtos(prCollections);
+        Page<PrCollection> page = new Page<>(pageIndex, 10);
+        prcs.page(page, Wrappers.lambdaQuery(PrCollection.class)
+                .eq(PrCollection::getUserName, userName)
+                .orderByDesc(PrCollection::getId));
+        return new ListResp<CollectionDto>()
+                .setList(getCollectionDtos(page.getRecords()))
+                .setPages(page.getPages())
+                .setCurrent(page.getCurrent());
     }
 
     @NotNull
@@ -229,7 +241,10 @@ public class ElementMngServiceImpl implements ElementMngService {
             return Collections.emptyList();
         }
         List<UserCollectionLike> likes = ucls.list(Wrappers.lambdaQuery(UserCollectionLike.class)
-                .in(UserCollectionLike::getCollectionId, prCollections.stream().map(PrCollection::getId).toList()));
+                .in(UserCollectionLike::getCollectionId,
+                        prCollections.stream()
+                                .map(PrCollection::getId)
+                                .toList()));
 
         return prCollections.parallelStream()
                 .map(prCollection -> new CollectionDto()
@@ -258,6 +273,7 @@ public class ElementMngServiceImpl implements ElementMngService {
                         .eq(FileUploadInfo::getEleFileId, eleFile.getId())
                         .eq(FileUploadInfo::getUploadFlag, PrConstant.NO))).filter(Objects::nonNull)
                 .map(fileUploadInfo -> uploadService.check(fileUploadInfo.getEleFileId())).filter(Objects::nonNull)
+                .sorted(Comparator.comparing(CheckResp::getEleFileId))
                 .toList();
     }
 
@@ -348,5 +364,17 @@ public class ElementMngServiceImpl implements ElementMngService {
         List<Long> ids = getCollectionEleIds(collection);
         ids.remove(collectionEleDto.getEleId());
         return ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+    }
+
+    private ElementDto getElementDto(Element element) {
+        List<UserEleLike> likes = userEleLikeService.list(Wrappers.lambdaQuery(UserEleLike.class)
+                .eq(UserEleLike::getEleId, element.getId())
+                .eq(UserEleLike::getAvailableFlag, PrConstant.VALIDATED));
+        return new ElementDto()
+                .setId(element.getId())
+                .setType(element.getType())
+                .setCompleted(CompleteFlagEnum.completed(element.getCompletedFlag()))
+                .setAvailable(PrConstant.VALIDATED == element.getAvailableFlag())
+                .setLikes(likes.size());
     }
 }
