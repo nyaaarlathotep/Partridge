@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author yuegenhua
@@ -185,22 +186,31 @@ public class ElementMngServiceImpl implements ElementMngService {
 
     @Override
     public void collectionAddElement(CollectionEleDto collectionEleDto) {
+        PrCollection collection = getPrCollection(collectionEleDto.getCollectionId());
+        getElement(collectionEleDto.getEleId());
 
+        prcs.update(Wrappers.lambdaUpdate(PrCollection.class)
+                .set(PrCollection::getEleIdGroup, getAddedIdGroup(collectionEleDto, collection))
+                .eq(PrCollection::getId, collectionEleDto.getCollectionId()));
     }
 
     @Override
     public void collectionDeleteElement(CollectionEleDto collectionEleDto) {
+        PrCollection collection = getPrCollection(collectionEleDto.getCollectionId());
+        getElement(collectionEleDto.getEleId());
 
+        prcs.update(Wrappers.lambdaUpdate(PrCollection.class)
+                .set(PrCollection::getEleIdGroup, getRemovedIdGroup(collectionEleDto, collection))
+                .eq(PrCollection::getId, collectionEleDto.getCollectionId()));
     }
 
     @Override
     public void deleteCollection(CollectionDto collectionDto) {
-        getPrCollection(collectionDto);
+        getPrCollection(collectionDto.getId());
         prcs.update(Wrappers.lambdaUpdate(PrCollection.class)
                 .set(PrCollection::getAvailableFlag, PrConstant.INVALIDATED)
                 .eq(PrCollection::getId, collectionDto.getId()));
     }
-
 
     @Override
     public List<CollectionDto> getCollections(String userName) {
@@ -230,13 +240,6 @@ public class ElementMngServiceImpl implements ElementMngService {
                                 .filter(like -> like.getCollectionId().equals(prCollection.getId()))
                                 .count())
                         .setEleIds(getCollectionEleIds(prCollection)))
-                .toList();
-    }
-
-    @NotNull
-    private static List<Long> getCollectionEleIds(PrCollection prCollection) {
-        return Arrays.stream(prCollection.getEleIdGroup().split(","))
-                .map(Long::parseLong)
                 .toList();
     }
 
@@ -312,15 +315,38 @@ public class ElementMngServiceImpl implements ElementMngService {
         return Objects.equals(ThreadLocalUtil.getCurrentUser(), element.getUploader());
     }
 
+    @NotNull
     private Element getElement(Long eleId) {
         Element element = elementService.getById(eleId);
         BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
         return element;
     }
 
-    private PrCollection getPrCollection(CollectionDto collectionDto) {
-        PrCollection prCollection = prcs.getById(collectionDto.getId());
+    @NotNull
+    private PrCollection getPrCollection(Integer collectionId) {
+        PrCollection prCollection = prcs.getById(collectionId);
         BusinessExceptionEnum.NOT_FOUND.assertNotNull(prCollection, "集合");
         return prCollection;
+    }
+
+    @NotNull
+    private static List<Long> getCollectionEleIds(PrCollection prCollection) {
+        return Arrays.stream(prCollection.getEleIdGroup().split(","))
+                .map(Long::parseLong)
+                .toList();
+    }
+
+    @NotNull
+    private static String getAddedIdGroup(CollectionEleDto collectionEleDto, PrCollection collection) {
+        List<Long> ids = getCollectionEleIds(collection);
+        ids.add(collectionEleDto.getEleId());
+        return ids.stream().distinct().map(String::valueOf).collect(Collectors.joining(","));
+    }
+
+    @NotNull
+    private static String getRemovedIdGroup(CollectionEleDto collectionEleDto, PrCollection collection) {
+        List<Long> ids = getCollectionEleIds(collection);
+        ids.remove(collectionEleDto.getEleId());
+        return ids.stream().map(String::valueOf).collect(Collectors.joining(","));
     }
 }

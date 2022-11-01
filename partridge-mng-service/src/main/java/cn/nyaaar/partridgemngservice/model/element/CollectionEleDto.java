@@ -21,7 +21,7 @@ public class CollectionEleDto {
 
     @Schema(title = "合集主键 id")
     @NotNull(message = "请指定合集主键 id")
-    private Long collectionId;
+    private Integer collectionId;
 
     @Schema(title = "元素主键 Id")
     @NotNull(message = "请指定元素主键 Id")
