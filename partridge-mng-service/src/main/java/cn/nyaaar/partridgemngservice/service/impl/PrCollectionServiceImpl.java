@@ -17,7 +17,7 @@ import java.util.List;
  * </p>
  *
  * @author nyaaar
- * @since 2022-10-31
+ * @since 2022-11-01
  */
 @Service
 public class PrCollectionServiceImpl extends ServiceImpl<PrCollectionMapper, PrCollection> implements PrCollectionService {

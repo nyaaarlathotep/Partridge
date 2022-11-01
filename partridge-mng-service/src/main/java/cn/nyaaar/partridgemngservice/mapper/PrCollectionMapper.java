@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author nyaaar
- * @since 2022-10-31
+ * @since 2022-11-01
  */
 public interface PrCollectionMapper extends BaseMapper<PrCollection> {
 

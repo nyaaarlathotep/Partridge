@@ -11,7 +11,7 @@ import java.util.List;
  * </p>
  *
  * @author nyaaar
- * @since 2022-10-31
+ * @since 2022-11-01
  */
 public interface PrCollectionService extends IService<PrCollection> {
 

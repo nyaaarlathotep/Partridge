@@ -83,6 +83,7 @@ public class ElementController {
     @GetMapping(value = "/like")
     @LogAnnotation
     public R<String> like(@RequestParam Long eleId) {
+        // TODO sort by like
         elementMngService.like(eleId);
         return new R<>();
     }
@@ -101,6 +102,14 @@ public class ElementController {
     public R<Integer> addCollection(@RequestBody @Validated(Add.class) CollectionDto collectionDto) {
 
         return new R<>(elementMngService.addCollection(collectionDto));
+    }
+
+    @Operation(summary = "分享合集", description = "分享合集，分享集合中的所有元素")
+    @PostMapping(value = "/collection/share")
+    @LogAnnotation
+    public R<String> shareCollection(@RequestBody Integer collectionId) {
+
+        return new R<>();
     }
 
     @Operation(summary = "获取用户对应集合")

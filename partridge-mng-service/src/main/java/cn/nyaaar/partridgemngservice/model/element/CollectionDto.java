@@ -26,8 +26,8 @@ public class CollectionDto {
     @NotNull(groups = {Delete.class}, message = "请指定主键 id")
     private Integer id;
 
-    @Schema(title = "合集包含的 element 主键 id")
-    private List<Long> eleIds;
+    @Schema(title = "合集包含的 element")
+    private List<ElementDto> elementDtos;
 
     @Schema(title = "合集名称")
     @NotNull(groups = {Add.class}, message = "请指定合集名称")

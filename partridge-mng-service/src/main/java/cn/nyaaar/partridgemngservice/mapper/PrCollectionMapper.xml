@@ -8,7 +8,6 @@
         <result column="USER_NAME" property="userName" />
         <result column="C_NAME" property="cName" />
         <result column="C_DESC" property="cDesc" />
-        <result column="ELE_ID_GROUP" property="eleIdGroup" />
         <result column="SHARED_FLAG" property="sharedFlag" />
         <result column="AVAILABLE_FLAG" property="availableFlag" />
         <result column="CREATED_TIME" property="createdTime" />
@@ -17,7 +16,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        ID, USER_NAME, C_NAME, C_DESC, ELE_ID_GROUP, SHARED_FLAG, AVAILABLE_FLAG, CREATED_TIME, UPDATED_TIME
+        ID, USER_NAME, C_NAME, C_DESC, SHARED_FLAG, AVAILABLE_FLAG, CREATED_TIME, UPDATED_TIME
     </sql>
 
 </mapper>

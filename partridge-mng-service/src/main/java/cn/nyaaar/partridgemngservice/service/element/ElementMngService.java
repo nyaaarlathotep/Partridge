@@ -18,7 +18,6 @@ import java.util.Optional;
  * @Version $Id: ElementService.java, v 0.1 2022-30 17:31 yuegenhua Exp $$
  */
 public interface ElementMngService {
-    // TODO elementControl
 
     /**
      * 分享 element 对所有用户可见
@@ -78,6 +77,13 @@ public interface ElementMngService {
      * @return collection id
      */
     Integer addCollection(CollectionDto collectionDto);
+
+    /**
+     * 新增 collection，返回新增的合集的 id
+     *
+     * @param collectionId collectionId
+     */
+    void shareCollection(Integer collectionId);
 
     /**
      * 合集增添元素

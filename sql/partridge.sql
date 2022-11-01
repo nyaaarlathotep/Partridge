@@ -11,7 +11,7 @@
  Target Server Version : 80027
  File Encoding         : 65001
 
- Date: 31/10/2022 18:15:16
+ Date: 01/11/2022 14:02:26
 */
 
 SET NAMES utf8mb4;
@@ -40,6 +40,18 @@ CREATE TABLE `author`  (
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for collection_ele_re
+-- ----------------------------
+DROP TABLE IF EXISTS `collection_ele_re`;
+CREATE TABLE `collection_ele_re`  (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `COLLECTION_ID` int NOT NULL,
+  `ELE_ID` bigint NOT NULL,
+  PRIMARY KEY (`ID`) USING BTREE,
+  UNIQUE INDEX `unique`(`ELE_ID`, `COLLECTION_ID`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '合集元素关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for ehentai_gallery
@@ -161,7 +173,7 @@ CREATE TABLE `element`  (
   `PUBLISHED_FLAG` tinyint NULL DEFAULT 0 COMMENT '释放标志(0-否;1-是)，释放后上传者将不能删除元素',
   `UPLOADER` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '上传用户',
   `AVAILABLE_FLAG` tinyint NULL DEFAULT 1 COMMENT '启用标志(0-禁用;1-启用)',
-  `COMPLETED_FLAG` tinyint NULL DEFAULT 0 COMMENT '完成标志(0-禁用;1-启用)',
+  `COMPLETED_FLAG` tinyint NULL DEFAULT 0 COMMENT '完成标志',
   `CREATED_TIME` datetime NULL DEFAULT NULL,
   `UPDATED_TIME` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
@@ -229,7 +241,6 @@ CREATE TABLE `pr_collection`  (
   `USER_NAME` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `C_NAME` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '合集名称',
   `C_DESC` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '合集描述',
-  `ELE_ID_GROUP` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '合集对应的 eleId，以 , 隔开',
   `SHARED_FLAG` tinyint NULL DEFAULT 0 COMMENT '分享标志(0-否;1-是)',
   `AVAILABLE_FLAG` tinyint NULL DEFAULT 1 COMMENT '启用标志(0-禁用;1-启用)',
   `CREATED_TIME` date NULL DEFAULT NULL COMMENT '创建时间',

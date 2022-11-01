@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author nyaaar
- * @since 2022-10-31
+ * @since 2022-11-01
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -45,12 +45,6 @@ public class PrCollection extends Model<PrCollection> {
      */
     @TableField("C_DESC")
     private String cDesc;
-
-    /**
-     * 合集对应的 eleId，以 , 隔开
-     */
-    @TableField("ELE_ID_GROUP")
-    private String eleIdGroup;
 
     /**
      * 分享标志(0-否;1-是)
