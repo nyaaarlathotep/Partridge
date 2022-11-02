@@ -90,6 +90,9 @@ public class ElementMngServiceImpl implements ElementMngService {
     public void share(Long eleId) {
         Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, eleId));
         BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
+        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(
+                Objects.equals(element.getUploader(), ThreadLocalUtil.getCurrentUser())
+                        || appUserService.isRoot(ThreadLocalUtil.getCurrentUser()));
         checkEleFilesCompleted(eleId);
         elementService.update(Wrappers.lambdaUpdate(Element.class)
                 .set(Element::getSharedFlag, PrConstant.YES)
@@ -198,8 +201,28 @@ public class ElementMngServiceImpl implements ElementMngService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void shareCollection(Integer collectionId) {
+        PrCollection prCollection = getPrCollection(collectionId);
+        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(
+                Objects.equals(prCollection.getUserName(), ThreadLocalUtil.getCurrentUser())
+                        || appUserService.isRoot(ThreadLocalUtil.getCurrentUser()));
 
+        prcs.update(Wrappers.lambdaUpdate(PrCollection.class)
+                .set(PrCollection::getSharedFlag, PrConstant.YES)
+                .eq(PrCollection::getId, collectionId));
+        getEleIds(prCollection)
+                .forEach(eleId -> {
+                    Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, eleId));
+                    BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
+                    if (Objects.equals(element.getUploader(), ThreadLocalUtil.getCurrentUser())
+                            || appUserService.isRoot(ThreadLocalUtil.getCurrentUser())) {
+                        checkEleFilesCompleted(eleId);
+                        elementService.update(Wrappers.lambdaUpdate(Element.class)
+                                .set(Element::getSharedFlag, PrConstant.YES)
+                                .eq(Element::getId, eleId));
+                    }
+                });
     }
 
     @Override
@@ -222,9 +245,7 @@ public class ElementMngServiceImpl implements ElementMngService {
                 .eq(CollectionEleRe::getEleId, collectionEleDto.getEleId()));
     }
 
-    @Override
     public void deleteCollection(CollectionDto collectionDto) {
-        // TODO
         getPrCollection(collectionDto.getId());
         prcs.update(Wrappers.lambdaUpdate(PrCollection.class)
                 .set(PrCollection::getAvailableFlag, PrConstant.INVALIDATED)
@@ -239,6 +260,8 @@ public class ElementMngServiceImpl implements ElementMngService {
         Page<PrCollection> page = new Page<>(pageIndex, 10);
         prcs.page(page, Wrappers.lambdaQuery(PrCollection.class)
                 .eq(PrCollection::getUserName, userName)
+                .eq(PrCollection::getAvailableFlag, PrConstant.VALIDATED)
+                .eq(PrCollection::getSharedFlag, PrConstant.YES)
                 .orderByDesc(PrCollection::getId));
         return new ListResp<CollectionDto>()
                 .setList(getCollectionDtos(page.getRecords()))
@@ -358,18 +381,29 @@ public class ElementMngServiceImpl implements ElementMngService {
     }
 
     @NotNull
-    private List<ElementDto> getCollectionEleDtos(PrCollection prCollection) {
-        List<Long> eleIds = collectionEleReService.list(Wrappers.lambdaQuery(CollectionEleRe.class)
+    private List<Element> getCollectionElements(PrCollection prCollection) {
+        List<Long> eleIds = getEleIds(prCollection);
+        if (eleIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return elementService.list(Wrappers.lambdaQuery(Element.class)
+                .in(Element::getId, eleIds));
+    }
+
+    @NotNull
+    private List<Long> getEleIds(PrCollection prCollection) {
+        return collectionEleReService.list(Wrappers.lambdaQuery(CollectionEleRe.class)
                         .eq(CollectionEleRe::getCollectionId, prCollection.getId())
                         .orderByDesc(CollectionEleRe::getId))
                 .parallelStream()
                 .map(CollectionEleRe::getEleId)
                 .toList();
-        if (eleIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return elementService.list(Wrappers.lambdaQuery(Element.class)
-                        .in(Element::getId, eleIds)).parallelStream()
+    }
+
+    @NotNull
+    private List<ElementDto> getCollectionEleDtos(PrCollection prCollection) {
+
+        return getCollectionElements(prCollection).parallelStream()
                 .map(this::getElementDto)
                 .toList();
     }

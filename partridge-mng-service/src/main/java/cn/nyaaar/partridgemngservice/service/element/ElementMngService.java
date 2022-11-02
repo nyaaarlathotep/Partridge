@@ -79,7 +79,7 @@ public interface ElementMngService {
     Integer addCollection(CollectionDto collectionDto);
 
     /**
-     * 新增 collection，返回新增的合集的 id
+     * 分享 collection，会分享集合中所有属于此用户的 element
      *
      * @param collectionId collectionId
      */
