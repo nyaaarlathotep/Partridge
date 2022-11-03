@@ -286,6 +286,8 @@ public class Settings {
     private static final String DEFAULT_QBITTORRENT_PATH = "/downloads/partridge";
     private static final String QBITTORRENT_HOST_PATH = "qbittorrent_host_path";
     private static final String DEFAULT_QBITTORRENT_HOST_PATH = "/mnt/shares/appdata/qbittorrent/partridge";
+    private static final int DEFAULT_ELEMENT_PUBLISH_MIN_LIKE = 3;
+    private static final String ELEMENT_PUBLISH_MIN_LIKE = "default_element_publish_min_like";
     private static final Map<String, Object> sSettingsPre = new HashMap<>();
     private static EhConfig sEhConfig;
 
@@ -1241,4 +1243,8 @@ public class Settings {
     public static String getQbittorrentHostPath() {
         return getString(QBITTORRENT_HOST_PATH, DEFAULT_QBITTORRENT_HOST_PATH);
     }
+    public static int getElementPublishMinLike() {
+        return getInt(ELEMENT_PUBLISH_MIN_LIKE, DEFAULT_ELEMENT_PUBLISH_MIN_LIKE);
+    }
+
 }

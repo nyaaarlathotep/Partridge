@@ -197,7 +197,7 @@ public class TorrentServiceImpl implements TorrentService {
     private QBitTorrent getQBitTorrentByHash(String hash) {
         List<QBitTorrent> qBitTorrents = qbittorrentEngine.getTorrents("", hash);
         if (qBitTorrents.size() < 1) {
-            BusinessExceptionEnum.NOT_FOUND.assertFail("qbittorrent 未找到对应磁链，请联系管理员");
+            BusinessExceptionEnum.NOT_FOUND.assertFail("磁链");
         }
         return qBitTorrents.get(0);
     }

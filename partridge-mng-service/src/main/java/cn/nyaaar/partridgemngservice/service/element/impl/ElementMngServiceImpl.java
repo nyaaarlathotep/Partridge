@@ -1,6 +1,7 @@
 package cn.nyaaar.partridgemngservice.service.element.impl;
 
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
+import cn.nyaaar.partridgemngservice.common.constants.Settings;
 import cn.nyaaar.partridgemngservice.common.enums.CompleteFlagEnum;
 import cn.nyaaar.partridgemngservice.common.enums.EleOrgReTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.*;
@@ -90,13 +91,15 @@ public class ElementMngServiceImpl implements ElementMngService {
     public void share(Long eleId) {
         Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, eleId));
         BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
-        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(
-                Objects.equals(element.getUploader(), ThreadLocalUtil.getCurrentUser())
-                        || appUserService.isRoot(ThreadLocalUtil.getCurrentUser()));
-        checkEleFilesCompleted(eleId);
+        if (Objects.equals(element.getSharedFlag(), PrConstant.YES)) {
+            return;
+        }
+        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(checkWritePermission(element.getId()));
+        BusinessExceptionEnum.ELEMENT_UNCOMPLETED.assertIsTrue(checkEleFilesCompleted(eleId));
         elementService.update(Wrappers.lambdaUpdate(Element.class)
                 .set(Element::getSharedFlag, PrConstant.YES)
                 .eq(Element::getId, eleId));
+        log.info("[{}] element shared", eleId);
     }
 
     @Override
@@ -131,7 +134,6 @@ public class ElementMngServiceImpl implements ElementMngService {
                 FileUtil.deleteDir(dirFile, deleteNum);
                 log.info("[{}],[{}] 删除成功，共删除文件数量：{}", eleId, dir, deleteNum);
             }
-
         } catch (IOException e) {
             log.error("file delete error, ", e);
             BusinessExceptionEnum.FILE_IO_ERROR.assertFail();
@@ -158,7 +160,7 @@ public class ElementMngServiceImpl implements ElementMngService {
                     .setUserName(ThreadLocalUtil.getCurrentUser())
                     .setAvailableFlag(PrConstant.VALIDATED);
             userEleLikeService.save(userEleLike);
-        } else {
+        } else if (!Objects.equals(userEleLike.getAvailableFlag(), PrConstant.VALIDATED)) {
             userEleLike.setAvailableFlag(PrConstant.VALIDATED);
             userEleLikeService.updateById(userEleLike);
         }
@@ -180,8 +182,11 @@ public class ElementMngServiceImpl implements ElementMngService {
     @Transactional(rollbackFor = Exception.class)
     public void publish(Long eleId) {
         Element element = getElement(eleId);
-        checkWritePermission(element.getId());
-        checkEleFilesCompleted(eleId);
+        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(checkWritePermission(element.getId()));
+        BusinessExceptionEnum.ELEMENT_UNCOMPLETED.assertIsTrue(checkEleFilesCompleted(eleId));
+        BusinessExceptionEnum.COMMON_BUSINESS_ERROR.assertIsTrue(checkElementPublish(eleId),
+                "未达到元素释放条件，需要至少 " + Settings.getElementPublishMinLike() + " 次喜爱");
+
         elementService.update(Wrappers.lambdaUpdate(Element.class)
                 .set(Element::getPublishedFlag, PrConstant.YES)
                 .eq(Element::getId, eleId));
@@ -197,6 +202,7 @@ public class ElementMngServiceImpl implements ElementMngService {
                 .setCDesc(collectionDto.getDesc())
                 .setSharedFlag(PrConstant.NO);
         prcs.save(prCollection);
+        log.info("[{}] collection created", prCollection.getId());
         return prCollection.getId();
     }
 
@@ -204,52 +210,52 @@ public class ElementMngServiceImpl implements ElementMngService {
     @Transactional(rollbackFor = Exception.class)
     public void shareCollection(Integer collectionId) {
         PrCollection prCollection = getPrCollection(collectionId);
-        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(
-                Objects.equals(prCollection.getUserName(), ThreadLocalUtil.getCurrentUser())
-                        || appUserService.isRoot(ThreadLocalUtil.getCurrentUser()));
+        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(checkWritePermission(prCollection));
 
+        getEleIds(prCollection)
+                .forEach(this::share);
         prcs.update(Wrappers.lambdaUpdate(PrCollection.class)
                 .set(PrCollection::getSharedFlag, PrConstant.YES)
                 .eq(PrCollection::getId, collectionId));
-        getEleIds(prCollection)
-                .forEach(eleId -> {
-                    Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, eleId));
-                    BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
-                    if (Objects.equals(element.getUploader(), ThreadLocalUtil.getCurrentUser())
-                            || appUserService.isRoot(ThreadLocalUtil.getCurrentUser())) {
-                        checkEleFilesCompleted(eleId);
-                        elementService.update(Wrappers.lambdaUpdate(Element.class)
-                                .set(Element::getSharedFlag, PrConstant.YES)
-                                .eq(Element::getId, eleId));
-                    }
-                });
+        log.info("[{}] collection shared", prCollection.getId());
     }
+
 
     @Override
     public void collectionAddElement(CollectionEleDto collectionEleDto) {
-        getPrCollection(collectionEleDto.getCollectionId());
-        checkReadPermission(collectionEleDto.getEleId());
+        PrCollection collection = getPrCollection(collectionEleDto.getCollectionId());
+        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(checkWritePermission(collection));
+        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(checkReadPermission(collectionEleDto.getEleId()));
+        BusinessExceptionEnum.ELEMENT_UNCOMPLETED.assertIsTrue(checkEleFilesCompleted(collectionEleDto.getEleId()));
+        if (Objects.equals(collection.getSharedFlag(), PrConstant.YES)) {
+            share(collectionEleDto.getEleId());
+        }
 
         collectionEleReService.save(new CollectionEleRe()
                 .setCollectionId(collectionEleDto.getCollectionId())
                 .setEleId(collectionEleDto.getEleId()));
+        log.info("[{}] collection add element: [{}]", collectionEleDto.getCollectionId(), collectionEleDto.getEleId());
     }
 
     @Override
     public void collectionDeleteElement(CollectionEleDto collectionEleDto) {
-        getPrCollection(collectionEleDto.getCollectionId());
+        PrCollection collection = getPrCollection(collectionEleDto.getCollectionId());
         getElement(collectionEleDto.getEleId());
 
+        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(checkWritePermission(collection));
         collectionEleReService.remove(Wrappers.lambdaQuery(CollectionEleRe.class)
                 .eq(CollectionEleRe::getCollectionId, collectionEleDto.getCollectionId())
                 .eq(CollectionEleRe::getEleId, collectionEleDto.getEleId()));
+        log.info("[{}] collection delete element: [{}]", collectionEleDto.getCollectionId(), collectionEleDto.getEleId());
     }
 
     public void deleteCollection(CollectionDto collectionDto) {
-        getPrCollection(collectionDto.getId());
+        PrCollection collection = getPrCollection(collectionDto.getId());
+        BusinessExceptionEnum.PERMISSION_DENY.assertIsTrue(checkWritePermission(collection));
         prcs.update(Wrappers.lambdaUpdate(PrCollection.class)
                 .set(PrCollection::getAvailableFlag, PrConstant.INVALIDATED)
                 .eq(PrCollection::getId, collectionDto.getId()));
+        log.info("[{}] collection deleted!", collectionDto.getId());
     }
 
     @Override
@@ -337,14 +343,15 @@ public class ElementMngServiceImpl implements ElementMngService {
                 in(TagInfo::getId, eleTagRes.stream().map(EleTagRe::getTagId).toList()));
     }
 
-    private void checkEleFilesCompleted(Long eleId) {
+    private boolean checkEleFilesCompleted(Long eleId) {
         List<EleFile> eleFiles = eleFileService.list(Wrappers.lambdaQuery(EleFile.class)
                 .eq(EleFile::getEleId, eleId));
         for (EleFile eleFile : eleFiles) {
             if (!CompleteFlagEnum.completed(eleFile.getCompletedFlag())) {
-                BusinessExceptionEnum.COMMON_BUSINESS_ERROR.assertFail("元素未完成，无法操作");
+                return false;
             }
         }
+        return true;
     }
 
     @Override
@@ -357,9 +364,29 @@ public class ElementMngServiceImpl implements ElementMngService {
                 Objects.equals(element.getUploader(), ThreadLocalUtil.getCurrentUser());
     }
 
+    public boolean checkReadPermission(Element element) {
+        if (appUserService.isRoot(ThreadLocalUtil.getCurrentUser())) {
+            return true;
+        }
+        return Objects.equals(PrConstant.YES, element.getSharedFlag()) ||
+                Objects.equals(element.getUploader(), ThreadLocalUtil.getCurrentUser());
+    }
+
+    private boolean checkWritePermission(PrCollection prCollection) {
+        return Objects.equals(prCollection.getUserName(), ThreadLocalUtil.getCurrentUser())
+                || appUserService.isRoot(ThreadLocalUtil.getCurrentUser());
+    }
+
     @Override
     public boolean checkWritePermission(Long eleId) {
         Element element = getElement(eleId);
+        if (appUserService.isRoot(ThreadLocalUtil.getCurrentUser())) {
+            return true;
+        }
+        return Objects.equals(ThreadLocalUtil.getCurrentUser(), element.getUploader());
+    }
+
+    public boolean checkWritePermission(Element element) {
         if (appUserService.isRoot(ThreadLocalUtil.getCurrentUser())) {
             return true;
         }
@@ -418,5 +445,13 @@ public class ElementMngServiceImpl implements ElementMngService {
                 .setCompleted(CompleteFlagEnum.completed(element.getCompletedFlag()))
                 .setAvailable(PrConstant.VALIDATED == element.getAvailableFlag())
                 .setLikes(likes.size());
+    }
+
+    private boolean checkElementPublish(Long eleId) {
+        List<UserEleLike> userEleLikes = userEleLikeService.list(Wrappers.lambdaQuery(UserEleLike.class)
+                .eq(UserEleLike::getEleId, eleId)
+                .eq(UserEleLike::getAvailableFlag, PrConstant.VALIDATED));
+        return userEleLikes.size() >= Settings.getElementPublishMinLike();
+
     }
 }

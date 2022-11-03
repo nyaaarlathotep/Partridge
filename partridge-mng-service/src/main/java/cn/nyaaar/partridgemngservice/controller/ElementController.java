@@ -108,7 +108,7 @@ public class ElementController {
     @PostMapping(value = "/collection/share")
     @LogAnnotation
     public R<String> shareCollection(@RequestBody Integer collectionId) {
-
+        elementMngService.shareCollection(collectionId);
         return new R<>();
     }
 
@@ -120,7 +120,7 @@ public class ElementController {
         return new R<>(elementMngService.getCollections(userName, pageIndex));
     }
 
-    @Operation(summary = "合集新增元素")
+    @Operation(summary = "合集新增元素", description = "新增元素至已分享集合会自动分享元素")
     @PostMapping(value = "/collection/add/element")
     @LogAnnotation
     public R<String> collectionAddElement(@RequestBody CollectionEleDto collectionEleDto) {
