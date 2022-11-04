@@ -78,6 +78,9 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("ehentai_gallery", "EhentaiGallery",
 		gen.FieldRename("CREATED_TIME", "CreatedAt"),
 		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))
+	g.ApplyBasic(g.GenerateModelAs("ehentai_gallery", "EhentaiGallery",
+		gen.FieldRename("CREATED_TIME", "CreatedAt"),
+		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))
 	g.ApplyBasic(g.GenerateModelAs("ele_file", "EleFile",
 		gen.FieldRename("CREATED_TIME", "CreatedAt"),
 		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))

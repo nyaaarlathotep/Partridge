@@ -35,6 +35,7 @@ func newElement(db *gorm.DB) element {
 	_element.PUBLISHEDFLAG = field.NewInt32(tableName, "PUBLISHED_FLAG")
 	_element.UPLOADER = field.NewString(tableName, "UPLOADER")
 	_element.AVAILABLEFLAG = field.NewInt32(tableName, "AVAILABLE_FLAG")
+	_element.COMPLETEDFLAG = field.NewInt32(tableName, "COMPLETED_FLAG")
 	_element.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
 	_element.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
 	_element.EleFile = elementHasManyEleFile{
@@ -84,6 +85,7 @@ type element struct {
 	PUBLISHEDFLAG field.Int32  // 释放标志(0-否;1-是)，释放后上传者将不能删除元素
 	UPLOADER      field.String // 上传用户
 	AVAILABLEFLAG field.Int32  // 启用标志(0-禁用;1-启用)
+	COMPLETEDFLAG field.Int32  // 完成标志
 	CreatedAt     field.Time
 	UpdatedAt     field.Time
 	EleFile       elementHasManyEleFile
@@ -119,6 +121,7 @@ func (e *element) updateTableName(table string) *element {
 	e.PUBLISHEDFLAG = field.NewInt32(table, "PUBLISHED_FLAG")
 	e.UPLOADER = field.NewString(table, "UPLOADER")
 	e.AVAILABLEFLAG = field.NewInt32(table, "AVAILABLE_FLAG")
+	e.COMPLETEDFLAG = field.NewInt32(table, "COMPLETED_FLAG")
 	e.CreatedAt = field.NewTime(table, "CREATED_TIME")
 	e.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
@@ -137,7 +140,7 @@ func (e *element) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (e *element) fillFieldMap() {
-	e.fieldMap = make(map[string]field.Expr, 15)
+	e.fieldMap = make(map[string]field.Expr, 16)
 	e.fieldMap["ID"] = e.ID
 	e.fieldMap["TYPE"] = e.TYPE
 	e.fieldMap["FILE_DIR"] = e.FILEDIR
@@ -146,6 +149,7 @@ func (e *element) fillFieldMap() {
 	e.fieldMap["PUBLISHED_FLAG"] = e.PUBLISHEDFLAG
 	e.fieldMap["UPLOADER"] = e.UPLOADER
 	e.fieldMap["AVAILABLE_FLAG"] = e.AVAILABLEFLAG
+	e.fieldMap["COMPLETED_FLAG"] = e.COMPLETEDFLAG
 	e.fieldMap["CREATED_TIME"] = e.CreatedAt
 	e.fieldMap["UPDATED_TIME"] = e.UpdatedAt
 

@@ -126,6 +126,10 @@ func scanJavDir(scanDir string) int {
 	return count
 }
 
+func scanEhentaiDir(scanDir string) int {
+	return 0
+}
+
 func addJav(eleId int64, code string) error {
 	jav, err := request.GetJavInfo(code)
 	if err != nil {
