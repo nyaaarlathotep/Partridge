@@ -1,10 +1,14 @@
 package scan
 
 import (
+	"bufio"
+	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"javCrawl/internal/util"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -110,5 +114,66 @@ func JavDic(dir string, codeFPathMap *map[string]string) {
 //        }
 //    }
 func ehentaiScan(dir string) {
+	folders, _ := ioutil.ReadDir(dir)
+	for _, galleryFolder := range folders {
+		log.Printf("galleryFolder name: %s", galleryFolder.Name())
+		gid, name, err := util.GetGidAndName(galleryFolder.Name())
+		log.Printf("[%v] name: %v", gid, name)
+		if err != nil {
+			log.Printf("read dir error, dir: %v", dir)
+			log.Fatal(err)
+		}
+		if galleryFolder.IsDir() {
+			scanGallery(dir, galleryFolder, gid)
+		}
 
+	}
+
+}
+
+func scanGallery(dir string, galleryFolder fs.FileInfo, gid string) {
+	files, err := ioutil.ReadDir(filepath.Join(dir, galleryFolder.Name()))
+	if err != nil {
+		log.Printf("read dir error, dir: %v", dir)
+		log.Fatal(err)
+	}
+	for _, file := range files {
+		if strings.Contains(file.Name(), ".ehviewer") {
+			gToken, err := readMetaData(filepath.Join(dir, galleryFolder.Name(), file.Name()), gid)
+			log.Printf("[%v] gtoken: %v", gid, gToken)
+			if err != nil {
+				log.Printf("error on reading metadata")
+				return
+			}
+		}
+		// TODO create eleFile and call partridge to finish gallery info
+	}
+}
+
+func readMetaData(path string, gid string) (string, error) {
+
+	f, err := os.Open(path)
+	if err != nil {
+		log.Printf("read file error, name: %v", f.Name())
+		return "", fmt.Errorf("read file error, name: %v", f.Name())
+	}
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			log.Printf("close dir error, name: %v", f.Name())
+		}
+	}(f)
+	var line string
+	r := bufio.NewReader(f)
+	line, err = r.ReadString('\n')
+	if strings.Contains(line, "VERSION2") {
+		line, err = r.ReadString('\n')
+	}
+	line, err = r.ReadString('\n')
+	if line != gid {
+		return "", fmt.Errorf("meta data mismitch, gid in file: %v", line)
+	}
+	line, err = r.ReadString('\n')
+	line, err = r.ReadString('\n')
+	return line, nil
 }
