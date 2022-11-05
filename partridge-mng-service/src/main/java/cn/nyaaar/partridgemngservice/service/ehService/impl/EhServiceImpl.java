@@ -154,7 +154,7 @@ public class EhServiceImpl implements EhService {
     }
 
     @NotNull
-    private EhentaiGallery getEhGAndSavOrUpdEhg(long gid, String gtoken, boolean downloadThumb) {
+    public EhentaiGallery getEhGAndSavOrUpdEhg(long gid, String gtoken, boolean downloadThumb) {
         GalleryDetail galleryDetail = ehEngine.getGalleryDetail(gid, gtoken);
         EhentaiGallery ehentaiGallery = galleryDetail.transToEntity();
 

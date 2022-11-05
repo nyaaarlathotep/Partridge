@@ -1,9 +1,11 @@
 package cn.nyaaar.partridgemngservice.service.ehService;
 
+import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
 import cn.nyaaar.partridgemngservice.model.eh.*;
 import cn.nyaaar.partridgemngservice.model.ListResp;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author nyaaar
@@ -27,13 +29,13 @@ public interface EhService {
      * @param pageIndexes 画廊图片页码
      * @return base64图片
      */
-    java.util.List<GalleryPage> getGalleryPage(long eleId, java.util.List<Integer> pageIndexes);
+    List<GalleryPage> getGalleryPage(long eleId, java.util.List<Integer> pageIndexes);
 
     /**
      * 下载画廊
      *
-     * @param gid      画廊id
-     * @param gtoken   gtoken
+     * @param gid    画廊id
+     * @param gtoken gtoken
      */
     void downloadGallery(long gid, String gtoken);
 
@@ -45,7 +47,7 @@ public interface EhService {
      * @param pageIndexes 画廊页数
      * @return GalleryPage List
      */
-    java.util.List<GalleryPage> downloadGalleryPages(long gid, String gtoken, java.util.List<Integer> pageIndexes);
+    List<GalleryPage> downloadGalleryPages(long gid, String gtoken, java.util.List<Integer> pageIndexes);
 
     /**
      * 返回当前画廊下载队列
@@ -81,4 +83,13 @@ public interface EhService {
      * @return GalleryDetail
      */
     GalleryDetail getGalleryDetailByGid(long gid, String gtoken);
+
+    /**
+     * 补全对应画廊的相关信息
+     *
+     * @param gid           gid
+     * @param gtoken        gtoken
+     * @param downloadThumb 是否下载缩略图
+     */
+    EhentaiGallery getEhGAndSavOrUpdEhg(long gid, String gtoken, boolean downloadThumb);
 }
