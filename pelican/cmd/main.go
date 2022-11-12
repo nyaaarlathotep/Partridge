@@ -77,6 +77,31 @@ func startServer() {
 			})
 		}
 	})
+	r.POST("/scanEhentai", func(c *gin.Context) {
+		var form scanDirForm
+		if c.ShouldBind(&form) == nil {
+			log.Printf("%v", form)
+			var duration time.Duration
+			var count int
+			if len(form.Dir) != 0 {
+				bT := time.Now()
+				count = scanEhentaiDir(form.Dir)
+				log.Printf("update or insert ehentai num: %v", count)
+				eT := time.Since(bT)
+				log.Printf("run time: %v", eT)
+				duration = eT
+			}
+			c.JSON(200, gin.H{
+				"message":  "SUCCESS",
+				"duration": fmt.Sprintf("%v", duration),
+				"count":    count,
+			})
+		} else {
+			c.JSON(400, gin.H{
+				"message": "form error",
+			})
+		}
+	})
 	r.POST("/upload", func(c *gin.Context) {
 		err = service.UploadFile(c)
 		if err != nil {
@@ -127,7 +152,17 @@ func scanJavDir(scanDir string) int {
 }
 
 func scanEhentaiDir(scanDir string) int {
-	return 0
+	count := 0
+	elements := scan.EhentaiScan(scanDir)
+	for _, element := range elements {
+		_ = queries.Element.Create(element)
+		count++
+		//
+		//completeUrl := "http://192.168.1.7:8080/partridge-mng-service/ehentai/complete"
+		//payload := url.Values{"gid": {strconv.FormatInt(gid, 10)}, "gtoken": {gToken}}
+		//_, _ = http.PostForm(completeUrl, payload)
+	}
+	return count
 }
 
 func addJav(eleId int64, code string) error {
@@ -329,7 +364,7 @@ func getTags(jav *request.JavInfo) []dao.TagInfo {
 
 func init() {
 	// TODO config
-	ormDb, err := gorm.Open(mysql.Open("root:12345678@tcp(127.0.0.1:3306)/partridge?charset=utf8mb4&parseTime=True&loc=Local"))
+	ormDb, err := gorm.Open(mysql.Open("root:12345678@tcp(192.168.1.7:3306)/partridge?charset=utf8mb4&parseTime=True&loc=Local"))
 	if err != nil {
 		log.Println("open mysql failed,", err)
 		panic(fmt.Sprintf("invalid database %q", err))

@@ -5,11 +5,19 @@ import (
 	"fmt"
 	"io/fs"
 	"io/ioutil"
+	"javCrawl/internal/dal/dao"
 	"javCrawl/internal/util"
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
+)
+
+const (
+	Jav     string = "1"
+	eHentai string = "2"
 )
 
 func JavDic(dir string, codeFPathMap *map[string]string) {
@@ -44,77 +52,9 @@ func JavDic(dir string, codeFPathMap *map[string]string) {
 	}
 }
 
-//     public static SpiderInfo read(@Nullable InputStream is) {
-//        if (null == is) {
-//            return null;
-//        }
-//
-//        SpiderInfo spiderInfo = null;
-//        try {
-//            spiderInfo = new SpiderInfo();
-//            // Get version
-//            String line = IOUtils.readAsciiLine(is);
-//            int version = getVersion(line);
-//            if (version == VERSION) {
-//                // Read next line
-//                line = IOUtils.readAsciiLine(is);
-//            } else if (version == 1) {
-//                // pass
-//            } else {
-//                // Invalid version
-//                return null;
-//            }
-//            // Start page
-//            spiderInfo.startPage = getStartPage(line);
-//            // Gid
-//            spiderInfo.gid = Long.parseLong(IOUtils.readAsciiLine(is));
-//            // Token
-//            spiderInfo.token = IOUtils.readAsciiLine(is);
-//            // Deprecated, mode, skip it
-//            IOUtils.readAsciiLine(is);
-//            // Preview pages
-//            spiderInfo.previewPages = Integer.parseInt(IOUtils.readAsciiLine(is));
-//            // Preview pre page
-//            line = IOUtils.readAsciiLine(is);
-//            if (version == 1) {
-//                // Skip it
-//            } else {
-//                spiderInfo.previewPerPage = Integer.parseInt(line);
-//            }
-//            // Pages
-//            spiderInfo.pages = Integer.parseInt(IOUtils.readAsciiLine(is));
-//            // Check pages
-//            if (spiderInfo.pages <= 0) {
-//                return null;
-//            }
-//            // PToken
-//            spiderInfo.pTokenMap = new SparseArray<>(spiderInfo.pages);
-//            while (true) { // EOFException will raise
-//                line = IOUtils.readAsciiLine(is);
-//                int pos = line.indexOf(" ");
-//                if (pos > 0) {
-//                    int index = Integer.parseInt(line.substring(0, pos));
-//                    String pToken = line.substring(pos + 1);
-//                    if (!TextUtils.isEmpty(pToken)) {
-//                        spiderInfo.pTokenMap.put(index, pToken);
-//                    }
-//                } else {
-//                    Log.e(TAG, "Can't parse index and pToken, index = " + pos);
-//                }
-//            }
-//        } catch (IOException | NumberFormatException e) {
-//            // Ignore
-//        }
-//
-//        if (spiderInfo == null || spiderInfo.gid == -1 || spiderInfo.token == null ||
-//                spiderInfo.pages == -1 || spiderInfo.pTokenMap == null) {
-//            return null;
-//        } else {
-//            return spiderInfo;
-//        }
-//    }
-func ehentaiScan(dir string) {
+func EhentaiScan(dir string) []*dao.Element {
 	folders, _ := ioutil.ReadDir(dir)
+	elements := make([]*dao.Element, 0)
 	for _, galleryFolder := range folders {
 		log.Printf("galleryFolder name: %s", galleryFolder.Name())
 		gid, name, err := util.GetGidAndName(galleryFolder.Name())
@@ -124,33 +64,61 @@ func ehentaiScan(dir string) {
 			log.Fatal(err)
 		}
 		if galleryFolder.IsDir() {
-			scanGallery(dir, galleryFolder, gid)
+			elements = append(elements, scanGallery(dir, galleryFolder, gid))
 		}
-
 	}
-
+	return elements
 }
 
-func scanGallery(dir string, galleryFolder fs.FileInfo, gid string) {
+func scanGallery(dir string, galleryFolder fs.FileInfo, gid int64) *dao.Element {
 	files, err := ioutil.ReadDir(filepath.Join(dir, galleryFolder.Name()))
 	if err != nil {
 		log.Printf("read dir error, dir: %v", dir)
 		log.Fatal(err)
 	}
+	var gToken string
+	ele := dao.Element{
+		TYPE:          eHentai,
+		FILEDIR:       filepath.Join(dir, galleryFolder.Name()),
+		SHAREDFLAG:    1,
+		PUBLISHEDFLAG: 1,
+		EleFile:       []dao.EleFile{},
+		UPLOADER:      "root",
+		AVAILABLEFLAG: 1,
+	}
 	for _, file := range files {
 		if strings.Contains(file.Name(), ".ehviewer") {
-			gToken, err := readMetaData(filepath.Join(dir, galleryFolder.Name(), file.Name()), gid)
-			log.Printf("[%v] gtoken: %v", gid, gToken)
+			gToken, err = readMetaData(filepath.Join(dir, galleryFolder.Name(), file.Name()), gid)
 			if err != nil {
-				log.Printf("error on reading metadata")
-				return
+				log.Fatalf("error on reading metadata, e: %v", err)
 			}
+			log.Printf("[%v] gtoken: %v", gid, gToken)
+			continue
 		}
-		// TODO create eleFile and call partridge to finish gallery info
+		err, pageIndex := util.GetNumFromString(file.Name())
+		if err != nil {
+			log.Printf("parse page index error, e: %v", err)
+			continue
+		}
+		ele.EleFile = append(ele.EleFile, dao.EleFile{
+			NAME:          file.Name(),
+			TYPE:          eHentai,
+			PATH:          filepath.Join(dir, galleryFolder.Name(), file.Name()),
+			PAGENUM:       int32(pageIndex),
+			COMPLETEDFLAG: 1,
+			AVAILABLEFLAG: 1,
+		})
 	}
+	ele.Ehentai_gallery = dao.EhentaiGallery{
+		GID:    gid,
+		TOKEN:  gToken,
+		POSTED: time.Now(),
+	}
+	return &ele
+
 }
 
-func readMetaData(path string, gid string) (string, error) {
+func readMetaData(path string, gid int64) (string, error) {
 
 	f, err := os.Open(path)
 	if err != nil {
@@ -170,10 +138,12 @@ func readMetaData(path string, gid string) (string, error) {
 		line, err = r.ReadString('\n')
 	}
 	line, err = r.ReadString('\n')
-	if line != gid {
-		return "", fmt.Errorf("meta data mismitch, gid in file: %v", line)
+	line = strings.Replace(line, "\n", "", -1)
+	if line != strconv.FormatInt(gid, 10) {
+		return "", fmt.Errorf("meta data mismitch, gid in file: %v, gid: %v",
+			line, strconv.FormatInt(gid, 10))
 	}
 	line, err = r.ReadString('\n')
 	line, err = r.ReadString('\n')
-	return line, nil
+	return strings.Replace(line, "\n", "", -1), nil
 }
