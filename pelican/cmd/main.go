@@ -8,6 +8,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"javCrawl/internal/constant"
 	"javCrawl/internal/dal/dao"
 	"javCrawl/internal/dal/query"
 	"javCrawl/internal/request"
@@ -25,12 +26,6 @@ import (
 // TODO transactional support
 // TODO or maybe multi thread
 var queries *query.Query
-
-const (
-	Jav     string = "1"
-	eHentai string = "2"
-)
-const completeInfoUrl = "http://192.168.1.7:8080/"
 
 func main() {
 	startServer()
@@ -167,7 +162,7 @@ func scanEhentaiDir(scanDir string) int {
 		galleryId["gtoken"] = element.Ehentai_gallery.TOKEN
 		bytesData, _ := json.Marshal(galleryId)
 
-		completeUrl := completeInfoUrl + "partridge-mng-service/ehentai/complete"
+		completeUrl := constant.CompleteInfoUrl + "partridge-mng-service/ehentai/complete"
 		_, _ = http.Post(completeUrl, "application/json;charset=utf-8", bytes.NewBuffer(bytesData))
 	}
 	return count
@@ -204,7 +199,7 @@ func updateOrInsertEle(jav *request.JavInfo, path string, update bool) int64 {
 	eleFile := getEleFile(path)
 
 	newEle := &dao.Element{
-		TYPE:         Jav,
+		TYPE:         constant.Jav,
 		SHAREDFLAG:   0,
 		UPLOADER:     "root",
 		EleFile:      []dao.EleFile{*eleFile},
@@ -361,7 +356,7 @@ func getTags(jav *request.JavInfo) []dao.TagInfo {
 			tags = append(tags, dao.TagInfo{
 				NAME:      javTag,
 				GROUPNAME: "",
-				SOURCE:    Jav,
+				SOURCE:    constant.Jav,
 			})
 		} else {
 			tags = append(tags, *searchTag[0])
@@ -371,8 +366,7 @@ func getTags(jav *request.JavInfo) []dao.TagInfo {
 }
 
 func init() {
-	// TODO config
-	ormDb, err := gorm.Open(mysql.Open("root:12345678@tcp(192.168.1.7:3306)/partridge?charset=utf8mb4&parseTime=True&loc=Local"))
+	ormDb, err := gorm.Open(mysql.Open(constant.MysqlUrl))
 	if err != nil {
 		log.Println("open mysql failed,", err)
 		panic(fmt.Sprintf("invalid database %q", err))

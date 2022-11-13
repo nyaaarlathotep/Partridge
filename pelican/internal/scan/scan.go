@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"io/ioutil"
+	"javCrawl/internal/constant"
 	"javCrawl/internal/dal/dao"
 	"javCrawl/internal/util"
 	"log"
@@ -13,11 +14,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-)
-
-const (
-	Jav     string = "1"
-	eHentai string = "2"
 )
 
 func JavDic(dir string, codeFPathMap *map[string]string) {
@@ -78,7 +74,7 @@ func scanGallery(dir string, galleryFolder fs.FileInfo, gid int64) *dao.Element 
 	}
 	var gToken string
 	ele := dao.Element{
-		TYPE:          eHentai,
+		TYPE:          constant.EHentai,
 		FILEDIR:       filepath.Join(dir, galleryFolder.Name()),
 		SHAREDFLAG:    1,
 		PUBLISHEDFLAG: 1,
@@ -102,7 +98,7 @@ func scanGallery(dir string, galleryFolder fs.FileInfo, gid int64) *dao.Element 
 		}
 		ele.EleFile = append(ele.EleFile, dao.EleFile{
 			NAME:          file.Name(),
-			TYPE:          eHentai,
+			TYPE:          constant.EHentai,
 			PATH:          filepath.Join(dir, galleryFolder.Name(), file.Name()),
 			PAGENUM:       int32(pageIndex),
 			COMPLETEDFLAG: 1,
