@@ -1,4 +1,4 @@
-module javCrawl
+module pelican
 
 go 1.16
 

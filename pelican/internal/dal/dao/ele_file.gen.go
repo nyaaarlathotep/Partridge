@@ -17,7 +17,7 @@ type EleFile struct {
 	NAME          string    `gorm:"column:NAME;type:varchar(255)" json:"NAME"`
 	TYPE          string    `gorm:"column:TYPE;type:varchar(32)" json:"TYPE"`
 	PATH          string    `gorm:"column:PATH;type:varchar(255)" json:"PATH"`
-	PAGENUM       int32     `gorm:"column:PAGE_NUM;type:tinyint" json:"PAGE_NUM"`                       // ehentai_gallery 对应画廊文件页码
+	PAGENUM       int32     `gorm:"column:PAGE_NUM;type:int" json:"PAGE_NUM"`                           // ehentai_gallery 对应画廊文件页码
 	COMPLETEDFLAG int32     `gorm:"column:COMPLETED_FLAG;type:tinyint" json:"COMPLETED_FLAG"`           // 完成标志(0-禁用;1-启用)
 	AVAILABLEFLAG int32     `gorm:"column:AVAILABLE_FLAG;type:tinyint;default:1" json:"AVAILABLE_FLAG"` // 启用标志(0-禁用;1-启用)
 	CreatedAt     time.Time `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`

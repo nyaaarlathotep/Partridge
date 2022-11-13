@@ -5,7 +5,7 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 	"gorm.io/gorm"
-	"javCrawl/internal/dal/dao"
+	"pelican/internal/dal/dao"
 )
 
 // generate code
