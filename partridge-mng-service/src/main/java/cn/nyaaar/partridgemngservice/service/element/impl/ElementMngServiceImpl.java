@@ -337,10 +337,16 @@ public class ElementMngServiceImpl implements ElementMngService {
 
     @Override
     public List<TagInfo> getTagInfos(long eleId) {
-        List<EleTagRe> eleTagRes = eleTagReService.list(
-                new LambdaQueryWrapper<EleTagRe>().eq(EleTagRe::getEleId, eleId));
+        List<Integer> eleTagIds = eleTagReService.list(new LambdaQueryWrapper<EleTagRe>()
+                        .eq(EleTagRe::getEleId, eleId))
+                .stream()
+                .map(EleTagRe::getTagId)
+                .toList();
+        if (eleTagIds.isEmpty()) {
+            return Collections.emptyList();
+        }
         return tagInfoService.list(new LambdaQueryWrapper<TagInfo>().
-                in(TagInfo::getId, eleTagRes.stream().map(EleTagRe::getTagId).toList()));
+                in(TagInfo::getId, eleTagIds));
     }
 
     private boolean checkEleFilesCompleted(Long eleId) {

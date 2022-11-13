@@ -92,4 +92,12 @@ public interface EhService {
      * @param downloadThumb 是否下载缩略图
      */
     EhentaiGallery getEhGAndSavOrUpdEhg(long gid, String gtoken, boolean downloadThumb);
+    /**
+     * 补全对应画廊的相关信息
+     *
+     * @param gid           gid
+     * @param gtoken        gtoken
+     * @param downloadThumb 是否下载缩略图
+     */
+    GalleryBasicInfo mendGallery(long gid, String gtoken, boolean downloadThumb);
 }

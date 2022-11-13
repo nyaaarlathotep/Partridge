@@ -102,10 +102,9 @@ public class EhentaiGalleryController {
     @Operation(summary = "补全 gallery 信息",
             description = "通过 gid 与 gtoken 补全 gallery 信息")
     @PostMapping(value = "/complete")
-    @LogAnnotation(omitRes = true)
-    public R<String> mendGallery(@RequestBody @Validated(EhDownload.class) EhCommonReq ehCommonReq) {
-        ehService.getEhGAndSavOrUpdEhg(ehCommonReq.getGid(), ehCommonReq.getGtoken(), true);
-        return new R<>();
+    public R<GalleryBasicInfo> mendGallery(@RequestBody @Validated(EhDownload.class) EhCommonReq ehCommonReq) {
+
+        return new R<>(ehService.mendGallery(ehCommonReq.getGid(), ehCommonReq.getGtoken(), true));
     }
 
 }

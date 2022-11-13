@@ -167,6 +167,11 @@ public class EhServiceImpl implements EhService {
         ehentaiGalleryService.saveOrUpdate(ehentaiGallery);
         return ehentaiGallery;
     }
+    @NotNull
+    public GalleryBasicInfo mendGallery(long gid, String gtoken, boolean downloadThumb) {
+        EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken, true);
+        return getGalleryBasicInfo(ehentaiGallery);
+    }
 
 
     private Long getOrInsertEleIdFromGid(long gid) {
