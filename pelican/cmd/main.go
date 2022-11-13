@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
@@ -13,7 +15,9 @@ import (
 	"javCrawl/internal/service"
 	"javCrawl/internal/util"
 	"log"
+	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -26,6 +30,7 @@ const (
 	Jav     string = "1"
 	eHentai string = "2"
 )
+const completeInfoUrl = "http://192.168.1.7:8080/"
 
 func main() {
 	startServer()
@@ -157,10 +162,13 @@ func scanEhentaiDir(scanDir string) int {
 	for _, element := range elements {
 		_ = queries.Element.Create(element)
 		count++
-		//
-		//completeUrl := "http://192.168.1.7:8080/partridge-mng-service/ehentai/complete"
-		//payload := url.Values{"gid": {strconv.FormatInt(gid, 10)}, "gtoken": {gToken}}
-		//_, _ = http.PostForm(completeUrl, payload)
+		galleryId := make(map[string]string)
+		galleryId["gid"] = strconv.FormatInt(element.Ehentai_gallery.GID, 10)
+		galleryId["gtoken"] = element.Ehentai_gallery.TOKEN
+		bytesData, _ := json.Marshal(galleryId)
+
+		completeUrl := completeInfoUrl + "partridge-mng-service/ehentai/complete"
+		_, _ = http.Post(completeUrl, "application/json;charset=utf-8", bytes.NewBuffer(bytesData))
 	}
 	return count
 }
