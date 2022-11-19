@@ -2,6 +2,7 @@ package cn.nyaaar.partridgemngservice.service.torrent.impl;
 
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
+import cn.nyaaar.partridgemngservice.common.enums.CompleteFlagEnum;
 import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
 import cn.nyaaar.partridgemngservice.entity.EleFile;
@@ -63,6 +64,7 @@ public class TorrentServiceImpl implements TorrentService {
                 .setUploader(userName)
                 .setFileSize(0L)
                 .setAvailableFlag(PrConstant.VALIDATED)
+                .setCompletedFlag(CompleteFlagEnum.DOWNLOADING.getCode())
                 .setSharedFlag(PrConstant.NO);
         elementService.save(element);
         qbittorrentEngine.addTorrent(torrent, userName, getDownloadDir(userName, element), element.getType());
@@ -135,20 +137,21 @@ public class TorrentServiceImpl implements TorrentService {
 
     @Override
     public void deleteTorrentContent(String hash, Integer contentIndex) {
-        EleTorrent eleTorrent = getEleTorrent(hash);
         List<QBitTorrentContent> qBitTorrentContents = qbittorrentEngine.getTorrentContents(hash);
-        qbittorrentEngine.setTorrentContentPriority(eleTorrent.getHash(), contentIndex, 0);
-        List<QBitTorrent> qBitTorrents = qbittorrentEngine.getTorrents("", hash);
+        QBitTorrent qBitTorrent = getQBitTorrentByHash(hash);
         Optional<QBitTorrentContent> qBitTorrentContent = qBitTorrentContents.stream()
-                .filter(qBitTorrentContentFilter -> qBitTorrentContentFilter.getIndex().equals(Long.valueOf(contentIndex)))
+                .filter(qBitTorrentContentFilter -> qBitTorrentContentFilter.getIndex().equals(contentIndex))
                 .findFirst();
+
         if (qBitTorrentContent.isPresent()) {
-            String path = FileUtil.simpleConcatPath(qBitTorrents.get(0).getSave_path(), qBitTorrentContent.get().getName());
+            qbittorrentEngine.setTorrentContentPriority(hash, contentIndex, 0);
+            String path = FileUtil.simpleConcatPath(qBitTorrent.getSave_path().replace(Settings.getQbittorrentPath(),
+                    Settings.getQbittorrentHostPath()), qBitTorrentContent.get().getName());
             boolean deleteSuccess = FileUtil.delete(path);
             if (!deleteSuccess) {
-                log.warn("[{}], contentIndex: [{}], delete error!", hash, contentIndex);
+                log.warn("[{}], contentIndex: [{}], path: [{}], delete error!", hash, contentIndex, path);
             } else {
-                log.info("[{}], contentIndex: [{}], delete success", hash, contentIndex);
+                log.info("[{}], contentIndex: [{}], path: [{}], delete success", hash, contentIndex, path);
             }
         } else {
             BusinessExceptionEnum.NOT_FOUND.assertFail("磁链内容");
@@ -171,24 +174,30 @@ public class TorrentServiceImpl implements TorrentService {
         QBitTorrent qBitTorrent = getQBitTorrentByHash(hash);
         updateEleTorrents(Collections.singletonList(qBitTorrent), Collections.singletonList(eleTorrent));
         List<QBitTorrentContent> contents = getTorrentContent(hash);
+        String fileDir = qBitTorrent.getSave_path().replace(Settings.getQbittorrentPath(),
+                Settings.getQbittorrentHostPath());
         for (QBitTorrentContent content : contents) {
             String fileName = FileUtil.getFileNameFromPath(content.getName());
             FileTypeEnum fileTypeEnum = FileTypeEnum.getTypeBySuffix(fileName);
             EleFile eleFile = new EleFile();
             eleFile.setEleId(eleTorrent.getEleId());
             eleFile.setName(fileName);
-            // TODO path convert
-            eleFile.setPath(FileUtil.simpleConcatPath(qBitTorrent.getSave_path(), content.getName()));
+            eleFile.setPath(FileUtil.simpleConcatPath(fileDir, content.getName()));
             eleFile.setAvailableFlag(PrConstant.VALIDATED);
-            eleFile.setCompletedFlag(PrConstant.YES);
+            eleFile.setCompletedFlag(CompleteFlagEnum.DOWNLOADED.getCode());
             eleFile.setType(fileTypeEnum.getCode());
         }
+        Element element = elementService.getById(eleTorrent.getEleId());
+        element.setAvailableFlag(PrConstant.VALIDATED);
+        element.setFileSize(qBitTorrent.getCompleted());
+        element.setFileDir(fileDir);
+        elementService.updateById(element);
     }
 
     private QBitTorrent getQBitTorrentByHash(String hash) {
         List<QBitTorrent> qBitTorrents = qbittorrentEngine.getTorrents("", hash);
         if (qBitTorrents.size() < 1) {
-            BusinessExceptionEnum.NOT_FOUND.assertFail("qbittorrent 未找到对应磁链，请联系管理员");
+            BusinessExceptionEnum.NOT_FOUND.assertFail("磁链");
         }
         return qBitTorrents.get(0);
     }
@@ -205,7 +214,8 @@ public class TorrentServiceImpl implements TorrentService {
         try {
             hash = torrent.substring(torrent.indexOf("btih:"));
             hash = hash.substring(hash.indexOf(":") + 1, hash.indexOf("&"));
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.error("hash parse error: ", e);
         }
         if (StringUtils.isEmpty(hash)) {
             BusinessExceptionEnum.FIELD_ERROR.assertFail("磁力链接解析错误");
@@ -235,7 +245,7 @@ public class TorrentServiceImpl implements TorrentService {
     }
 
     private static String getDownloadDir(String userName, Element element) {
-        return FileUtil.simpleConcatPath(Settings.getDownloadRootPath(),
+        return FileUtil.simpleConcatPath(Settings.getQbittorrentPath(),
                 userName, element.getType(), String.valueOf(element.getId()));
     }
 

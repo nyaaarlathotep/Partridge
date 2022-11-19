@@ -16,7 +16,7 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"javCrawl/internal/dal/dao"
+	"pelican/internal/dal/dao"
 )
 
 func newEleFile(db *gorm.DB) eleFile {
@@ -53,7 +53,7 @@ type eleFile struct {
 	TYPE          field.String
 	PATH          field.String
 	PAGENUM       field.Int32 // ehentai_gallery 对应画廊文件页码
-	COMPLETEDFLAG field.Int32 // 完成标志(0-禁用;1-启用)，可以被删除
+	COMPLETEDFLAG field.Int32 // 完成标志(0-禁用;1-启用)
 	AVAILABLEFLAG field.Int32 // 启用标志(0-禁用;1-启用)
 	CreatedAt     field.Time
 	UpdatedAt     field.Time

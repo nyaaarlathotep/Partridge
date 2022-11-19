@@ -29,7 +29,8 @@ public enum BusinessExceptionEnum implements BusinessExceptionAssert {
     FILE_IO_ERROR(100018, "文件 I/O 异常，请联系管理员"),
     // 特殊业务异常
 
-    PERMISSION_DENY(200005, "用户权限不足"),
+    ELEMENT_UNCOMPLETED(200003, "元素存在未完成的上传或下载文件，无法进行操作"),
+    PERMISSION_DENY(200004, "用户权限不足"),
     SPACE_INSUFFICIENT(200005, "用户空间配额不足"),
     USER_CUSTOM(200006, "{0}"),
     USER_EXIST(200009, "用户名已存在"),

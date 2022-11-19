@@ -3,6 +3,7 @@ package cn.nyaaar.partridgemngservice.service.ehService.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.nyaaar.partridgemngservice.common.constants.PrConstant;
 import cn.nyaaar.partridgemngservice.common.constants.Settings;
+import cn.nyaaar.partridgemngservice.common.enums.CompleteFlagEnum;
 import cn.nyaaar.partridgemngservice.common.enums.FileTypeEnum;
 import cn.nyaaar.partridgemngservice.entity.*;
 import cn.nyaaar.partridgemngservice.common.enums.SourceEnum;
@@ -153,7 +154,7 @@ public class EhServiceImpl implements EhService {
     }
 
     @NotNull
-    private EhentaiGallery getEhGAndSavOrUpdEhg(long gid, String gtoken, boolean downloadThumb) {
+    public EhentaiGallery getEhGAndSavOrUpdEhg(long gid, String gtoken, boolean downloadThumb) {
         GalleryDetail galleryDetail = ehEngine.getGalleryDetail(gid, gtoken);
         EhentaiGallery ehentaiGallery = galleryDetail.transToEntity();
 
@@ -166,6 +167,11 @@ public class EhServiceImpl implements EhService {
         ehentaiGalleryService.saveOrUpdate(ehentaiGallery);
         return ehentaiGallery;
     }
+    @NotNull
+    public GalleryBasicInfo mendGallery(long gid, String gtoken, boolean downloadThumb) {
+        EhentaiGallery ehentaiGallery = getEhGAndSavOrUpdEhg(gid, gtoken, true);
+        return getGalleryBasicInfo(ehentaiGallery);
+    }
 
 
     private Long getOrInsertEleIdFromGid(long gid) {
@@ -175,6 +181,7 @@ public class EhServiceImpl implements EhService {
         if (ehentaiGalleryOld == null) {
             Element element = new Element();
             element.setType(SourceEnum.Ehentai.getCode());
+            element.setCompletedFlag(CompleteFlagEnum.INFO_ONLY.getCode());
             element.setAvailableFlag(PrConstant.VALIDATED);
             elementService.save(element);
             eleId = element.getId();
@@ -195,8 +202,21 @@ public class EhServiceImpl implements EhService {
     }
 
     @Override
-    public Map<Long, DownloadingGallery> getDownloadingQueue() {
-        return ehDownload.getDownloadingQueue();
+    public Collection<DownloadingGallery> getDownloadingQueue() {
+        String userName = ThreadLocalUtil.getCurrentUser();
+        if (appUserService.isRoot(userName)) {
+            return ehDownload.getDownloadingQueue().values();
+        }
+        Map<Long, DownloadingGallery> downloadingGalleryMap = ehDownload.getDownloadingQueue();
+        Collection<DownloadingGallery> downloadingGalleries = new ArrayList<>();
+        Iterator<DownloadingGallery> iterator = downloadingGalleryMap.values().iterator();
+        if (iterator.hasNext()) {
+            DownloadingGallery downloadingGallery = iterator.next();
+            if (downloadingGallery.getUserName().equals(userName)) {
+                downloadingGalleries.add(downloadingGallery);
+            }
+        }
+        return downloadingGalleries;
     }
 
     private GalleryPage getGalleryPage(EleFile eleFile) {

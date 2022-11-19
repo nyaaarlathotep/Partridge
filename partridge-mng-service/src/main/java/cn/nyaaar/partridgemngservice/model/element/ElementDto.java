@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.model;
+package cn.nyaaar.partridgemngservice.model.element;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -20,5 +20,14 @@ public class ElementDto {
 
     @Schema(title = "element类型")
     private String type;
+
+    @Schema(title = "收到喜爱的数量")
+    private Integer likes;
+
+    @Schema(title = "是否可用，已被上传者删除或其他原因")
+    private Boolean available;
+
+    @Schema(title = "是否完成")
+    private Boolean completed;
 
 }

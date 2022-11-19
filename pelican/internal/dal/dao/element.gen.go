@@ -12,21 +12,23 @@ const TableNameElement = "element"
 
 // Element mapped from table <element>
 type Element struct {
-	ID            int64          `gorm:"column:ID;type:bigint;primaryKey;autoIncrement:true" json:"ID"`
-	TYPE          string         `gorm:"column:TYPE;type:varchar(32);not null" json:"TYPE"`
-	FILEDIR       string         `gorm:"column:FILE_DIR;type:varchar(255)" json:"FILE_DIR"`        // 关联文件所在目录
-	FILESIZE      int64          `gorm:"column:FILE_SIZE;type:bigint" json:"FILE_SIZE"`            // 关联文件总大小，单位为 B
-	SHAREDFLAG    int32          `gorm:"column:SHARED_FLAG;type:tinyint" json:"SHARED_FLAG"`       // 分享标志(0-否;1-是)
-	PUBLISHEDFLAG int32          `gorm:"column:PUBLISHED_FLAG;type:tinyint" json:"PUBLISHED_FLAG"` // 释放标志(0-否;1-是)，释放后上传者将不能删除元素
-	UPLOADER      string         `gorm:"column:UPLOADER;type:varchar(128)" json:"UPLOADER"`        // 上传用户
-	AVAILABLEFLAG int32          `gorm:"column:AVAILABLE_FLAG;type:tinyint" json:"AVAILABLE_FLAG"` // 启用标志(0-禁用;1-启用)
-	CreatedAt     time.Time      `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`
-	UpdatedAt     time.Time      `gorm:"column:UPDATED_TIME;type:datetime" json:"UPDATED_TIME"`
-	EleFile       []EleFile      `gorm:"foreignKey:ELE_ID" json:"ele_file"`
-	Actor         []Actor        `gorm:"many2many:ele_actor_re;foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:ACTOR_ID" json:"actor"`
-	Author        []Author       `gorm:"many2many:ele_author_re;foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:AUTHOR_ID" json:"author"`
-	Organization  []Organization `gorm:"many2many:ele_org_re;foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:ORG_ID" json:"organization"`
-	TagInfo       []TagInfo      `gorm:"many2many:ele_tag_re;foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:TAG_ID" json:"tag_info"`
+	ID              int64          `gorm:"column:ID;type:bigint;primaryKey;autoIncrement:true" json:"ID"`
+	TYPE            string         `gorm:"column:TYPE;type:varchar(32);not null" json:"TYPE"`
+	FILEDIR         string         `gorm:"column:FILE_DIR;type:varchar(255)" json:"FILE_DIR"`                  // 关联文件所在目录
+	FILESIZE        int64          `gorm:"column:FILE_SIZE;type:bigint" json:"FILE_SIZE"`                      // 关联文件总大小，单位为 B
+	SHAREDFLAG      int32          `gorm:"column:SHARED_FLAG;type:tinyint" json:"SHARED_FLAG"`                 // 分享标志(0-否;1-是)
+	PUBLISHEDFLAG   int32          `gorm:"column:PUBLISHED_FLAG;type:tinyint" json:"PUBLISHED_FLAG"`           // 释放标志(0-否;1-是)，释放后上传者将不能删除元素
+	UPLOADER        string         `gorm:"column:UPLOADER;type:varchar(128)" json:"UPLOADER"`                  // 上传用户
+	AVAILABLEFLAG   int32          `gorm:"column:AVAILABLE_FLAG;type:tinyint;default:1" json:"AVAILABLE_FLAG"` // 启用标志(0-禁用;1-启用)
+	COMPLETEDFLAG   int32          `gorm:"column:COMPLETED_FLAG;type:tinyint" json:"COMPLETED_FLAG"`           // 完成标志
+	CreatedAt       time.Time      `gorm:"column:CREATED_TIME;type:datetime" json:"CREATED_TIME"`
+	UpdatedAt       time.Time      `gorm:"column:UPDATED_TIME;type:datetime" json:"UPDATED_TIME"`
+	Ehentai_gallery EhentaiGallery `gorm:"foreignKey:ELE_ID" json:"ehentai_gallery"`
+	EleFile         []EleFile      `gorm:"foreignKey:ELE_ID" json:"ele_file"`
+	Actor           []Actor        `gorm:"many2many:ele_actor_re;foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:ACTOR_ID" json:"actor"`
+	Author          []Author       `gorm:"many2many:ele_author_re;foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:AUTHOR_ID" json:"author"`
+	Organization    []Organization `gorm:"many2many:ele_org_re;foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:ORG_ID" json:"organization"`
+	TagInfo         []TagInfo      `gorm:"many2many:ele_tag_re;foreignKey:ID;joinForeignKey:ELE_ID;References:ID;joinReferences:TAG_ID" json:"tag_info"`
 }
 
 // TableName Element's table name

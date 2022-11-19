@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Map;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,7 +57,7 @@ public class EhServiceTest {
     @Test
     public void downloadGalleryQueueTest() {
         log.info("------before start-------");
-        Map<Long, DownloadingGallery> queue = ehService.getDownloadingQueue();
+        Collection<DownloadingGallery> queue = ehService.getDownloadingQueue();
         log.info(JSON.toJSONString(queue));
         log.info("------before start-------");
         ehService.downloadGallery(2315232, "c4fdf93bea");

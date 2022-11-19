@@ -1,19 +1,24 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"javCrawl/internal/dal/dao"
-	"javCrawl/internal/dal/query"
-	"javCrawl/internal/request"
-	"javCrawl/internal/scan"
-	"javCrawl/internal/service"
-	"javCrawl/internal/util"
 	"log"
+	"net/http"
 	"os"
+	"pelican/internal/constant"
+	"pelican/internal/dal/dao"
+	"pelican/internal/dal/query"
+	"pelican/internal/request"
+	"pelican/internal/scan"
+	"pelican/internal/service"
+	"pelican/internal/util"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -21,11 +26,6 @@ import (
 // TODO transactional support
 // TODO or maybe multi thread
 var queries *query.Query
-
-const (
-	Jav     string = "1"
-	eHentai string = "2"
-)
 
 func main() {
 	startServer()
@@ -77,6 +77,31 @@ func startServer() {
 			})
 		}
 	})
+	r.POST("/scanEhentai", func(c *gin.Context) {
+		var form scanDirForm
+		if c.ShouldBind(&form) == nil {
+			log.Printf("%v", form)
+			var duration time.Duration
+			var count int
+			if len(form.Dir) != 0 {
+				bT := time.Now()
+				count = scanEhentaiDir(form.Dir)
+				log.Printf("update or insert ehentai num: %v", count)
+				eT := time.Since(bT)
+				log.Printf("run time: %v", eT)
+				duration = eT
+			}
+			c.JSON(200, gin.H{
+				"message":  "SUCCESS",
+				"duration": fmt.Sprintf("%v", duration),
+				"count":    count,
+			})
+		} else {
+			c.JSON(400, gin.H{
+				"message": "form error",
+			})
+		}
+	})
 	r.POST("/upload", func(c *gin.Context) {
 		err = service.UploadFile(c)
 		if err != nil {
@@ -98,10 +123,11 @@ func startServer() {
 				c.JSON(400, gin.H{
 					"message": fmt.Sprintf(err.Error()),
 				})
+			} else {
+				c.JSON(200, gin.H{
+					"message": "SUCCESS",
+				})
 			}
-			c.JSON(200, gin.H{
-				"message": "SUCCESS",
-			})
 		} else {
 			c.JSON(400, gin.H{
 				"message": "form error",
@@ -121,6 +147,23 @@ func scanJavDir(scanDir string) int {
 		log.Printf("%+v", *jav)
 		count++
 		updateOrInsertEle(jav, codeFPathMap[code], false)
+	}
+	return count
+}
+
+func scanEhentaiDir(scanDir string) int {
+	count := 0
+	elements := scan.EhentaiScan(scanDir)
+	for _, element := range elements {
+		_ = queries.Element.Create(element)
+		count++
+		galleryId := make(map[string]string)
+		galleryId["gid"] = strconv.FormatInt(element.Ehentai_gallery.GID, 10)
+		galleryId["gtoken"] = element.Ehentai_gallery.TOKEN
+		bytesData, _ := json.Marshal(galleryId)
+
+		completeUrl := constant.CompleteInfoUrl + "partridge-mng-service/ehentai/complete"
+		_, _ = http.Post(completeUrl, "application/json;charset=utf-8", bytes.NewBuffer(bytesData))
 	}
 	return count
 }
@@ -156,7 +199,7 @@ func updateOrInsertEle(jav *request.JavInfo, path string, update bool) int64 {
 	eleFile := getEleFile(path)
 
 	newEle := &dao.Element{
-		TYPE:         Jav,
+		TYPE:         constant.Jav,
 		SHAREDFLAG:   0,
 		UPLOADER:     "root",
 		EleFile:      []dao.EleFile{*eleFile},
@@ -313,7 +356,7 @@ func getTags(jav *request.JavInfo) []dao.TagInfo {
 			tags = append(tags, dao.TagInfo{
 				NAME:      javTag,
 				GROUPNAME: "",
-				SOURCE:    Jav,
+				SOURCE:    constant.Jav,
 			})
 		} else {
 			tags = append(tags, *searchTag[0])
@@ -323,8 +366,7 @@ func getTags(jav *request.JavInfo) []dao.TagInfo {
 }
 
 func init() {
-	// TODO config
-	ormDb, err := gorm.Open(mysql.Open("root:12345678@tcp(127.0.0.1:3306)/partridge?charset=utf8mb4&parseTime=True&loc=Local"))
+	ormDb, err := gorm.Open(mysql.Open(constant.MysqlUrl))
 	if err != nil {
 		log.Println("open mysql failed,", err)
 		panic(fmt.Sprintf("invalid database %q", err))

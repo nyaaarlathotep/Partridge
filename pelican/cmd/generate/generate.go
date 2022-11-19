@@ -5,7 +5,7 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gen/field"
 	"gorm.io/gorm"
-	"javCrawl/internal/dal/dao"
+	"pelican/internal/dal/dao"
 )
 
 // generate code
@@ -35,7 +35,7 @@ func main() {
 
 	// reuse the database connection in Project or create a connection here
 	// if you want to use GenerateModel/GenerateModelAs, UseDB is necessary or it will panic
-	db, _ := gorm.Open(mysql.Open("root:12345678@tcp(127.0.0.1:3306)/partridge?charset=utf8mb4&parseTime=True&loc=Local"))
+	db, _ := gorm.Open(mysql.Open("root:12345678@tcp(192.168.1.7:3306)/partridge?charset=utf8mb4&parseTime=True&loc=Local"))
 	//db, _ := gorm.Open(mysql.Open("root:@(127.0.0.1:3306)/demo?charset=utf8mb4&parseTime=True&loc=Local"))
 	g.UseDB(db)
 
@@ -49,6 +49,9 @@ func main() {
 	g.ApplyBasic(g.GenerateModelAs("element", "Element",
 		gen.FieldRename("CREATED_TIME", "CreatedAt"),
 		gen.FieldRename("UPDATED_TIME", "UpdatedAt"),
+		gen.FieldRelateModel(field.HasOne, "Ehentai_gallery", dao.EhentaiGallery{}, &field.RelateConfig{
+			GORMTag: "foreignKey:ELE_ID",
+		}),
 		gen.FieldRelateModel(field.HasMany, "EleFile", dao.EleFile{}, &field.RelateConfig{
 			GORMTag: "foreignKey:ELE_ID",
 		}),
@@ -73,6 +76,9 @@ func main() {
 		gen.FieldRename("CREATED_TIME", "CreatedAt"),
 		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))
 	g.ApplyBasic(g.GenerateModelAs("jav", "Jav",
+		gen.FieldRename("CREATED_TIME", "CreatedAt"),
+		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))
+	g.ApplyBasic(g.GenerateModelAs("ehentai_gallery", "EhentaiGallery",
 		gen.FieldRename("CREATED_TIME", "CreatedAt"),
 		gen.FieldRename("UPDATED_TIME", "UpdatedAt")))
 	g.ApplyBasic(g.GenerateModelAs("ehentai_gallery", "EhentaiGallery",

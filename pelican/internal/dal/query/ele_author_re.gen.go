@@ -16,7 +16,7 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"javCrawl/internal/dal/dao"
+	"pelican/internal/dal/dao"
 )
 
 func newEleAuthorRe(db *gorm.DB) eleAuthorRe {

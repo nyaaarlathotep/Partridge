@@ -2,19 +2,23 @@ package cn.nyaaar.partridgemngservice.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+
 import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.io.Serializable;
 import java.io.Serial;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author nyaaar
@@ -50,7 +54,8 @@ public class EleFile extends Model<EleFile> {
     private Integer pageNum;
 
     /**
-     * 完成标志(0-禁用;1-启用)，可以被删除
+     * 完成标志，详见
+     * {@link cn.nyaaar.partridgemngservice.common.enums.CompleteFlagEnum}
      */
     @TableField("COMPLETED_FLAG")
     private Integer completedFlag;

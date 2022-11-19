@@ -4,19 +4,17 @@ import (
 	"fmt"
 	"github.com/antchfx/htmlquery"
 	"log"
+	"pelican/internal/constant"
 	"regexp"
 	"strings"
 	"time"
 )
 
-const YYYYMMDD = "2006-01-02"
-const urlPrefix = "https://www.javbus.com/"
-
 var spaceReg = regexp.MustCompile("\\s+")
 
 func GetJavInfo(code string) (*JavInfo, error) {
 
-	doc, err := htmlquery.LoadURL(urlPrefix + code)
+	doc, err := htmlquery.LoadURL(constant.JavBus + code)
 	if err != nil {
 		log.Printf("parse failed, err:%v\n", err)
 		return nil, fmt.Errorf("parse error, please check your network")
@@ -64,7 +62,7 @@ func GetJavInfo(code string) (*JavInfo, error) {
 			jav.Code = right
 		}
 		if left == "發行日期" {
-			t, err := time.Parse(YYYYMMDD, right)
+			t, err := time.Parse(constant.YYYYMMDD, right)
 			if err != nil {
 				log.Fatal(err)
 			}

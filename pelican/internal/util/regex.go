@@ -11,11 +11,12 @@ var number = regexp.MustCompile(`\d+`)
 var movieReg = regexp.MustCompile(".*[a-zA-Z]{3,5}[-_]?[0-9]{3}.*(avi|mp4)$")
 var codeReg = regexp.MustCompile("[a-zA-Z]{3,5}[-_]?[0-9]{3}")
 var bigLetter = regexp.MustCompile("[A-Z]+")
+var ehvFolder = regexp.MustCompile(`\d+-.*`)
 
 func GetNumFromString(stringLength string) (error, int64) {
 	lengths := number.FindAllString(stringLength, -1)
 	if len(lengths) != 1 {
-		return fmt.Errorf("find multi number"), 0
+		return fmt.Errorf("find %d number, string: %v", len(lengths), stringLength), 0
 	}
 	length, err := strconv.ParseInt(lengths[0], 10, 64)
 	if err != nil {
@@ -39,4 +40,17 @@ func FormatJavCode(rawCode string) string {
 		code = code[0:index[0][1]] + "-" + code[index[0][1]:]
 	}
 	return code
+}
+
+func GetGidAndName(folderName string) (int64, string, error) {
+	matches := ehvFolder.FindAllString(folderName, -1)
+	if len(matches) == 0 {
+		return -1, "", fmt.Errorf("folder name parse error, folder name: [%s]", folderName)
+	}
+	parts := strings.Split(folderName, "-")
+	gid, err := strconv.ParseInt(parts[0], 10, 64)
+	if err != nil {
+		return -1, "", fmt.Errorf("folder name parse error, folder name: [%s]", folderName)
+	}
+	return gid, parts[1], nil
 }

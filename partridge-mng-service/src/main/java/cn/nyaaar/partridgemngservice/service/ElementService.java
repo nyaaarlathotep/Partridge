@@ -7,16 +7,16 @@ import java.util.List;
 
 /**
  * <p>
- * 基本元素表 服务类
+ * 基本元素表，包含相关控制信息 服务类
  * </p>
  *
  * @author nyaaar
- * @since 2022-10-08
+ * @since 2022-10-31
  */
 public interface ElementService extends IService<Element> {
 
     /**
-     * 查询基本元素表分页数据
+     * 查询基本元素表，包含相关控制信息分页数据
      *
      * @param where     查询条件
      * @param page      页码
@@ -26,7 +26,7 @@ public interface ElementService extends IService<Element> {
     QueryData<Element> findListByPage(Element where,Integer page, Integer pageCount);
 
     /**
-    * 查询基本元素表所有数据
+    * 查询基本元素表，包含相关控制信息所有数据
     *
     * @param where     查询条件
     * @return List
@@ -35,15 +35,15 @@ public interface ElementService extends IService<Element> {
 
 
     /**
-     * 添加基本元素表
+     * 添加基本元素表，包含相关控制信息
      *
-     * @param element 基本元素表
+     * @param element 基本元素表，包含相关控制信息
      * @return 影响条数
      */
     Integer add(Element element);
 
     /**
-     * 删除基本元素表
+     * 删除基本元素表，包含相关控制信息
      *
      * @param id 主键
      * @return 影响条数
@@ -51,9 +51,9 @@ public interface ElementService extends IService<Element> {
     Integer delete(Integer id);
 
     /**
-     * 修改基本元素表
+     * 修改基本元素表，包含相关控制信息
      *
-     * @param element 基本元素表
+     * @param element 基本元素表，包含相关控制信息
      * @return 影响条数
      */
     Integer updateData(Element element);

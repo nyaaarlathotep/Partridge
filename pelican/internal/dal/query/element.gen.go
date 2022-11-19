@@ -16,7 +16,7 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"javCrawl/internal/dal/dao"
+	"pelican/internal/dal/dao"
 )
 
 func newElement(db *gorm.DB) element {
@@ -35,8 +35,15 @@ func newElement(db *gorm.DB) element {
 	_element.PUBLISHEDFLAG = field.NewInt32(tableName, "PUBLISHED_FLAG")
 	_element.UPLOADER = field.NewString(tableName, "UPLOADER")
 	_element.AVAILABLEFLAG = field.NewInt32(tableName, "AVAILABLE_FLAG")
+	_element.COMPLETEDFLAG = field.NewInt32(tableName, "COMPLETED_FLAG")
 	_element.CreatedAt = field.NewTime(tableName, "CREATED_TIME")
 	_element.UpdatedAt = field.NewTime(tableName, "UPDATED_TIME")
+	_element.Ehentai_gallery = elementHasOneEhentai_gallery{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("Ehentai_gallery", "dao.EhentaiGallery"),
+	}
+
 	_element.EleFile = elementHasManyEleFile{
 		db: db.Session(&gorm.Session{}),
 
@@ -75,18 +82,21 @@ func newElement(db *gorm.DB) element {
 type element struct {
 	elementDo
 
-	ALL           field.Asterisk
-	ID            field.Int64
-	TYPE          field.String
-	FILEDIR       field.String // 关联文件所在目录
-	FILESIZE      field.Int64  // 关联文件总大小，单位为 B
-	SHAREDFLAG    field.Int32  // 分享标志(0-否;1-是)
-	PUBLISHEDFLAG field.Int32  // 释放标志(0-否;1-是)，释放后上传者将不能删除元素
-	UPLOADER      field.String // 上传用户
-	AVAILABLEFLAG field.Int32  // 启用标志(0-禁用;1-启用)
-	CreatedAt     field.Time
-	UpdatedAt     field.Time
-	EleFile       elementHasManyEleFile
+	ALL             field.Asterisk
+	ID              field.Int64
+	TYPE            field.String
+	FILEDIR         field.String // 关联文件所在目录
+	FILESIZE        field.Int64  // 关联文件总大小，单位为 B
+	SHAREDFLAG      field.Int32  // 分享标志(0-否;1-是)
+	PUBLISHEDFLAG   field.Int32  // 释放标志(0-否;1-是)，释放后上传者将不能删除元素
+	UPLOADER        field.String // 上传用户
+	AVAILABLEFLAG   field.Int32  // 启用标志(0-禁用;1-启用)
+	COMPLETEDFLAG   field.Int32  // 完成标志
+	CreatedAt       field.Time
+	UpdatedAt       field.Time
+	Ehentai_gallery elementHasOneEhentai_gallery
+
+	EleFile elementHasManyEleFile
 
 	Actor elementManyToManyActor
 
@@ -119,6 +129,7 @@ func (e *element) updateTableName(table string) *element {
 	e.PUBLISHEDFLAG = field.NewInt32(table, "PUBLISHED_FLAG")
 	e.UPLOADER = field.NewString(table, "UPLOADER")
 	e.AVAILABLEFLAG = field.NewInt32(table, "AVAILABLE_FLAG")
+	e.COMPLETEDFLAG = field.NewInt32(table, "COMPLETED_FLAG")
 	e.CreatedAt = field.NewTime(table, "CREATED_TIME")
 	e.UpdatedAt = field.NewTime(table, "UPDATED_TIME")
 
@@ -137,7 +148,7 @@ func (e *element) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (e *element) fillFieldMap() {
-	e.fieldMap = make(map[string]field.Expr, 15)
+	e.fieldMap = make(map[string]field.Expr, 17)
 	e.fieldMap["ID"] = e.ID
 	e.fieldMap["TYPE"] = e.TYPE
 	e.fieldMap["FILE_DIR"] = e.FILEDIR
@@ -146,6 +157,7 @@ func (e *element) fillFieldMap() {
 	e.fieldMap["PUBLISHED_FLAG"] = e.PUBLISHEDFLAG
 	e.fieldMap["UPLOADER"] = e.UPLOADER
 	e.fieldMap["AVAILABLE_FLAG"] = e.AVAILABLEFLAG
+	e.fieldMap["COMPLETED_FLAG"] = e.COMPLETEDFLAG
 	e.fieldMap["CREATED_TIME"] = e.CreatedAt
 	e.fieldMap["UPDATED_TIME"] = e.UpdatedAt
 
@@ -154,6 +166,72 @@ func (e *element) fillFieldMap() {
 func (e element) clone(db *gorm.DB) element {
 	e.elementDo.ReplaceDB(db)
 	return e
+}
+
+type elementHasOneEhentai_gallery struct {
+	db *gorm.DB
+
+	field.RelationField
+}
+
+func (a elementHasOneEhentai_gallery) Where(conds ...field.Expr) *elementHasOneEhentai_gallery {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a elementHasOneEhentai_gallery) WithContext(ctx context.Context) *elementHasOneEhentai_gallery {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a elementHasOneEhentai_gallery) Model(m *dao.Element) *elementHasOneEhentai_galleryTx {
+	return &elementHasOneEhentai_galleryTx{a.db.Model(m).Association(a.Name())}
+}
+
+type elementHasOneEhentai_galleryTx struct{ tx *gorm.Association }
+
+func (a elementHasOneEhentai_galleryTx) Find() (result *dao.EhentaiGallery, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a elementHasOneEhentai_galleryTx) Append(values ...*dao.EhentaiGallery) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a elementHasOneEhentai_galleryTx) Replace(values ...*dao.EhentaiGallery) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a elementHasOneEhentai_galleryTx) Delete(values ...*dao.EhentaiGallery) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a elementHasOneEhentai_galleryTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a elementHasOneEhentai_galleryTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type elementHasManyEleFile struct {

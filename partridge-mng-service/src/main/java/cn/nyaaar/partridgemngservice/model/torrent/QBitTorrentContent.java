@@ -18,7 +18,7 @@ import java.util.List;
 public class QBitTorrentContent {
 
     @Schema(title = "integer	File index")
-    private Long index;
+    private Integer index;
 
     @Schema(title = "File name (including relative path)")
     private String name;

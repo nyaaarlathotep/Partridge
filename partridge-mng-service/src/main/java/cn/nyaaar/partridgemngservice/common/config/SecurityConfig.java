@@ -44,6 +44,8 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/user/**")
                 .permitAll()
+                .antMatchers("/ehentai/complete")
+                .permitAll()
                 .antMatchers("/swagger-ui/**")
                 .hasRole(PrivilegeEnum.ROOT.getCode())
                 .anyRequest()

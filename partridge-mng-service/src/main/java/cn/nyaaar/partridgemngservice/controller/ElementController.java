@@ -1,17 +1,19 @@
 package cn.nyaaar.partridgemngservice.controller;
 
 import cn.nyaaar.partridgemngservice.common.annotation.LogAnnotation;
-import cn.nyaaar.partridgemngservice.entity.Element;
-import cn.nyaaar.partridgemngservice.exception.BusinessExceptionEnum;
-import cn.nyaaar.partridgemngservice.model.ElementDto;
+import cn.nyaaar.partridgemngservice.model.ListResp;
+import cn.nyaaar.partridgemngservice.model.element.CollectionDto;
+import cn.nyaaar.partridgemngservice.model.element.CollectionEleDto;
+import cn.nyaaar.partridgemngservice.model.element.ElementDto;
 import cn.nyaaar.partridgemngservice.model.file.CheckResp;
 import cn.nyaaar.partridgemngservice.model.response.R;
-import cn.nyaaar.partridgemngservice.service.ElementService;
+import cn.nyaaar.partridgemngservice.model.validate.Add;
+import cn.nyaaar.partridgemngservice.model.validate.Delete;
 import cn.nyaaar.partridgemngservice.service.element.ElementMngService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,25 +29,30 @@ import java.util.List;
 @RequestMapping("/element")
 @Slf4j
 public class ElementController {
-    private final ElementService elementService;
+    // TODO getUserCollection
+    // TODO crud element to collection
+    // TODO get user like elements
+    // TODO get user like collection
     private final ElementMngService elementMngService;
 
-    public ElementController(ElementService elementService,
-                             ElementMngService elementMngService) {
-        this.elementService = elementService;
+    public ElementController(ElementMngService elementMngService) {
         this.elementMngService = elementMngService;
     }
 
-    @Operation(summary = "element基本信息", description = "通过主键id获取element基本信息")
+    @Operation(summary = "获取 element 基本信息", description = "通过主键 id 获取 element 基本信息")
     @GetMapping(value = "/element")
     @LogAnnotation
     public R<ElementDto> getElementById(@RequestParam Long elementId) {
-        Element element = elementService.getOne(new LambdaQueryWrapper<Element>().eq(Element::getId, elementId));
-        BusinessExceptionEnum.NOT_FOUND.assertNotNull(element, "元素");
-        ElementDto elementDto = new ElementDto()
-                .setId(elementId)
-                .setType(element.getType());
-        return new R<>(elementDto);
+
+        return new R<>(elementMngService.getEle(elementId));
+    }
+
+    @Operation(summary = "获取 elements 基本信息", description = "通过主键 id 获取 element 基本信息")
+    @GetMapping(value = "/elements")
+    @LogAnnotation
+    public R<List<ElementDto>> getElementById(@RequestParam List<Long> elementIds) {
+
+        return new R<>(elementMngService.getElements(elementIds));
     }
 
     @Operation(summary = "分享 element", description = "通过主键id 分享 element")
@@ -72,10 +79,77 @@ public class ElementController {
         return new R<>();
     }
 
+    @Operation(summary = "喜爱对应的元素")
+    @GetMapping(value = "/like")
+    @LogAnnotation
+    public R<String> like(@RequestParam Long eleId) {
+        // TODO sort by like
+        elementMngService.like(eleId);
+        return new R<>();
+    }
+
+    @Operation(summary = "取消喜爱对应的元素")
+    @GetMapping(value = "/unlike")
+    @LogAnnotation
+    public R<String> unlike(@RequestParam Long eleId) {
+        elementMngService.unlike(eleId);
+        return new R<>();
+    }
+
+    @Operation(summary = "新增合集", description = "新增合集，返回新增集合的 id")
+    @PostMapping(value = "/collection/add")
+    @LogAnnotation
+    public R<Integer> addCollection(@RequestBody @Validated(Add.class) CollectionDto collectionDto) {
+
+        return new R<>(elementMngService.addCollection(collectionDto));
+    }
+
+    @Operation(summary = "分享合集", description = "分享合集，分享集合中的所有元素")
+    @PostMapping(value = "/collection/share")
+    @LogAnnotation
+    public R<String> shareCollection(@RequestBody Integer collectionId) {
+        elementMngService.shareCollection(collectionId);
+        return new R<>();
+    }
+
+    @Operation(summary = "获取用户对应集合")
+    @GetMapping(value = "/collection/get/{pageIndex}")
+    @LogAnnotation
+    public R<ListResp<CollectionDto>> getCollection(@RequestParam String userName, @PathVariable Integer pageIndex) {
+
+        return new R<>(elementMngService.getCollections(userName, pageIndex));
+    }
+
+    @Operation(summary = "合集新增元素", description = "新增元素至已分享集合会自动分享元素")
+    @PostMapping(value = "/collection/add/element")
+    @LogAnnotation
+    public R<String> collectionAddElement(@RequestBody CollectionEleDto collectionEleDto) {
+        elementMngService.collectionAddElement(collectionEleDto);
+        return new R<>();
+    }
+
+    @Operation(summary = "合集删除元素")
+    @PostMapping(value = "/collection/delete/element")
+    @LogAnnotation
+    public R<String> collectionDeleteElement(@RequestBody CollectionEleDto collectionEleDto) {
+        elementMngService.collectionDeleteElement(collectionEleDto);
+        return new R<>();
+    }
+
+    @Operation(summary = "删除合集")
+    @PostMapping(value = "/collection/delete")
+    @LogAnnotation
+    public R<String> deleteCollection(@RequestBody @Validated(Delete.class) CollectionDto collectionDto) {
+        elementMngService.deleteCollection(collectionDto);
+        return new R<>();
+    }
+
     @Operation(summary = "获取未上传完成的 elements 的 checkResp", description = "返回 check 的结果列表")
     @GetMapping(value = "/uploading")
     @LogAnnotation
-    public R<List<CheckResp>> getUploadingJavs() {
+    public R<List<CheckResp>> getUploadingElements() {
+
         return new R<>(elementMngService.getUploadingElements());
     }
+
 }

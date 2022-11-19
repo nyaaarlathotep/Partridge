@@ -69,9 +69,9 @@ public class TorrentController {
 
 
     @Operation(summary = "删除 torrent 的内容", description = "删除 torrent 的内容")
-    @GetMapping(value = "/delete/content")
+    @PostMapping(value = "/delete/content")
     @LogAnnotation
-    public R<String> deleteTorrentContent(@RequestParam @Validated(Delete.class) TorrentContentReq torrentContentReq) {
+    public R<String> deleteTorrentContent(@RequestBody @Validated(Delete.class) TorrentContentReq torrentContentReq) {
         torrentService.deleteTorrentContent(torrentContentReq.getHash(), torrentContentReq.getIndex());
         return new R<>();
     }
