@@ -4,12 +4,8 @@ import {ElMessage} from 'element-plus';
 const service = axios.create({
     baseURL: 'http://223.166.241.224:51320/',
     withCredentials: true, // 异步请求携带cookies
-    headers: {
-        // 设置后端需要的传参类型
-        'Content-Type': 'application/json',
-        'token': 'your token',
-        'X-Requested-With': 'XMLHttpRequest',
-    },
+    changeOrigin: true,
+    timeout: 5000
 })
  
 // 添加请求拦截器
@@ -28,7 +24,6 @@ service.interceptors.request.use(
 // 添加响应拦截器
 service.interceptors.response.use(
     function (response) {
-        // dataAxios 是 axios 返回数据中的 data
         const dataAxios = response.data
         return dataAxios
     },

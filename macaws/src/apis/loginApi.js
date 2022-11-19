@@ -1,9 +1,9 @@
-import httpRequest from '../requests/api';
+import httpRequest from '../requests/base';
 
-export function userLogin(param) {
-    return httpRequest({
-        url: '/posts',
-        method: 'post',
-        data: param,
-    })
+export function userLogin(params) {
+    return httpRequest.post("/user/login", params);
+}
+
+export function userRegister(params) {
+    return httpRequest.post("/user/register", params);
 }
