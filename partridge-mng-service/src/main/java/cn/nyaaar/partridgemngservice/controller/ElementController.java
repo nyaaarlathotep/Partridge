@@ -58,7 +58,7 @@ public class ElementController {
     @Operation(summary = "分享 element", description = "通过主键id 分享 element")
     @GetMapping(value = "/share")
     @LogAnnotation
-    public R<String> share(@RequestParam Long elementId) {
+    public R<Void> share(@RequestParam Long elementId) {
         elementMngService.share(elementId);
         return new R<>();
     }
@@ -66,7 +66,7 @@ public class ElementController {
     @Operation(summary = "公开 element", description = "通过主键id 公开 element")
     @GetMapping(value = "/publish")
     @LogAnnotation
-    public R<String> publish(@RequestParam Long elementId) {
+    public R<Void> publish(@RequestParam Long elementId) {
         elementMngService.publish(elementId);
         return new R<>();
     }
@@ -74,7 +74,7 @@ public class ElementController {
     @Operation(summary = "删除 element", description = "删除文件及其关联分片")
     @PostMapping(value = "/delete")
     @LogAnnotation
-    public R<String> delete(@RequestBody Long eleId) {
+    public R<Void> delete(@RequestBody Long eleId) {
         elementMngService.delete(eleId);
         return new R<>();
     }
@@ -82,7 +82,7 @@ public class ElementController {
     @Operation(summary = "喜爱对应的元素")
     @GetMapping(value = "/like")
     @LogAnnotation
-    public R<String> like(@RequestParam Long eleId) {
+    public R<Void> like(@RequestParam Long eleId) {
         // TODO sort by like
         elementMngService.like(eleId);
         return new R<>();
@@ -91,7 +91,7 @@ public class ElementController {
     @Operation(summary = "取消喜爱对应的元素")
     @GetMapping(value = "/unlike")
     @LogAnnotation
-    public R<String> unlike(@RequestParam Long eleId) {
+    public R<Void> unlike(@RequestParam Long eleId) {
         elementMngService.unlike(eleId);
         return new R<>();
     }
@@ -107,7 +107,7 @@ public class ElementController {
     @Operation(summary = "分享合集", description = "分享合集，分享集合中的所有元素")
     @PostMapping(value = "/collection/share")
     @LogAnnotation
-    public R<String> shareCollection(@RequestBody Integer collectionId) {
+    public R<Void> shareCollection(@RequestBody Integer collectionId) {
         elementMngService.shareCollection(collectionId);
         return new R<>();
     }
@@ -123,7 +123,7 @@ public class ElementController {
     @Operation(summary = "合集新增元素", description = "新增元素至已分享集合会自动分享元素")
     @PostMapping(value = "/collection/add/element")
     @LogAnnotation
-    public R<String> collectionAddElement(@RequestBody CollectionEleDto collectionEleDto) {
+    public R<Void> collectionAddElement(@RequestBody CollectionEleDto collectionEleDto) {
         elementMngService.collectionAddElement(collectionEleDto);
         return new R<>();
     }
@@ -131,7 +131,7 @@ public class ElementController {
     @Operation(summary = "合集删除元素")
     @PostMapping(value = "/collection/delete/element")
     @LogAnnotation
-    public R<String> collectionDeleteElement(@RequestBody CollectionEleDto collectionEleDto) {
+    public R<Void> collectionDeleteElement(@RequestBody CollectionEleDto collectionEleDto) {
         elementMngService.collectionDeleteElement(collectionEleDto);
         return new R<>();
     }
@@ -139,7 +139,7 @@ public class ElementController {
     @Operation(summary = "删除合集")
     @PostMapping(value = "/collection/delete")
     @LogAnnotation
-    public R<String> deleteCollection(@RequestBody @Validated(Delete.class) CollectionDto collectionDto) {
+    public R<Void> deleteCollection(@RequestBody @Validated(Delete.class) CollectionDto collectionDto) {
         elementMngService.deleteCollection(collectionDto);
         return new R<>();
     }
