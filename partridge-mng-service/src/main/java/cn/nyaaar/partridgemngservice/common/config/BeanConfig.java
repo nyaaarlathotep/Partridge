@@ -131,4 +131,20 @@ public class BeanConfig {
         pool.setThreadNamePrefix("downloadQueue-executor---");
         return pool;
     }
+    @Bean(name = "previewQueueExecutor")
+    public ThreadPoolTaskExecutor previewQueueExecutor() {
+        ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
+        //核心线程池数
+        pool.setCorePoolSize(3);
+        //最大线程数
+        pool.setMaxPoolSize(5);
+        //队列容量
+        pool.setQueueCapacity(300);
+        // 线程最大空闲时间
+        pool.setKeepAliveSeconds(300);
+        //队列满，调用线程中运行被拒绝的任务。
+        pool.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy());
+        pool.setThreadNamePrefix("previewQueue-executor---");
+        return pool;
+    }
 }

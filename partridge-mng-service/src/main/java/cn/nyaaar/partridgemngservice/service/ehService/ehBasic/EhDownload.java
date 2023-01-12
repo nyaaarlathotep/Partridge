@@ -45,6 +45,7 @@ public class EhDownload {
     private final ElementService elementService;
     private final AppUserService appUserService;
     private final ThreadPoolTaskExecutor downloadQueueExecutor;
+    private final ThreadPoolTaskExecutor previewQueueExecutor;
 
     private static final int ehentaiPreviewSize = 40;
     private static final int maxFailCount = 2;
@@ -55,7 +56,8 @@ public class EhDownload {
                       EhentaiGalleryService ehentaiGalleryService,
                       ElementService elementService,
                       AppUserService appUserService,
-                      ThreadPoolTaskExecutor downloadQueueExecutor) {
+                      ThreadPoolTaskExecutor downloadQueueExecutor,
+                      ThreadPoolTaskExecutor previewQueueExecutor) {
         this.ehEngine = ehEngine;
         this.downloadService = downloadService;
         this.eleFileService = eleFileService;
@@ -63,6 +65,7 @@ public class EhDownload {
         this.elementService = elementService;
         this.appUserService = appUserService;
         this.downloadQueueExecutor = downloadQueueExecutor;
+        this.previewQueueExecutor = previewQueueExecutor;
     }
 
     public void downloadGalleryAsync(@NonNull EhentaiGallery ehentaiGallery) {
@@ -213,17 +216,19 @@ public class EhDownload {
     public List<GalleryPage> getGalleryPages(long gid, String gtoken, List<Integer> pageIndexes, EhentaiGallery ehentaiGallery) {
         List<GalleryPage> pages = new ArrayList<>();
         for (Integer pageIndex : pageIndexes) {
-            int index = pageIndex - 1;
-            if (index < 0 || index >= ehentaiGallery.getPages()) {
-                BusinessExceptionEnum.FIELD_ER_WITH_ER_VALUE.assertFail("页码 ", pageIndex);
-            }
-            int ptokenPageIndex = index / ehentaiPreviewSize;
-            int ptokenListIndex = index % ehentaiPreviewSize;
+            previewQueueExecutor.submit(() -> {
+                int index = pageIndex - 1;
+                if (index < 0 || index >= ehentaiGallery.getPages()) {
+                    BusinessExceptionEnum.FIELD_ER_WITH_ER_VALUE.assertFail("页码 ", pageIndex);
+                }
+                int ptokenPageIndex = index / ehentaiPreviewSize;
+                int ptokenListIndex = index % ehentaiPreviewSize;
 
-            List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken, ptokenPageIndex);
-            GalleryPage galleryPage = downloadGalleryPageSync(galleryTokens.get(ptokenListIndex), index, gid, gtoken);
-            galleryPage.setPageIndex(pageIndex);
-            pages.add(galleryPage);
+                List<String> galleryTokens = ehEngine.getPTokens(gid, gtoken, ptokenPageIndex);
+                GalleryPage galleryPage = downloadGalleryPageSync(galleryTokens.get(ptokenListIndex), index, gid, gtoken);
+                galleryPage.setPageIndex(pageIndex);
+                pages.add(galleryPage);
+            });
         }
         return pages;
     }
