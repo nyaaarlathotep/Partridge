@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.common.enums;
+package cn.nyaaar.partridgemngservice.common.enums.error;
 
 import cn.nyaaar.partridgemngservice.exception.BaseException;
 import cn.nyaaar.partridgemngservice.exception.CommonExceptionAssert;
@@ -41,11 +41,11 @@ public enum CommonResponseEnum implements CommonExceptionAssert {
     /**
      * 返回码
      */
-    private int code;
+    private final int code;
     /**
      * 返回消息
      */
-    private String message;
+    private final String message;
 
     /**
      * 校验返回结果是否成功

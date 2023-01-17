@@ -1,7 +1,9 @@
 package cn.nyaaar.partridgemngservice.exception;
 
 
-import cn.nyaaar.partridgemngservice.common.enums.IResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.error.IResponseEnum;
+
+import java.io.Serial;
 
 /**
  * <p>业务异常</p>
@@ -9,6 +11,7 @@ import cn.nyaaar.partridgemngservice.common.enums.IResponseEnum;
  */
 public class BusinessException extends BaseException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public BusinessException(IResponseEnum responseEnum, Object[] args, String message) {

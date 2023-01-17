@@ -1,7 +1,7 @@
 package cn.nyaaar.partridgemngservice.model.response;
 
-import cn.nyaaar.partridgemngservice.common.enums.CommonResponseEnum;
-import cn.nyaaar.partridgemngservice.common.enums.IResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.error.CommonResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.error.IResponseEnum;
 import lombok.Data;
 
 /**
@@ -14,9 +14,17 @@ public class BaseResponse {
      */
     protected int code;
     /**
+     * 次级返回码
+     */
+    protected String subCode;
+    /**
      * 返回消息
      */
     protected String message;
+    /**
+     * 次级返回消息
+     */
+    protected String subMsg;
 
     public BaseResponse() {
         // 默认创建成功的回应

@@ -1,6 +1,6 @@
 package cn.nyaaar.partridgemngservice.exception;
 
-import cn.nyaaar.partridgemngservice.common.enums.IResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.error.IResponseEnum;
 import cn.nyaaar.partridgemngservice.exception.assertion.Assert;
 
 import java.text.MessageFormat;

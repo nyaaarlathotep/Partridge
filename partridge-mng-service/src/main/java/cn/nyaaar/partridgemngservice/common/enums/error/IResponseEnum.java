@@ -1,4 +1,4 @@
-package cn.nyaaar.partridgemngservice.common.enums;
+package cn.nyaaar.partridgemngservice.common.enums.error;
 
 /**
  * <pre>

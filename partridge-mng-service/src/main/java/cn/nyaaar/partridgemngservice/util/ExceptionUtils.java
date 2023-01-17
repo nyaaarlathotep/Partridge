@@ -17,11 +17,37 @@
 package cn.nyaaar.partridgemngservice.util;
 
 
+import cn.nyaaar.partridgemngservice.common.enums.error.CodeEnum;
+import cn.nyaaar.partridgemngservice.exception.BaseException;
 import org.springframework.lang.NonNull;
+import org.springframework.util.StringUtils;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public final class ExceptionUtils {
+    private static final String PATTERN_DOUBLE_CODE_REGEX = "(\\d{3}-\\w+).*";
+    private static final Pattern PATTERN_DOUBLE_CODE = Pattern.compile(PATTERN_DOUBLE_CODE_REGEX);
+    private static final String CODE_SPLIT = "-";
 
+    public static String message(String code, String subCode) {
+        return code + '-' + subCode;
+    }
+
+    public static boolean isCode(String message) {
+        return StringUtils.hasLength(message) && message.matches(PATTERN_DOUBLE_CODE_REGEX);
+    }
+
+    public static String[] extractCode(String message) {
+        if (isCode(message)) {
+            Matcher matcher = PATTERN_DOUBLE_CODE.matcher(message);
+            if (matcher.find()) {
+                return matcher.group(1).split(CODE_SPLIT);
+            }
+        }
+        throw new BaseException(CodeEnum.ERROR);
+    }
 
     public static void throwIfFatal(@NonNull Throwable t) {
         // values here derived from https://github.com/ReactiveX/RxJava/issues/748#issuecomment-32471495

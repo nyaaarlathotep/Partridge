@@ -1,7 +1,9 @@
 package cn.nyaaar.partridgemngservice.exception;
 
-import cn.nyaaar.partridgemngservice.common.enums.IResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.error.IResponseEnum;
 import lombok.Getter;
+
+import java.io.Serial;
 
 /**
  * <p>基础异常类，所有自定义异常类都需要继承本类</p>
@@ -9,6 +11,7 @@ import lombok.Getter;
 @Getter
 public class BaseException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

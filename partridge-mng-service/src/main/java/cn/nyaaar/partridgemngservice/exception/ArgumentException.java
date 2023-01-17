@@ -1,6 +1,8 @@
 package cn.nyaaar.partridgemngservice.exception;
 
-import cn.nyaaar.partridgemngservice.common.enums.IResponseEnum;
+import cn.nyaaar.partridgemngservice.common.enums.error.IResponseEnum;
+
+import java.io.Serial;
 
 /**
  * <p>参数异常</p>
@@ -9,6 +11,7 @@ import cn.nyaaar.partridgemngservice.common.enums.IResponseEnum;
  */
 public class ArgumentException extends BaseException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ArgumentException(IResponseEnum responseEnum, Object[] args, String message) {
