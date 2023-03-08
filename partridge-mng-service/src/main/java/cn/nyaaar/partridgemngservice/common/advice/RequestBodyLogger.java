@@ -16,10 +16,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdviceAd
 
 import java.lang.reflect.Type;
 
-/**
- * @author yuegenhua
- * @Version $Id: RequestBodyLogger.java, v 0.1 2023-12 17:35 yuegenhua Exp $$
- */
 @ControllerAdvice
 @ConditionalOnProperty(
     prefix = "partridge.webmvc",
@@ -28,7 +24,7 @@ import java.lang.reflect.Type;
 )
 public class RequestBodyLogger extends RequestBodyAdviceAdapter {
   private static final Logger log = LoggerFactory.getLogger(RequestBodyLogger.class);
-  @Value("${saicfc.webmvc.access-logging-enabled:true}")
+  @Value("${partridge.webmvc.access-logging-enabled:false}")
   private boolean accessLoggingEnabled;
 
   public RequestBodyLogger() {

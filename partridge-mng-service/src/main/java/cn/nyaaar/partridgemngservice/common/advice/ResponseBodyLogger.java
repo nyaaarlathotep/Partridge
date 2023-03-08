@@ -26,10 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author yuegenhua
- * @Version $Id: ResponseBodyLogger.java, v 0.1 2023-12 17:55 yuegenhua Exp $$
- */
 @ControllerAdvice
 @ConditionalOnProperty(
     prefix = "partridge.webmvc",
@@ -64,7 +60,7 @@ public class ResponseBodyLogger implements ResponseBodyAdvice<Object> {
   private List<String> responseLoggingIgnoreUriKeyWords;
   @Value("${partridge.webmvc.rest-response-error-wrapper-enabled:false}")
   private boolean restResponseErrorWrapperEnabled;
-  @Value("${partridge.webmvc.access-logging-enabled:true}")
+  @Value("${partridge.webmvc.access-logging-enabled:false}")
   private boolean accessLoggingEnabled;
   @Value("${partridge.webmvc.rest-response-error-wrapper-tpl:TraceId:\t#`[traceId]`<br/>错误码:\t#`[subCode]`<br/>错误信息:\t#`[subMsg]`}")
   private String errTpl;

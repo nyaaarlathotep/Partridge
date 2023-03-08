@@ -3,6 +3,7 @@ package cn.nyaaar.partridgemngservice.service.ehservice;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.nyaaar.partridgemngservice.PartridgeMngServiceApplication;
 import cn.nyaaar.partridgemngservice.entity.EhentaiGallery;
+import cn.nyaaar.partridgemngservice.entity.Element;
 import cn.nyaaar.partridgemngservice.model.eh.DownloadingGallery;
 import cn.nyaaar.partridgemngservice.service.EhentaiGalleryService;
 import cn.nyaaar.partridgemngservice.service.ElementService;
@@ -15,7 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -77,5 +81,27 @@ public class EhServiceTest {
     @Test
     public void getGalleryPageTest() {
         log.info(ehService.getGalleryPage(2312700, 41));
+    }
+
+    @Test
+    public void generateElementData() {
+        for (int i = 46894; i < 1000000; i++) {
+            List<Element> elements = new ArrayList<>();
+            for (int j = 0; j < 100; j++) {
+                Element element = new Element();
+                element.setType(String.valueOf((int) (Math.random() * 10)));
+                element.setFileDir("tettDir");
+                element.setFileSize(((long) (Math.random() * 100000)));
+                element.setCompletedFlag(((int) (Math.random() * 2)));
+                element.setCreatedTime(new Date());
+                element.setUploader("test" + i);
+                element.setPublishedFlag(0);
+                element.setAvailableFlag(0);
+                element.setUpdatedTime(new Date());
+                i++;
+                elements.add(element);
+            }
+            elementService.saveBatch(elements);
+        }
     }
 }
